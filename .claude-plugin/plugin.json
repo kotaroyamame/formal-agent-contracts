@@ -1,7 +1,7 @@
 {
   "name": "formal-agent-contracts",
-  "version": "0.1.0",
-  "description": "Formal methods toolkit for multi-agent development: define agent contracts in VDM-SL, verify specifications, and generate proof obligations with natural language explanations",
+  "version": "0.2.0",
+  "description": "Formal methods toolkit for multi-agent development: define agent contracts in VDM-SL, verify specifications, generate proof obligations, and auto-prove with SMT solver (Z3)",
   "author": {
     "name": "IID Systems"
   },
