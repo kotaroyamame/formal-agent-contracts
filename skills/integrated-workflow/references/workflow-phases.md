@@ -1,8 +1,10 @@
 # Workflow Phase Details — Decision Criteria & Error Recovery
+ワークフローフェーズの詳細 — 判定基準とエラー回復
 
 ## Phase Transition Decision Matrix
 
 Each phase transition has explicit criteria. Claude evaluates these before proceeding.
+各フェーズ遷移には明確な基準がある。Claudeはこれらを評価してから次に進む。
 
 ### Phase 1 → Phase 2 (Define → Verify)
 
@@ -14,6 +16,7 @@ Each phase transition has explicit criteria. Claude evaluates these before proce
 | User confirmed spec | ✅ Yes | Explicit "OK" or equivalent |
 
 **If NOT met**: Stay in Phase 1, explain what's missing.
+**条件未達の場合**: Phase 1に留まり、不足要素を説明する。
 
 ### Phase 2 → Phase 3 (Verify → Prove)
 
@@ -25,7 +28,9 @@ Each phase transition has explicit criteria. Claude evaluates these before proce
 | Z3 available | ⚠️ Conditional | Only if `smt_enabled: true` |
 
 **If syntax/type errors**: Return to Phase 1 with specific error locations and fix suggestions.
+**構文/型エラーの場合**: 具体的なエラー箇所と修正案とともにPhase 1に戻る。
 **If Z3 not available**: Skip Phase 3 automatically → Phase 4.
+**Z3未インストールの場合**: Phase 3を自動スキップ → Phase 4へ。
 
 ### Phase 2 → Phase 4 (Verify → Generate, skipping Prove)
 
@@ -57,8 +62,10 @@ Each phase transition has explicit criteria. Claude evaluates these before proce
 | Target runtime available | ⚠️ Conditional | Node.js for TS, Python 3 for Python |
 
 ## Error Recovery Patterns
+## エラー回復パターン
 
 ### Pattern 1: Specification Error Loop
+仕様エラーループ — VDMJがPhase 2でエラーを報告した場合の修正サイクル
 
 ```
 Phase 1 (Define) → Phase 2 (Verify) → ERROR → Phase 1 (Fix) → Phase 2 (Re-verify)
@@ -75,8 +82,10 @@ When VDMJ reports errors in Phase 2:
 5. Re-run Phase 2
 
 **Max retries**: 3 automatic attempts. After 3, present all remaining errors and ask user for guidance.
+**最大リトライ**: 自動3回。3回後は全エラーを提示しユーザーに判断を委ねる。
 
 ### Pattern 2: Counterexample Resolution
+反例の解決 — Z3が反例を検出した場合の仕様強化サイクル
 
 ```
 Phase 3 (Prove) → COUNTEREXAMPLE → Phase 1 (Strengthen spec) → Phase 2 → Phase 3
@@ -92,6 +101,7 @@ When Z3 returns `sat` (counterexample found):
    - Restrict type (e.g., `nat1` instead of `nat`)
 
 ### Pattern 3: Code Generation Fallback
+コード生成のフォールバック — VDM-SLパターンが変換不可の場合
 
 ```
 Phase 4 (Generate) → UNSUPPORTED PATTERN → Generate stub + TODO
@@ -104,6 +114,7 @@ When the VDM-SL spec contains patterns that don't map cleanly:
 4. **Higher-order functions**: Generate a function type alias with manual implementation note
 
 ### Pattern 4: Test Failure Diagnosis
+テスト失敗の診断 — スモークテストが失敗した場合の原因特定
 
 ```
 Phase 5 (Test) → FAILURE → Diagnose → Fix generated code → Re-test
@@ -118,6 +129,7 @@ Common test failure causes and fixes:
 ## Phase-Specific Context Propagation
 
 Information flows between phases. Track these across the session:
+フェーズ間で情報が伝播する。セッション全体で以下を追跡する。
 
 ### From Phase 1 (Define)
 - `spec_file_path`: Path to generated `.vdmsl` file
@@ -152,6 +164,7 @@ Information flows between phases. Track these across the session:
 - `failure_details`: Details of each failure
 
 ## Partial Workflow Entry Points
+ユーザーは任意のフェーズからワークフローに参加できる。
 
 ### Entry at Phase 2 (Existing `.vdmsl` file)
 

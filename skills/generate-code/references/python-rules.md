@@ -1,39 +1,39 @@
-# VDM-SL → Python 変換ルール
+# VDM-SL → Python Conversion Rules / VDM-SL → Python 変換ルール
 
-## 型の変換
+## Type Conversion / 型の変換
 
-### 基本型
+### Basic Types / 基本型
 
-| VDM-SL | Python | 型ヒント |
+| VDM-SL | Python | Type Hint / 型ヒント |
 |--------|--------|---------|
 | `bool` | `bool` | `bool` |
-| `nat` | `int` | `int` （ランタイムで `>= 0` 検証） |
-| `nat1` | `int` | `int` （ランタイムで `>= 1` 検証） |
+| `nat` | `int` | `int` (runtime: `>= 0`) |
+| `nat1` | `int` | `int` (runtime: `>= 1`) |
 | `int` | `int` | `int` |
 | `real` | `float` | `float` |
-| `char` | `str` | `str` （1文字） |
+| `char` | `str` | `str` (1 char) |
 | `token` | `str` | `str` |
 
-NewTypeで厳密に表現する場合:
+For stricter representation using NewType: / NewTypeで厳密に表現する場合:
 ```python
 from typing import NewType
 
 UserId = NewType('UserId', int)
 ```
 
-### 複合型
+### Compound Types / 複合型
 
-| VDM-SL | Python型ヒント |
+| VDM-SL | Python Type Hint / Python型ヒント |
 |--------|---------------|
 | `seq of T` | `list[T]` |
-| `seq1 of T` | `list[T]` （ランタイムで `len > 0` 検証） |
+| `seq1 of T` | `list[T]` (runtime: `len > 0` / ランタイム検証) |
 | `set of T` | `set[T]` |
-| `set1 of T` | `set[T]` （ランタイムで `len > 0` 検証） |
+| `set1 of T` | `set[T]` (runtime: `len > 0` / ランタイム検証) |
 | `map K to V` | `dict[K, V]` |
 | `[T]` (option) | `T \| None` |
 | `T1 \| T2` (union) | `T1 \| T2` |
 
-### レコード型 → dataclass + バリデーション
+### Record Types → dataclass + Validation / レコード型 → dataclass + バリデーション
 
 ```
 VDM-SL:
@@ -54,7 +54,7 @@ class User:
     age: int
 
     def __post_init__(self) -> None:
-        """不変条件チェック (inv_User)"""
+        """Invariant check (inv_User) / 不変条件チェック"""
         if contracts_enabled():
             assert len(self.name) > 0, \
                 f"User invariant: name must be non-empty, got '{self.name}'"
@@ -66,10 +66,9 @@ class User:
                 f"User invariant: age <= 150 failed, got {self.age}"
 ```
 
-`frozen=True` にすることで不変（イミュータブル）なレコードを表現する。
-VDM-SLのレコードは値型であり、変更は新しいインスタンスの生成で表現される。
+Using `frozen=True` to represent immutable records. VDM-SL records are value types; modifications are expressed by creating new instances. / `frozen=True` にすることで不変（イミュータブル）なレコードを表現する。VDM-SLのレコードは値型であり、変更は新しいインスタンスの生成で表現される。
 
-### 型の別名
+### Type Aliases / 型の別名
 
 ```
 VDM-SL: UserId = nat1;
@@ -82,9 +81,9 @@ def is_valid_user_id(uid: int) -> bool:
     return isinstance(uid, int) and uid >= 1
 ```
 
-## 関数の変換
+## Function Conversion / 関数の変換
 
-### 明示的定義あり
+### With Explicit Definition / 明示的定義あり
 
 ```
 VDM-SL:
@@ -111,7 +110,7 @@ def find_user(uid: UserId, users: dict[UserId, User]) -> User:
     return result
 ```
 
-### 暗黙的定義（スタブ生成）
+### Implicit Definition (stub generation) / 暗黙的定義（スタブ生成）
 
 ```
 VDM-SL:
@@ -146,9 +145,9 @@ def sqrt(x: float) -> float:
     return result
 ```
 
-## 操作（operation）の変換
+## Operation Conversion / 操作（operation）の変換
 
-操作はクラスのメソッドとして生成する。
+Operations are generated as class methods. / 操作はクラスのメソッドとして生成する。
 
 ```python
 class UserDB:
@@ -165,7 +164,7 @@ class UserDB:
         self._check_invariant()
 
     def _check_invariant(self) -> None:
-        """状態不変条件"""
+        """State invariant / 状態不変条件"""
         if not contracts_enabled():
             return
         assert self._next_id not in self._users, \
@@ -173,7 +172,7 @@ class UserDB:
 
     @property
     def users(self) -> dict[UserId, User]:
-        return dict(self._users)  # コピーを返す
+        return dict(self._users)  # Return a copy / コピーを返す
 
     @property
     def next_id(self) -> UserId:
@@ -212,7 +211,7 @@ class UserDB:
         return uid
 ```
 
-## 契約検証の基盤コード
+## Contract Verification Infrastructure / 契約検証の基盤コード
 
 ```python
 # contracts.py
@@ -220,16 +219,16 @@ class UserDB:
 import os
 
 class ContractError(AssertionError):
-    """契約違反エラー"""
+    """Contract violation error / 契約違反エラー"""
     def __init__(self, message: str) -> None:
         super().__init__(f"[Contract Violation] {message}")
 
 def contracts_enabled() -> bool:
-    """契約チェックの有効/無効（環境変数で制御）"""
+    """Enable/disable contract checking (controlled by env var) / 契約チェックの有効/無効（環境変数で制御）"""
     return os.environ.get('VDM_CONTRACT_CHECK', 'on') != 'off'
 ```
 
-## VDM-SL式の変換パターン
+## VDM-SL Expression Mapping Patterns / VDM-SL式の変換パターン
 
 | VDM-SL式 | Python |
 |---------|--------|
@@ -246,7 +245,7 @@ def contracts_enabled() -> bool:
 | `m1 munion m2` | `{**m1, **m2}` |
 | `m ++ {k \|-> v}` | `{**m, k: v}` |
 | `{k} <-: m` | `{k2: v for k2, v in m.items() if k2 != k}` |
-| `mk_T(a, b)` | `T(a=a, b=b)` （dataclass） |
+| `mk_T(a, b)` | `T(a=a, b=b)` (dataclass / dataclass) |
 | `r.field` | `r.field` |
 | `if P then A else B` | `A if P else B` |
 | `let x = e in body` | `(lambda x: body)(e)` or ブロック |
@@ -254,15 +253,15 @@ def contracts_enabled() -> bool:
 | `forall x in set S & P(x)` | `all(P(x) for x in S)` |
 | `exists x in set S & P(x)` | `any(P(x) for x in S)` |
 
-## 命名規則
+## Naming Conventions / 命名規則
 
 | VDM-SL | Python |
 |--------|--------|
-| `UserId` (型) | `UserId` (NewType or type alias) |
-| `mk_User` (コンストラクタ) | `User(...)` (dataclass) |
-| `inv_User` (不変条件) | `__post_init__` 内 |
-| `pre_findUser` (事前条件) | 関数内のガード節 |
-| `RegisterUser` (操作) | `register_user` (snake_case) |
-| `UserDB` (状態) | `UserDB` (class, PascalCase) |
-| `findUser` (関数) | `find_user` (snake_case) |
-| `isAdult` (関数) | `is_adult` (snake_case) |
+| `UserId` (Type / 型) | `UserId` (NewType or type alias) |
+| `mk_User` (Constructor / コンストラクタ) | `User(...)` (dataclass) |
+| `inv_User` (Invariant / 不変条件) | `__post_init__` 内 |
+| `pre_findUser` (Pre-condition / 事前条件) | 関数内のガード節 |
+| `RegisterUser` (Operation / 操作) | `register_user` (snake_case) |
+| `UserDB` (State / 状態) | `UserDB` (class, PascalCase) |
+| `findUser` (Function / 関数) | `find_user` (snake_case) |
+| `isAdult` (Function / 関数) | `is_adult` (snake_case) |

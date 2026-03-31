@@ -1,6 +1,8 @@
 # Session Report Template
+セッションレポートテンプレート
 
 Use this template to generate the final report after workflow completion (or partial completion).
+ワークフロー完了後（または部分完了後）に最終レポートを生成するテンプレート。
 
 ## Template
 
@@ -105,19 +107,21 @@ The following items require manual implementation:
 ```
 
 ## Status Emoji Reference
+ステータス絵文字リファレンス
 
-| Status | Emoji | Meaning |
-|--------|-------|---------|
-| Completed successfully | ✅ | Phase passed all criteria |
-| Completed with warnings | ⚠️ | Phase completed but issues noted |
-| Failed | ❌ | Phase did not pass criteria |
-| Skipped | ⏭ | Phase intentionally skipped |
-| Not reached | ⬜ | Workflow ended before this phase |
+| Status | Emoji | Meaning | 意味 |
+|--------|-------|---------|------|
+| Completed successfully | ✅ | Phase passed all criteria | 全基準クリア |
+| Completed with warnings | ⚠️ | Phase completed but issues noted | 完了（注意事項あり） |
+| Failed | ❌ | Phase did not pass criteria | 基準未達 |
+| Skipped | ⏭ | Phase intentionally skipped | 意図的にスキップ |
+| Not reached | ⬜ | Workflow ended before this phase | 未到達 |
 
 ## Report Generation Rules
+レポート生成ルール
 
 1. **Always generate a report** — even if workflow was interrupted or partially completed
 2. **Use actual data** — never use placeholder values; omit sections if data is unavailable
 3. **Be specific** — include file paths, actual counts, actual PO expressions
 4. **Actionable next steps** — tailor recommendations to the actual session results
-5. **Bilingual support** — generate in the language the user has been using (Japanese or English)
+5. **Bilingual support** — generate in the language the user has been using (Japanese or English). ユーザーが使用している言語（日本語または英語）でレポートを生成する

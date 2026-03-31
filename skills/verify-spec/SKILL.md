@@ -1,137 +1,159 @@
 ---
 name: verify-spec
 description: >
-  VDM-SL仕様ファイルの検証を実行する。「仕様を検証して」「VDMファイルをチェックして」
-  「型チェックして」「PO（証明責務）を生成して」「仕様に問題がないか確認して」
-  「エラーがないかチェックして」「.vdmslファイルを検証」といったリクエストに使用する。
-  VDMJを使って構文チェック・型チェック・PO生成を実行し、結果を形式手法の知識がない
-  開発者にもわかるように自然言語で解説する。
+  Verify VDM-SL specification files. Triggered by requests like "verify the spec",
+  "check the VDM file", "type check", "generate proof obligations", "check for errors",
+  or "verify the .vdmsl file".
+  Also responds to Japanese: 「仕様を検証して」「型チェックして」「PO生成して」等。
+  Runs VDMJ syntax/type checks and PO generation, then explains results in plain language
+  accessible to developers without formal methods expertise.
 metadata:
   version: "0.1.0"
 ---
 
-# VDM-SL仕様の検証
+# VDM-SL Specification Verification
+
+Verify VDM-SL specification files using the VDMJ toolchain and explain results in plain language.
 
 VDMJツールチェーンを使ってVDM-SL仕様ファイルを検証し、結果をわかりやすく解説する。
 
-## 前提条件
+## Prerequisites
 
-VDMJのJARファイルが必要。以下の優先順でJARを探す:
+VDMJ JAR file is required. Search in this priority order:
 
-1. ワークスペース内の `vdmj/vdmj/target/vdmj-*.jar`
+1. `vdmj/vdmj/target/vdmj-*.jar` in the workspace
 2. `~/.vdmj/vdmj.jar`
-3. 見つからない場合はユーザーに取得方法を案内する
+3. If not found, guide the user on how to obtain it
 
-JARのパスを特定したら、以降のコマンドで使用する。
+VDMJのJARファイルが必要。上記の優先順で探索する。
 
-## 検証の実行手順
+## Verification Steps
 
-### Step 1: VDM-SLファイルの特定
+### Step 1: Locate VDM-SL Files
 
-ユーザーが指定したファイル、またはワークスペース内の `.vdmsl` ファイルを特定する。
-複数ファイルがある場合はすべてVDMJに渡す（モジュール間の依存関係を解決するため）。
+Identify the file specified by the user, or find all `.vdmsl` files in the workspace.
+Pass all files to VDMJ together (to resolve inter-module dependencies).
+
+ユーザー指定のファイル、またはワークスペース内の `.vdmsl` ファイルを特定する。
 
 ```bash
-# ファイル探索
+# File discovery
 find . -name "*.vdmsl" -type f
 ```
 
-### Step 2: 構文チェック + 型チェック
+### Step 2: Syntax Check + Type Check
 
 ```bash
 java -jar <VDMJ_JAR> -vdmsl <files...> 2>&1
 ```
 
-出力を解析し、以下を報告する:
-- 構文エラー（syntax error）→ ファイル名・行番号・エラー内容を日本語で説明
-- 型エラー（type error）→ 何が型の不一致を起こしているか平易に説明
-- 警告（warning）→ 未使用の定義など
+Parse the output and report:
+- Syntax errors → explain the file name, line number, and error in plain language
+- Type errors → explain what caused the type mismatch in simple terms
+- Warnings → unused definitions, etc.
 
-エラーがある場合はここで修正を提案し、Step 3には進まない。
+If errors are found, suggest fixes and do NOT proceed to Step 3.
 
-### Step 3: PO生成
+出力を解析し、構文エラー・型エラー・警告を平易に報告する。
+エラーがある場合は修正を提案し、Step 3には進まない。
 
-型チェックが通ったら、証明責務（PO）を生成する:
+### Step 3: PO Generation
+
+Once type checking passes, generate proof obligations (POs):
+
+型チェック通過後、証明責務（PO）を生成する:
 
 ```bash
 java -jar <VDMJ_JAR> -vdmsl <files...> -p 2>&1
 ```
 
-### Step 4: PO結果の解説
+### Step 4: PO Result Explanation
 
-生成された各POについて、以下の形式で解説する:
+Explain each generated PO in the following format:
 
-**PO #N: [PO種別]** （[定義名]）
-- **場所**: ファイル名:行番号
-- **何を確認しているか**: 〈開発者向けの平易な説明〉
-- **PO式**: 〈VDM-SLの式〉
-- **判定の見通し**: 〈自明/要検討/要注意〉
+**PO #N: [PO Type]** ([Definition Name])
+- **Location**: filename:line
+- **What it checks**: Plain language explanation for developers
+- **PO expression**: The VDM-SL expression
+- **Assessment**: Trivial / Needs review / Attention required
 
-#### 判定の見通しの基準
+各POについて場所・何を確認しているか・PO式・判定の見通しを解説する。
 
-- **自明**: 事前条件から直接導かれる、定義から明らか
-- **要検討**: 論理的には正しそうだが、条件の組み合わせが複雑
-- **要注意**: 不変条件の維持が微妙、または反例が存在する可能性がある
+#### Assessment Criteria
 
-### Step 5: サマリーの提示
+- **Trivial** (自明): Directly derivable from pre-conditions or obvious from definitions
+- **Needs review** (要検討): Logically likely correct but complex condition combinations
+- **Attention required** (要注意): Invariant maintenance is delicate or counterexamples may exist
+
+### Step 5: Present Summary
+
+Present a summary of all PO results:
 
 全PO結果のサマリーを提示する:
 
 ```
-## 検証サマリー
+## Verification Summary / 検証サマリー
 
-- 構文チェック: OK / NG
-- 型チェック: OK / NG（エラー数）
-- 証明責務: N件生成
-  - 自明: X件
-  - 要検討: Y件
-  - 要注意: Z件
+- Syntax check: OK / NG
+- Type check: OK / NG (error count)
+- Proof obligations: N generated
+  - Trivial: X
+  - Needs review: Y
+  - Attention required: Z
 ```
 
-「要注意」のPOがある場合は、仕様の修正案を具体的に提案する。
+If any POs are marked "Attention required", propose specific spec modifications.
 
-## PO種別の日本語対応表
+「要注意」のPOがある場合は仕様の修正案を具体的に提案する。
 
-POの種別を日本語で説明するとき、以下を参考にする。
-詳細は formal-methods-guide スキルの `references/po-types-detail.md` を参照。
+## PO Type Reference
 
-| 英語表記 | 日本語説明 |
-|---------|-----------|
-| subtype obligation | 部分型義務 — 値が型の制約に適合するか |
-| invariant satisfiability | 不変条件充足 — 制約を満たす値が存在するか |
-| map apply obligation | 写像適用義務 — キーが写像に存在するか |
-| total function obligation | 全域関数義務 — 条件式が正しく評価できるか |
-| func post condition | 関数事後条件 — 関数が事後条件を満たすか |
-| operation postcondition | 操作事後条件 — 操作後に事後条件が成立するか |
-| state invariant | 状態不変条件 — 操作後も状態の整合性が維持されるか |
-| map compatible | 写像互換性 — 写像結合時にキーの衝突がないか |
-| state init | 状態初期化 — 初期状態が不変条件を満たすか |
+| English | Japanese | Description |
+|---------|----------|-------------|
+| subtype obligation | 部分型義務 | Whether a value conforms to type constraints |
+| invariant satisfiability | 不変条件充足 | Whether a value satisfying the constraint can exist |
+| map apply obligation | 写像適用義務 | Whether a key exists in the map |
+| total function obligation | 全域関数義務 | Whether condition expressions evaluate correctly |
+| func post condition | 関数事後条件 | Whether the function satisfies its post-condition |
+| operation postcondition | 操作事後条件 | Whether the operation satisfies its post-condition |
+| state invariant | 状態不変条件 | Whether state consistency is maintained after an operation |
+| map compatible | 写像互換性 | Whether keys don't conflict when merging maps |
+| state init | 状態初期化 | Whether the initial state satisfies the invariant |
 
-## エラー時の対応パターン
+For details, see the formal-methods-guide skill's `references/po-types-detail.md`.
 
-### 構文エラー
-- `Expected ...` → 期待されるトークンを示し、VDM-SLの正しい構文を提示
-- よくある間違い: `==` と `=` の混同、セミコロンの位置、`end` の忘れ
+## Error Handling Patterns
 
-### 型エラー
-- `Name '...' is not in scope` → モジュールのimport漏れ、または変数のスコープの問題
-- `Type mismatch` → 期待される型と実際の型を対比して説明
+### Syntax Errors
+- `Expected ...` → show the expected token and present correct VDM-SL syntax
+- Common mistakes: confusing `==` with `=`, semicolon placement, missing `end`
 
-### PO関連の問題
-- 大量のPOが生成される場合 → 型の制約が複雑すぎる可能性を指摘
-- invariant satisfiabilityが怪しい場合 → 不変条件が矛盾していないか確認
+### Type Errors
+- `Name '...' is not in scope` → missing module import or variable scope issue
+- `Type mismatch` → contrast expected type vs actual type
 
-## SMT検証への連携
+### PO-Related Issues
+- Too many POs generated → type constraints may be overly complex
+- Suspicious invariant satisfiability → check if the invariant is contradictory
 
-PO生成が完了し、ユーザーが証明を望む場合は **smt-verify** スキルに連携する。
-サマリー提示後、以下のように案内する:
+構文エラー・型エラー・PO関連の問題への対処パターン。
 
-> POの自動証明を行いたい場合は「POをSMTで検証して」とお伝えください。
-> Z3ソルバーを使って各POの正しさを自動的に確認できます。
+## Handoff to SMT Verification
 
-## 重要な注意事項
+After PO generation, if the user wants proofs, hand off to the **smt-verify** skill.
+After presenting the summary, guide:
 
-- VDMJの出力は英語のため、必ず日本語に翻訳して説明する
+> To automatically prove POs, say "verify POs with SMT" or 「POをSMTで検証して」.
+> The Z3 solver can automatically check each PO's correctness.
+
+## Important Notes
+
+- VDMJ output is in English — always translate and explain in the user's language
+- Minimize formal methods jargon; use intuitive expressions developers can understand
+- Don't just show PO expressions — always add a plain language explanation of "what it checks"
+- Include concrete code in fix proposals
+
+- VDMJの出力は英語のため、ユーザーの言語に翻訳して説明する
 - 形式手法の専門用語は最小限にし、開発者が直感的に理解できる表現を使う
-- PO式をそのまま提示するだけでなく、「何を確認しているか」を必ず自然言語で添える
-- エラーの修正提案は具体的なコードを添えて行う
+- PO式だけでなく「何を確認しているか」を必ず自然言語で添える
+- 修正提案は具体的なコードを添えて行う

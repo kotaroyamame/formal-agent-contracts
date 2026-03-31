@@ -1,20 +1,20 @@
-# VDM-SL → TypeScript 変換ルール
+# VDM-SL → TypeScript Conversion Rules / VDM-SL → TypeScript 変換ルール
 
-## 型の変換
+## Type Conversion / 型の変換
 
-### 基本型
+### Basic Types / 基本型
 
-| VDM-SL | TypeScript | 備考 |
+| VDM-SL | TypeScript | Notes / 備考 |
 |--------|-----------|------|
 | `bool` | `boolean` | |
-| `nat` | `number` | ランタイムで `>= 0` を検証 |
-| `nat1` | `number` | ランタイムで `>= 1` を検証 |
+| `nat` | `number` | Runtime check: `>= 0` / ランタイム検証 |
+| `nat1` | `number` | Runtime check: `>= 1` / ランタイム検証 |
 | `int` | `number` | |
 | `real` | `number` | |
-| `char` | `string` | 1文字の文字列 |
-| `token` | `symbol` または `string` | ブランド型推奨 |
+| `char` | `string` | Single character string / 1文字の文字列 |
+| `token` | `symbol` または `string` | Branded type recommended / ブランド型推奨 |
 
-nat/nat1 をより厳密に表現したい場合はブランド型を使用:
+Use branded types for stricter nat/nat1 representation: / nat/nat1をより厳密に表現したい場合はブランド型を使用:
 ```typescript
 type Nat = number & { readonly __brand: 'nat' };
 type Nat1 = number & { readonly __brand: 'nat1' };
@@ -25,19 +25,19 @@ function asNat(n: number): Nat {
 }
 ```
 
-### 複合型
+### Compound Types / 複合型
 
 | VDM-SL | TypeScript |
 |--------|-----------|
 | `seq of T` | `T[]` |
-| `seq1 of T` | `T[]` （ランタイムで `.length > 0` 検証） |
+| `seq1 of T` | `T[]` (runtime: `.length > 0`) |
 | `set of T` | `Set<T>` |
-| `set1 of T` | `Set<T>` （ランタイムで `.size > 0` 検証） |
+| `set1 of T` | `Set<T>` (runtime: `.size > 0`) |
 | `map K to V` | `Map<K, V>` |
 | `[T]` (option) | `T \| null` |
 | `T1 \| T2` (union) | `T1 \| T2` |
 
-### レコード型 → interface + ファクトリ関数
+### Record Types → interface + Factory Function / レコード型
 
 ```
 VDM-SL:
@@ -55,7 +55,7 @@ interface User {
   readonly age: number;
 }
 
-/** 不変条件: User */
+/** Invariant: User / 不変条件 */
 function invUser(u: User): boolean {
   return u.name.length > 0
     && u.email.length > 0
@@ -63,7 +63,7 @@ function invUser(u: User): boolean {
     && u.age <= 150;
 }
 
-/** ファクトリ関数: mk_User */
+/** Factory: mk_User / ファクトリ関数 */
 function mkUser(name: string, email: string, age: number): User {
   const u: User = { name, email, age };
   if (!invUser(u)) {
@@ -73,7 +73,7 @@ function mkUser(name: string, email: string, age: number): User {
 }
 ```
 
-### 型の別名
+### Type Aliases / 型の別名
 
 ```
 VDM-SL: UserId = nat1;
@@ -87,9 +87,9 @@ function isValidUserId(id: number): boolean {
 }
 ```
 
-## 関数の変換
+## Function Conversion / 関数の変換
 
-### 明示的定義あり（実装を変換）
+### With Explicit Definition (convert implementation) / 明示的定義あり
 
 ```
 VDM-SL:
@@ -116,7 +116,7 @@ function findUser(uid: UserId, users: Map<UserId, User>): User {
 }
 ```
 
-### 暗黙的定義（スタブ生成）
+### Implicit Definition (generate stub) / 暗黙的定義
 
 ```
 VDM-SL:
@@ -153,9 +153,9 @@ function sqrt(x: number): number {
 }
 ```
 
-## 操作（operation）の変換
+## Operation Conversion / 操作の変換
 
-操作は状態を変更するため、クラスのメソッドとして生成する。
+Operations modify state, so they are generated as class methods. / 操作は状態を変更するため、クラスのメソッドとして生成する。
 
 ```
 VDM-SL:
@@ -185,7 +185,7 @@ class UserDB {
     this.checkInvariant();
   }
 
-  /** 状態不変条件 */
+  /** State invariant / 状態不変条件 */
   private checkInvariant(): void {
     if (!contractsEnabled()) return;
     assert(
@@ -194,7 +194,7 @@ class UserDB {
     );
   }
 
-  /** 読み取り専用アクセサ */
+  /** Read-only accessor / 読み取り専用 */
   get users(): ReadonlyMap<UserId, User> { return this._users; }
   get nextId(): UserId { return this._nextId; }
 
@@ -231,14 +231,14 @@ class UserDB {
 }
 ```
 
-## 契約検証の基盤コード
+## Contract Verification Infrastructure / 契約検証の基盤コード
 
-生成するすべてのファイルが依存する共通ユーティリティ:
+Common utilities that all generated files depend on: / 生成ファイルが依存する共通ユーティリティ:
 
 ```typescript
 // contracts.ts
 
-/** 契約違反エラー */
+/** Contract violation error */
 export class ContractError extends Error {
   constructor(message: string) {
     super(`[Contract Violation] ${message}`);
@@ -259,7 +259,7 @@ export function assert(condition: boolean, message: string): asserts condition {
 }
 ```
 
-## VDM-SL式の変換パターン
+## VDM-SL Expression Mapping Patterns / VDM-SL式の変換パターン
 
 | VDM-SL式 | TypeScript |
 |---------|-----------|
@@ -267,7 +267,7 @@ export function assert(condition: boolean, message: string): asserts condition {
 | `e not in set S` | `!S.has(e)` |
 | `dom m` | `new Set(m.keys())` |
 | `rng m` | `new Set(m.values())` |
-| `m(k)` | `m.get(k)!` （事前条件で存在保証） |
+| `m(k)` | `m.get(k)!` (guaranteed by pre-condition / 事前条件で存在保証) |
 | `card S` | `S.size` |
 | `len s` | `s.length` |
 | `s1 ^ s2` | `[...s1, ...s2]` |
@@ -276,18 +276,18 @@ export function assert(condition: boolean, message: string): asserts condition {
 | `m1 munion m2` | `new Map([...m1, ...m2])` |
 | `m ++ {k \|-> v}` | `new Map([...m, [k, v]])` |
 | `{k} <-: m` | `(() => { const r = new Map(m); r.delete(k); return r; })()` |
-| `mk_T(a, b)` | `mkT(a, b)` （ファクトリ関数経由） |
+| `mk_T(a, b)` | `mkT(a, b)` (via factory function / ファクトリ関数経由) |
 | `r.field` | `r.field` |
 | `if P then A else B` | `P ? A : B` |
 | `let x = e in body` | `(() => { const x = e; return body; })()` |
 
-## 命名規則
+## Naming Conventions / 命名規則
 
 | VDM-SL | TypeScript |
 |--------|-----------|
-| `UserId` (型) | `UserId` (type alias) |
-| `mk_User` (コンストラクタ) | `mkUser` (ファクトリ関数) |
-| `inv_User` (不変条件) | `invUser` (検証関数) |
-| `pre_findUser` (事前条件) | 関数内のガード節 |
-| `RegisterUser` (操作) | `registerUser` (メソッド、camelCase) |
-| `UserDB` (状態) | `UserDB` (class) |
+| `UserId` (type / 型) | `UserId` (type alias) |
+| `mk_User` (constructor / コンストラクタ) | `mkUser` (factory function / ファクトリ関数) |
+| `inv_User` (invariant / 不変条件) | `invUser` (validation function / 検証関数) |
+| `pre_findUser` (pre-condition / 事前条件) | guard clause in function / 関数内のガード節 |
+| `RegisterUser` (operation / 操作) | `registerUser` (method, camelCase / メソッド、camelCase) |
+| `UserDB` (state / 状態) | `UserDB` (class) |

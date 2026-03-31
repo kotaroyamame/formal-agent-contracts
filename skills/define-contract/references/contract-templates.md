@@ -1,8 +1,12 @@
-# エージェント間契約テンプレート集
+# Inter-Agent Contract Templates
+
+Contract pattern templates commonly used in multi-agent development, provided as VDM-SL specifications.
 
 マルチエージェント開発で頻出するパターンをVDM-SL仕様のテンプレートとして提供する。
 
-## パターン1: データ変換エージェント
+## Pattern 1: Data Transform Agent
+
+An agent that converts input data to a different format and returns it. No side effects.
 
 入力データを別の形式に変換して返すエージェント。副作用なし。
 
@@ -10,18 +14,18 @@
 module TransformAgent
 definitions
 types
-  InputData :: -- 入力の型定義
+  InputData ::
     field1 : seq1 of char
     field2 : nat;
 
-  OutputData :: -- 出力の型定義
+  OutputData ::
     result : seq1 of char
     score  : real
   inv o == o.score >= 0.0 and o.score <= 1.0;
 
 functions
   transform: InputData -> OutputData
-  transform(input) == -- 実装（暗黙的定義も可）
+  transform(input) ==
     mk_OutputData(input.field1, 0.5)
   pre len input.field1 > 0
   post RESULT.score >= 0.0 and RESULT.score <= 1.0;
@@ -29,9 +33,13 @@ functions
 end TransformAgent
 ```
 
+**Use cases**: Text analysis agent, data formatting agent, scoring agent
+
 **適用例**: テキスト分析エージェント、データ整形エージェント、スコアリングエージェント
 
-## パターン2: CRUD操作エージェント
+## Pattern 2: CRUD Operations Agent
+
+An agent that maintains internal state and provides Create, Read, Update, Delete operations.
 
 内部状態を持ち、作成・読取・更新・削除の操作を提供するエージェント。
 
@@ -59,7 +67,7 @@ operations
     nextId := nextId + 1;
     return id
   )
-  pre true  -- 常に作成可能
+  pre true
   post RESULT in set dom entities;
 
   Read: EntityId ==> Entity
@@ -82,9 +90,13 @@ operations
 end CrudAgent
 ```
 
+**Use cases**: User management agent, task management agent, settings management agent
+
 **適用例**: ユーザー管理エージェント、タスク管理エージェント、設定管理エージェント
 
-## パターン3: パイプラインエージェント
+## Pattern 3: Pipeline Agent
+
+An agent that executes multiple processing steps in order.
 
 複数の処理ステップを順序付きで実行するエージェント。
 
@@ -114,9 +126,13 @@ functions
 end PipelineAgent
 ```
 
+**Use cases**: CI/CD agent, data processing pipeline, workflow engine
+
 **適用例**: CI/CDエージェント、データ処理パイプライン、ワークフローエンジン
 
-## パターン4: 仲介エージェント（Mediator）
+## Pattern 4: Mediator Agent
+
+An agent that mediates messages between multiple agents and handles routing.
 
 複数のエージェント間のメッセージを仲介し、ルーティングするエージェント。
 
@@ -133,7 +149,7 @@ types
 
   RoutingRule :: from    : AgentId
                  to      : AgentId
-                 filter  : seq of char;  -- メッセージフィルタ条件
+                 filter  : seq of char;
 
 state MessageBroker of
   queue : seq of Message
@@ -160,11 +176,9 @@ operations
 
   Receive: AgentId ==> [Message]
   Receive(id) == (
-    -- 先頭からidへのメッセージを探す
     if exists i in set inds queue & queue(i).receiver = id
     then (
       dcl idx : nat1 := 1;
-      -- 最初のマッチを見つける
       while queue(idx).receiver <> id do
         idx := idx + 1;
       dcl msg : Message := queue(idx);
@@ -179,9 +193,13 @@ operations
 end MediatorAgent
 ```
 
+**Use cases**: Event bus, message queue, orchestrator
+
 **適用例**: イベントバス、メッセージキュー、オーケストレーター
 
-## パターン5: バリデーションエージェント
+## Pattern 5: Validation Agent
+
+An agent that validates data and returns results.
 
 データの妥当性を検証し、結果を返すエージェント。
 
@@ -203,7 +221,6 @@ types
 functions
   validate: map seq1 of char to seq of char -> ValidationResult
   validate(data) ==
-    -- 暗黙的定義: 具体的なルールは実装で定義
     mk_ValidationResult(true, [])
   post RESULT.valid = (not exists i in set inds RESULT.issues &
                          RESULT.issues(i).severity = <Error>);
@@ -220,5 +237,7 @@ functions
 
 end ValidationAgent
 ```
+
+**Use cases**: Input validation, schema verification, policy checking
 
 **適用例**: 入力バリデーション、スキーマ検証、ポリシーチェック

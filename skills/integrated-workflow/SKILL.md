@@ -8,6 +8,9 @@ This skill orchestrates the full formal development pipeline for multi-agent sys
 Each phase invokes an existing skill, with automated handoff, error recovery,
 and a final session report summarizing all results.
 
+各フェーズは既存のスキルを呼び出し、フェーズ間の自動ハンドオフ、エラー回復、
+最終セッションレポートの生成を行います。
+
 ## Trigger Conditions
 
 Activate this skill when the user says any of:
@@ -54,6 +57,8 @@ Activate this skill when the user says any of:
    phases_completed: []
    ```
 
+セッションパラメータを収集し、内部状態を初期化する。
+
 ### Phase 1: Define — Contract Definition
 
 **Invoke**: `define-contract` skill
@@ -61,6 +66,8 @@ Activate this skill when the user says any of:
 1. Follow the define-contract SKILL.md flow (5-step dialogue)
 2. Guide the user through natural language → VDM-SL conversion
 3. Save the generated `.vdmsl` file to the workspace
+
+define-contractスキルの対話フローに従い、自然言語→VDM-SL変換を実施する。
 
 **Handoff criteria** → Phase 2:
 - ✅ `.vdmsl` file generated and saved
@@ -90,6 +97,8 @@ Activate this skill when the user says any of:
    - **Critical**: pre/post-condition obligations, state invariant obligations
    - **Standard**: subtype obligations, non-empty set/seq obligations
    - **Info**: let-be-st, cases exhaustiveness
+
+VDMJで構文チェック→型チェック→PO生成を実行し、各POを平易に解説する。
 
 **Handoff criteria** → Phase 3:
 - ✅ Syntax check: PASSED
@@ -124,6 +133,8 @@ If skipped, proceed directly to Phase 4.
    - `unsat` → ✅ Proved (obligation is guaranteed to hold)
    - `sat` → ⚠️ Counterexample found (specification may have a flaw)
    - `unknown`/`timeout` → ℹ️ Could not determine (may need manual review)
+
+各POをSMT-LIBに変換しZ3で検証。反例があれば仕様修正を提案する。
 
 **Handoff criteria** → Phase 4:
 - ✅ All POs processed (proved, counterexample, or unknown)
@@ -160,6 +171,8 @@ If skipped, proceed directly to Phase 4.
    └── index.ts / __init__.py       # Module exports
    ```
 
+検証済み仕様からターゲット言語のコードを生成。ランタイム契約検証を含む。
+
 **Handoff criteria** → Phase 5:
 - ✅ All types converted
 - ✅ All functions/operations generated with contract checks
@@ -194,6 +207,8 @@ If skipped, proceed directly to Phase 4.
 
 3. Report test results
 
+生成コードの動作検証としてスモークテストを生成・実行する。
+
 **Completion criteria**:
 - ✅ All valid-input tests pass
 - ✅ All invalid-input tests correctly catch contract violations
@@ -215,6 +230,8 @@ If skipped, proceed directly to Phase 4.
 
 After all phases complete (or when the user stops), generate a comprehensive session report.
 See `references/session-report-template.md` for the full template.
+
+全フェーズ完了後（またはユーザーが中断した時点で）、包括的なセッションレポートを生成する。
 
 Summary format:
 ```
@@ -261,6 +278,8 @@ Users may enter the workflow at any phase:
 
 Detect the entry point from the user's request and session state.
 
+ユーザーは任意のフェーズからワークフローに参加できる。
+
 ## Integration with Other Skills
 
 This skill acts as an **orchestrator** — it does not duplicate logic from other skills.
@@ -270,6 +289,8 @@ Instead, it:
 2. Delegates to the appropriate skill for each phase
 3. Handles transitions, error recovery, and reporting
 4. Maintains session state across phases
+
+このスキルはオーケストレーターとして機能し、各フェーズの詳細は個別スキルに委譲する。
 
 Reference the individual skill SKILL.md files for phase-specific details:
 - Phase 1: `skills/define-contract/SKILL.md`
