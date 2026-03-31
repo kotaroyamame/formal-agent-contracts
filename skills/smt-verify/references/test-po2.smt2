@@ -2,18 +2,20 @@
 ; exists u : User & ((u.age) <= 150)
 ; 期待結果: unsat（= 元の命題は valid）
 
-; 型宣言
+(set-logic ALL)
+
+; 型宣言（declare-datatypesはコンストラクタリストを二重括弧で囲む）
 (declare-datatypes ((User 0))
-  ((mk_User (name String) (email String) (age Int))))
+  (((mk_User (user_name String) (user_email String) (age Int)))))
 
 ; PO: 否定を assert
 (assert (not
   (exists ((u User))
     (and
-      (>= (age u) 0)             ; nat制約
-      (> (str.len (name u)) 0)   ; seq1制約
-      (> (str.len (email u)) 0)  ; seq1制約
-      (<= (age u) 150)           ; 不変条件
+      (>= (age u) 0)                  ; nat制約
+      (> (str.len (user_name u)) 0)   ; seq1制約
+      (> (str.len (user_email u)) 0)  ; seq1制約
+      (<= (age u) 150)                ; 不変条件
     ))))
 
 (check-sat)

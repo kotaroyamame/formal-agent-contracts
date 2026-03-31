@@ -1,7 +1,9 @@
 # PO → SMT-LIB 変換の具体例
 
 実際のVDMJ PO出力をSMT-LIBに変換した完全な例を示す。
-すべてZ3で検証済み。
+すべてZ3 4.13.0で検証済み。
+
+**重要**: すべてのSMT-LIBファイルは冒頭に `(set-logic ALL)` を記述すること。
 
 ## 例1: invariant satisfiability（最も単純）
 
@@ -15,9 +17,11 @@ exists u : User & ((u.age) <= 150)
 ### SMT-LIB変換
 
 ```smt-lib
+(set-logic ALL)
+
 ; ===== 型宣言 =====
 (declare-datatypes ((User 0))
-  ((mk_User (name String) (email String) (age Int))))
+  (((mk_User (user_name String) (user_email String) (age Int)))))
 
 ; ===== PO: exists u : User & u.age <= 150 =====
 ; 戦略: 否定を assert して unsat を確認
@@ -28,9 +32,9 @@ exists u : User & ((u.age) <= 150)
       ; 型制約: age は nat（>= 0）
       (>= (age u) 0)
       ; 型制約: name は seq1 of char（非空文字列）
-      (> (str.len (name u)) 0)
+      (> (str.len (user_name u)) 0)
       ; 型制約: email は seq1 of char（非空文字列）
-      (> (str.len (email u)) 0)
+      (> (str.len (user_email u)) 0)
       ; 不変条件本体
       (<= (age u) 150)
     ))))
@@ -41,9 +45,10 @@ exists u : User & ((u.age) <= 150)
 
 ### 解説
 - `exists` + `and` パターン（存在量化の型制約は `and` で結合）
-- レコード型は `declare-datatypes` で宣言
+- レコード型は `declare-datatypes` で宣言（コンストラクタリストは二重括弧）
 - `seq1 of char` は `String` + 長さ制約
 - `nat` は `Int` + `>= 0` 制約
+- セレクタ名は `user_name`, `user_email` のようにプレフィックス付与（Z3組込み関数との衝突回避）
 
 ---
 
@@ -59,11 +64,13 @@ exists s : UserDB & (s = mk_UserDB({|->}, 1))
 ### SMT-LIB変換
 
 ```smt-lib
+(set-logic ALL)
+
 ; ===== 型宣言 =====
 (declare-datatypes ((User 0))
-  ((mk_User (name String) (email String) (age Int))))
+  (((mk_User (user_name String) (user_email String) (age Int)))))
 
-; 写像型の宣言
+; 写像型の宣言（declare-datatypesより先に宣言すること）
 (declare-sort Map_UserId_User 0)
 (declare-fun map_apply (Map_UserId_User Int) User)
 (declare-fun map_dom (Map_UserId_User) (Array Int Bool))
@@ -72,9 +79,9 @@ exists s : UserDB & (s = mk_UserDB({|->}, 1))
 (declare-const empty_map Map_UserId_User)
 (assert (forall ((k Int)) (not (select (map_dom empty_map) k))))
 
-; UserDB型
+; UserDB型（Map_UserId_Userを参照するので、declare-sortの後に宣言）
 (declare-datatypes ((UserDB 0))
-  ((mk_UserDB (users Map_UserId_User) (nextId Int))))
+  (((mk_UserDB (users Map_UserId_User) (nextId Int)))))
 
 ; 状態不変条件
 (define-fun inv_UserDB ((s UserDB)) Bool
@@ -113,9 +120,11 @@ findUser: map apply obligation in 'TestPO' at line 20:27
 ### SMT-LIB変換
 
 ```smt-lib
+(set-logic ALL)
+
 ; ===== 型宣言 =====
 (declare-datatypes ((User 0))
-  ((mk_User (name String) (email String) (age Int))))
+  (((mk_User (user_name String) (user_email String) (age Int)))))
 
 (declare-sort Map_UserId_User 0)
 (declare-fun map_apply (Map_UserId_User Int) User)
@@ -123,15 +132,15 @@ findUser: map apply obligation in 'TestPO' at line 20:27
 
 ; ===== 事前条件の定義 =====
 ; pre_findUser(uid, users) == uid in set dom users
-(define-fun pre_findUser ((uid Int) (users Map_UserId_User)) Bool
-  (select (map_dom users) uid))
+(define-fun pre_findUser ((uid Int) (m Map_UserId_User)) Bool
+  (select (map_dom m) uid))
 
 ; ===== PO =====
 (assert (not
-  (forall ((uid Int) (users Map_UserId_User))
+  (forall ((uid Int) (m Map_UserId_User))
     (=> (>= uid 1)  ; UserId = nat1
-        (=> (pre_findUser uid users)
-            (select (map_dom users) uid))))))
+        (=> (pre_findUser uid m)
+            (select (map_dom m) uid))))))
 
 (check-sat)
 ; 期待結果: unsat
@@ -155,22 +164,23 @@ RegisterUser: subtype obligation in 'TestPO' at line 31:36
 ### SMT-LIB変換
 
 ```smt-lib
+(set-logic ALL)
+
 ; ===== 型宣言 =====
 (declare-datatypes ((User 0))
-  ((mk_User (name String) (email String) (age Int))))
+  (((mk_User (user_name String) (user_email String) (age Int)))))
 
 (declare-sort Map_UserId_User 0)
-(declare-fun map_apply (Map_UserId_User Int) User)
 (declare-fun map_dom (Map_UserId_User) (Array Int Bool))
 
 (declare-datatypes ((UserDB 0))
-  ((mk_UserDB (users Map_UserId_User) (nextId Int))))
+  (((mk_UserDB (users Map_UserId_User) (nextId Int)))))
 
 ; ===== 不変条件 =====
 (define-fun inv_User ((u User)) Bool
   (and (>= (age u) 0) (<= (age u) 150)
-       (> (str.len (name u)) 0)
-       (> (str.len (email u)) 0)))
+       (> (str.len (user_name u)) 0)
+       (> (str.len (user_email u)) 0)))
 
 (define-fun inv_UserDB ((db UserDB)) Bool
   (and (>= (nextId db) 1)
@@ -219,16 +229,18 @@ RegisterUser: operation postcondition obligation at line 36:32
 ### SMT-LIB変換
 
 ```smt-lib
-; ===== 型宣言（省略: 上記と同じ） =====
+(set-logic ALL)
+
+; ===== 型宣言 =====
 (declare-datatypes ((User 0))
-  ((mk_User (name String) (email String) (age Int))))
+  (((mk_User (user_name String) (user_email String) (age Int)))))
 
 (declare-sort Map_UserId_User 0)
 (declare-fun map_apply_m (Map_UserId_User Int) User)
 (declare-fun map_dom_m (Map_UserId_User) (Array Int Bool))
 
 (declare-datatypes ((UserDB 0))
-  ((mk_UserDB (users Map_UserId_User) (nextId Int))))
+  (((mk_UserDB (users Map_UserId_User) (nextId Int)))))
 
 (define-fun inv_UserDB ((db UserDB)) Bool
   (and (>= (nextId db) 1)
@@ -271,23 +283,27 @@ RegisterUser: operation postcondition obligation at line 36:32
 ; 確認: RESULT in set dom users_new and users_new(RESULT).name = name
 (assert (not
   (and
-    (select (map_dom_m users_new) uid)              ; RESULT in set dom users_new
-    (= (name (map_apply_m users_new uid)) name_arg) ; users_new(RESULT).name = name
+    (select (map_dom_m users_new) uid)                       ; RESULT in set dom users_new
+    (= (user_name (map_apply_m users_new uid)) name_arg)     ; users_new(RESULT).name = name
   )))
 
 (check-sat)
 ; 期待結果: unsat
 ; 理由:
 ;   1. uid は users_new の定義域に含まれる（munionで追加したため）
-;   2. users_new(uid) = mk_User(name, email, 0) なので .name = name ✓
+;   2. users_new(uid) = mk_User(name, email, 0) なので .user_name = name ✓
 ```
 
 ---
 
 ## SMT-LIB変換の一般手順（まとめ）
 
-1. **型宣言フェーズ**: POに出現するすべての型をSMT-LIBで宣言
-2. **補助定義フェーズ**: inv_T, pre_f, post_f を define-fun で定義
-3. **PO変換フェーズ**: POの式を式マッピングルールに従って変換
-4. **否定+check-sat**: `(assert (not PO_smt))` → `(check-sat)`
-5. **結果解釈**: `unsat` = valid, `sat` = 反例あり, `unknown` = 判定不能
+1. **`(set-logic ALL)` を冒頭に記述** — 文字列・配列・整数理論の併用に必要
+2. **型宣言フェーズ**: POに出現するすべての型をSMT-LIBで宣言
+   - `declare-datatypes` は二重括弧: `(((CtorName (field Sort))))`
+   - セレクタ名のZ3組込み関数との衝突に注意（プレフィックス付与）
+   - 未解釈ソート (`declare-sort`) はそれを使う `declare-datatypes` より先に宣言
+3. **補助定義フェーズ**: inv_T, pre_f, post_f を define-fun で定義
+4. **PO変換フェーズ**: POの式を式マッピングルールに従って変換
+5. **否定+check-sat**: `(assert (not PO_smt))` → `(check-sat)`
+6. **結果解釈**: `unsat` = valid, `sat` = 反例あり, `unknown` = 判定不能

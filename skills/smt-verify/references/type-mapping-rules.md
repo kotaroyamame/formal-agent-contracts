@@ -1,5 +1,20 @@
 # VDM-SL → SMT-LIB 型マッピングルール
 
+## 重要: SMT-LIB構文の注意事項
+
+1. **ファイル冒頭に `(set-logic ALL)` を記述する** — 文字列理論・配列理論・整数理論を併用するため
+2. **`declare-datatypes`の括弧構造** — コンストラクタリストには二重括弧が必要:
+   ```smt-lib
+   ; 正しい: (( ... )) でコンストラクタリストを囲む
+   (declare-datatypes ((TypeName 0))
+     (((CtorName (field1 Sort1) (field2 Sort2)))))
+
+   ; 間違い: 括弧が1段足りない
+   (declare-datatypes ((TypeName 0))
+     ((CtorName (field1 Sort1) (field2 Sort2))))
+   ```
+3. **セレクタ名の衝突回避** — `name`などZ3組込み関数と衝突する可能性のあるセレクタ名にはプレフィックス（例: `user_name`）を付与する
+
 ## 基本型
 
 | VDM-SL型 | SMT-LIBソート | 追加制約 |
@@ -35,19 +50,20 @@ VDM-SL:
 
 SMT-LIB:
   (declare-datatypes ((User 0))
-    ((mk_User (name String) (email String) (age Int))))
+    (((mk_User (user_name String) (user_email String) (age Int)))))
 
   (define-fun inv_User ((u User)) Bool
     (and
       (>= (age u) 0)         ; nat制約
       (<= (age u) 150)       ; 不変条件
-      (> (str.len (name u)) 0)   ; seq1制約
-      (> (str.len (email u)) 0)  ; seq1制約
+      (> (str.len (user_name u)) 0)   ; seq1制約
+      (> (str.len (user_email u)) 0)  ; seq1制約
     ))
 ```
 
 - レコードコンストラクタ `mk_User(...)` → SMT-LIBのdatatypeコンストラクタ `(mk_User ...)`
-- フィールドアクセス `u.name` → datatypeセレクタ `(name u)`
+- フィールドアクセス `u.name` → datatypeセレクタ `(user_name u)`
+- **注意**: `name`などZ3の組込み関数と衝突する可能性があるセレクタ名には `user_` 等のプレフィックスを付与する
 - 不変条件は `inv_TypeName` として `define-fun` で定義
 
 ## seq of char (文字列型)
@@ -190,8 +206,8 @@ SMT-LIB:
 VDM-SL: nat | bool
 SMT-LIB:
   (declare-datatypes ((Union_nat_bool 0))
-    ((union_nat (union_nat_val Int))
-     (union_bool (union_bool_val Bool))))
+    (((union_nat (union_nat_val Int))
+      (union_bool (union_bool_val Bool)))))
 ```
 
 ## オプション型
@@ -200,6 +216,6 @@ SMT-LIB:
 VDM-SL: [nat]  -- nat または nil
 SMT-LIB:
   (declare-datatypes ((Option_nat 0))
-    ((some_nat (option_val Int))
-     (none_nat)))
+    (((some_nat (option_val Int))
+      (none_nat))))
 ```
