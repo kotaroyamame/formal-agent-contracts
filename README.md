@@ -1,86 +1,106 @@
 # Formal Agent Contracts
 
+A formal methods toolkit for multi-agent development. Define inter-agent contracts in VDM-SL and verify them automatically.
+
 マルチエージェント開発における形式手法ツールキット。エージェント間の契約をVDM-SLで定義し、自動検証する。
 
-## 概要
+## Overview / 概要
 
-形式手法の知識がない開発者でも、Claudeの支援により：
+With Claude's assistance, even developers without formal methods expertise can:
 
-- エージェント間のインターフェースを厳密に定義できる
-- 仕様の整合性を自動検証できる
-- 証明責務（Proof Obligation）の意味を理解できる
-- POをSMT-LIBに変換し、Z3ソルバーで自動証明できる（v0.2.0）
-- VDM-SL仕様からTypeScript/Pythonのコードスキャフォールドを自動生成できる（v0.3.0）
+- **Define** agent interfaces rigorously using VDM-SL formal specifications
+- **Verify** specification consistency via syntax/type checking and proof obligation generation
+- **Prove** proof obligations automatically by converting to SMT-LIB and solving with Z3 (v0.2.0)
+- **Generate** TypeScript/Python code scaffolds from VDM-SL specs with runtime contract checks (v0.3.0)
+- **Integrate** the full pipeline — define, verify, prove, generate, and test — in a single guided session (v1.0.0)
 
-## スキル一覧
+形式手法の知識がない開発者でも、Claudeの支援により、エージェント間インターフェースの厳密な定義、仕様の自動検証、POのSMT自動証明、仕様からのコード自動生成、そして統合ワークフローによる一気通貫開発が可能です。
 
-### define-contract（契約定義）
+## Skills / スキル一覧
 
-自然言語でエージェントの役割・入出力を説明すると、VDM-SLの形式仕様に変換する。
+### define-contract — Contract Definition / 契約定義
 
-**トリガー例**: 「エージェントの契約を定義したい」「エージェント間のインターフェースを仕様化したい」
+Describe an agent's role and I/O in natural language, and Claude converts it into a VDM-SL formal specification.
 
-### verify-spec（仕様検証）
+自然言語でエージェントの役割・入出力を説明すると、VDM-SLの形式仕様に変換します。
 
-VDM-SL仕様ファイルに対してVDMJによる構文チェック・型チェック・PO生成を実行し、結果を平易な日本語で解説する。
+**Triggers**: "define an agent contract", "formalize the interface between agents"
 
-**トリガー例**: 「仕様を検証して」「PO（証明責務）を生成して」
+### verify-spec — Specification Verification / 仕様検証
 
-### smt-verify（SMT自動証明） *v0.2.0 NEW*
+Run VDMJ syntax/type checks and proof obligation generation on a VDM-SL spec file, with results explained in plain language.
 
-VDMJが生成したPOをSMT-LIB形式に変換し、Z3ソルバーで自動証明する。変換ルール（型マッピング・式マッピング）に基づいてClaudeがSMT-LIBコードを生成し、Z3の結果（証明成功/反例発見/判定不能）をわかりやすく報告する。
+VDM-SL仕様ファイルに対してVDMJによる構文チェック・型チェック・PO生成を実行し、結果を平易に解説します。
 
-**トリガー例**: 「POをSMTで検証して」「Z3で証明して」「反例を探して」
+**Triggers**: "verify the spec", "generate proof obligations"
 
-### generate-code（コード生成） *v0.3.0 NEW*
+### smt-verify — SMT Automated Proving / SMT自動証明 *(v0.2.0)*
 
-VDM-SL仕様（型、関数、操作）からTypeScriptまたはPythonの実装スキャフォールドを生成する。事前条件・事後条件・不変条件のランタイム検証コードも含めて生成し、契約違反を実行時に検出できる。
+Convert VDMJ-generated POs to SMT-LIB format and prove them with the Z3 solver. Claude generates SMT-LIB code based on type/expression mapping rules and reports results (proved / counterexample found / unknown).
 
-**トリガー例**: 「仕様からコードを生成して」「TypeScriptに変換して」「Pythonコードにして」
+VDMJが生成したPOをSMT-LIB形式に変換し、Z3ソルバーで自動証明します。
 
-### formal-methods-guide（形式手法ガイド）
+**Triggers**: "verify POs with SMT", "prove with Z3", "find counterexamples"
 
-VDM-SLの文法、型システム、PO種別の意味など、形式手法の背景知識を提供する。
+### generate-code — Code Scaffold Generation / コード生成 *(v0.3.0)*
 
-**トリガー例**: 「VDM-SLの文法を教えて」「事前条件とは何か」
+Generate TypeScript or Python implementation scaffolds from VDM-SL specifications (types, functions, operations). Includes runtime verification of pre-conditions, post-conditions, and invariants to detect contract violations at execution time.
 
-## セットアップ
+VDM-SL仕様からTypeScript/Pythonの実装スキャフォールドを生成します。事前条件・事後条件・不変条件のランタイム検証コード付き。
 
-### VDMJ（必須）
+**Triggers**: "generate code from the spec", "convert to TypeScript", "generate Python code"
 
-仕様検証にはVDMJが必要です。以下のいずれかの方法でインストールしてください：
+### integrated-workflow — End-to-End Workflow / 統合ワークフロー *(v1.0.0)*
 
-1. GitHub Releasesからダウンロード: https://github.com/nickbattle/vdmj/releases
-2. ソースからビルド: `git clone https://github.com/nickbattle/vdmj.git && cd vdmj && mvn install`
+Orchestrates the full formal development pipeline in a single session: Define → Verify → Prove → Generate → Test. Handles phase transitions, error recovery (e.g., returning to definition when verification fails), and generates a comprehensive session report.
 
-JARファイルを `~/.vdmj/vdmj.jar` に配置するか、ワークスペースの `vdmj/` ディレクトリにクローンしてください。
+定義→検証→証明→生成→テストの全パイプラインを1セッションで実行します。フェーズ間の遷移、エラー回復、セッションレポート生成を自動的に行います。
 
-### Z3（SMT検証に必要）
+**Triggers**: "run the full workflow", "end-to-end development", 「統合ワークフローで開発したい」「一気通貫で」
 
-SMT自動証明にはZ3ソルバーが必要です：
+### formal-methods-guide — Formal Methods Guide / 形式手法ガイド
+
+Provides background knowledge on VDM-SL syntax, type system, and the meaning of each PO type.
+
+VDM-SLの文法、型システム、PO種別の意味など、形式手法の背景知識を提供します。
+
+**Triggers**: "explain VDM-SL syntax", "what is a pre-condition"
+
+## Setup / セットアップ
+
+### VDMJ (Required / 必須)
+
+VDMJ is required for specification verification. Install via one of:
+
+1. Download from [GitHub Releases](https://github.com/nickbattle/vdmj/releases)
+2. Build from source: `git clone https://github.com/nickbattle/vdmj.git && cd vdmj && mvn install`
+
+Place the JAR file at `~/.vdmj/vdmj.jar` or clone into the `vdmj/` directory of your workspace.
+
+### Z3 (Required for SMT verification / SMT検証に必要)
 
 ```bash
 pip install z3-solver
 ```
 
-または https://github.com/Z3Prover/z3/releases からバイナリをダウンロード。
+Or download binaries from https://github.com/Z3Prover/z3/releases
 
-### 動作環境
+### Requirements / 動作環境
 
-- Java 11以上（VDMJ用）
-- Python 3.8以上（Z3用、pip install の場合）
+- Java 11+ (for VDMJ)
+- Python 3.8+ (for Z3 via pip)
 
-## 開発ロードマップ
+## Roadmap / 開発ロードマップ
 
-- [x] v0.1.0 — 契約テンプレート、構文/型チェック、PO生成と自然言語解説
-- [x] v0.2.0 — SMT-LIB自動変換とZ3による証明（VDM-SMT Bridge Phase 1対応）
-- [x] v0.3.0 — 仕様からコードスキャフォールドの自動生成（TypeScript/Python、ランタイム契約検証付き）
-- [ ] v1.0.0 — 統合ワークフロー（定義→検証→生成→テストの一気通貫）
+- [x] v0.1.0 — Contract templates, syntax/type checking, PO generation with natural language explanation
+- [x] v0.2.0 — SMT-LIB auto-conversion and Z3 automated proving (VDM-SMT Bridge Phase 1)
+- [x] v0.3.0 — Code scaffold generation from specs (TypeScript/Python with runtime contract checks)
+- [x] v1.0.0 — Integrated workflow (define → verify → prove → generate → test, end-to-end)
 
-## 作者
+## Author / 作者
 
 IID Systems (https://iid.systems)
 
-## ライセンス
+## License / ライセンス
 
 MIT
