@@ -1,0 +1,124 @@
+module TaskManager
+
+definitions
+
+types
+  TaskId = nat1;
+
+  Priority = <Low> | <Medium> | <High>;
+
+  Status = <Todo> | <InProgress> | <Done>;
+
+  Task :: id       : TaskId
+          title    : seq1 of char
+          desc     : seq of char
+          status   : Status
+          priority : Priority
+          assignee : [seq1 of char]
+  inv t == len t.title <= 100 and len t.desc <= 500;
+
+  TaskBoard = map TaskId to Task
+  inv board == forall id in set dom board & board(id).id = id;
+
+state TaskManagerState of
+  board   : TaskBoard
+  nextId  : TaskId
+inv mk_TaskManagerState(board, nextId) ==
+  (forall id in set dom board & id < nextId) and
+  nextId >= 1
+init s == s = mk_TaskManagerState({|->}, 1)
+end
+
+functions
+  -- Check if a status transition is valid
+  -- Allowed: Todo->InProgress, Todo->Done, InProgress->Done, InProgress->Todo
+  -- Denied:  Done->Todo, Done->InProgress
+  -- Same status is always valid (no-op)
+  ValidTransition: Status * Status -> bool
+  ValidTransition(fromSt, toSt) ==
+    if fromSt = toSt then true
+    else if fromSt = <Done> then false
+    else true;
+
+  -- Filter tasks by status
+  FilterByStatus: TaskBoard * Status -> set of Task
+  FilterByStatus(board, s) ==
+    {board(id) | id in set dom board & board(id).status = s};
+
+  -- Filter tasks by priority
+  FilterByPriority: TaskBoard * Priority -> set of Task
+  FilterByPriority(board, p) ==
+    {board(id) | id in set dom board & board(id).priority = p};
+
+  -- Count tasks by status
+  CountByStatus: TaskBoard * Status -> nat
+  CountByStatus(board, s) ==
+    card {id | id in set dom board & board(id).status = s};
+
+  -- Get tasks assigned to a specific person
+  GetAssignedTasks: TaskBoard * seq1 of char -> set of Task
+  GetAssignedTasks(board, person) ==
+    {board(id) | id in set dom board & board(id).assignee = person};
+
+operations
+  -- Create a new task
+  CreateTask: seq1 of char * seq of char * Priority * [seq1 of char] ==> TaskId
+  CreateTask(title, desc, priority, assignee) ==
+  (
+    dcl newId : TaskId := nextId;
+    dcl newTask : Task := mk_Task(newId, title, desc, <Todo>, priority, assignee);
+    board := board munion {newId |-> newTask};
+    nextId := nextId + 1;
+    return newId
+  )
+  pre len title <= 100 and len desc <= 500
+  post RESULT = nextId~ - 1 and
+       RESULT in set dom board and
+       board(RESULT).title = title and
+       board(RESULT).status = <Todo>;
+
+  -- Change task status with transition validation
+  ChangeStatus: TaskId * Status ==> ()
+  ChangeStatus(taskId, newStatus) ==
+  (
+    dcl task : Task := board(taskId);
+    dcl updated : Task := mk_Task(task.id, task.title, task.desc,
+                                   newStatus, task.priority, task.assignee);
+    board := board ++ {taskId |-> updated}
+  )
+  pre taskId in set dom board and
+      ValidTransition(board(taskId).status, newStatus)
+  post board(taskId).status = newStatus and
+       board(taskId).title = board~(taskId).title;
+
+  -- Update task details (title, description, priority, assignee)
+  UpdateTask: TaskId * seq1 of char * seq of char * Priority * [seq1 of char] ==> ()
+  UpdateTask(taskId, title, desc, priority, assignee) ==
+  (
+    dcl task : Task := board(taskId);
+    dcl updated : Task := mk_Task(task.id, title, desc,
+                                   task.status, priority, assignee);
+    board := board ++ {taskId |-> updated}
+  )
+  pre taskId in set dom board and
+      len title <= 100 and len desc <= 500
+  post board(taskId).title = title and
+       board(taskId).status = board~(taskId).status;
+
+  -- Delete a task
+  DeleteTask: TaskId ==> ()
+  DeleteTask(taskId) ==
+    board := {taskId} <-: board
+  pre taskId in set dom board
+  post taskId not in set dom board and
+       card dom board = card dom board~ - 1;
+
+  -- Get board summary (todo, in_progress, done counts)
+  GetSummary: () ==> nat * nat * nat
+  GetSummary() ==
+    return mk_(CountByStatus(board, <Todo>),
+               CountByStatus(board, <InProgress>),
+               CountByStatus(board, <Done>))
+  post let mk_(t, i, d) = RESULT in t + i + d = card dom board;
+
+end TaskManager

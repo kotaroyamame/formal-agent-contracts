@@ -66,6 +66,125 @@ VDM-SLの文法、型システム、PO種別の意味など、形式手法の背
 
 **Triggers**: "explain VDM-SL syntax", "what is a pre-condition"
 
+## Quick Start: Usage Example / 使い方の例
+
+This section walks through a real example — building a task management agent — to show what the plugin does at each step. No formal methods knowledge required.
+
+形式手法の知識がなくても大丈夫です。タスク管理アプリを題材に、プラグインの各ステップで何が起きるかを具体的に示します。
+
+### Step 1: Tell Claude what your agent does / エージェントの役割を伝える
+
+Just describe your agent in plain language. Claude will convert it to a formal spec.
+
+自然言語でエージェントの役割を説明するだけで、Claudeが形式仕様に変換します。
+
+```
+You: "タスク管理エージェントを定義して。タスクにはID・タイトル・ステータス（Todo/InProgress/Done）がある。
+      Done からは Todo に戻せないようにしたい。"
+```
+
+Claude generates a VDM-SL specification like this:
+
+```
+Task :: id : nat1  title : seq1 of char  status : Status
+inv t == len t.title <= 100;                          -- title must be ≤ 100 chars
+
+ChangeStatus(taskId, newStatus)
+  pre  taskId in set dom board and                    -- task must exist
+       ValidTransition(board(taskId).status, newStatus) -- transition must be allowed
+  post board(taskId).status = newStatus;              -- status is updated
+```
+
+**What you get:** `pre` = "this must be true *before* calling", `post` = "this will be true *after* calling", `inv` = "this must *always* be true". These are your agent's contract — the rules it promises to follow.
+
+**得られるもの:** `pre`（事前条件）= 呼び出す前に満たすべき条件、`post`（事後条件）= 呼び出し後に保証される結果、`inv`（不変条件）= 常に成り立つルール。これがエージェントの「契約」です。
+
+### Step 2: Claude verifies the spec / 仕様を自動検証
+
+```
+You: "この仕様を検証して"
+```
+
+Claude runs VDMJ and reports results in plain language:
+
+```
+✅ Syntax check: PASSED
+✅ Type check: PASSED
+📋 Proof Obligations: 38 generated
+   - "If you create a task, the new ID must actually be in the board afterward"
+   - "If you delete a task, the board must shrink by exactly 1"
+   - "Changing status must not alter the task's title"
+```
+
+Proof obligations (POs) are questions the tool automatically asks about your spec: "Can this actually go wrong?" You don't write them — they're generated from your `pre`/`post`/`inv` rules.
+
+PO（証明責務）は、仕様から自動的に導出される「この契約は本当に守れるか？」という検証項目です。自分で書く必要はありません。
+
+### Step 3: Generate working code / 動くコードを生成
+
+```
+You: "TypeScriptでコードを生成して"
+```
+
+Claude generates TypeScript (or Python) with runtime contract checks baked in:
+
+```typescript
+changeStatus(taskId: TaskId, newStatus: Status): void {
+  // Pre-conditions (from VDM-SL spec)
+  checkPre(this.board.has(taskId),
+    `taskId ${taskId} not in dom board`);
+  checkPre(validTransition(oldTask.status, newStatus),
+    `Invalid transition: ${oldTask.status} → ${newStatus}`);
+
+  // ... operation body ...
+
+  // Post-conditions (from VDM-SL spec)
+  checkPost(this.board.get(taskId)!.status === newStatus,
+    `status must be ${newStatus}`);
+}
+```
+
+The generated code **enforces your contracts at runtime**. If any rule is violated, you get a clear `ContractError` instead of a silent bug:
+
+```
+[Contract Violation] Pre-condition failed: Invalid transition: Done → InProgress
+```
+
+生成されたコードは契約をランタイムで強制します。違反があれば、原因不明のバグではなく明確な `ContractError` が発生します。
+
+### Step 4: Run the full pipeline at once / 一気通貫で実行
+
+For the fastest experience, use the integrated workflow:
+
+```
+You: "統合ワークフローでタスク管理エージェントを開発して"
+```
+
+Claude runs all phases automatically: Define → Verify → Prove → Generate → Test, with a final session report.
+
+一言で全フェーズを自動実行し、最後にセッションレポートが生成されます。
+
+### Why use this? / なぜ形式手法か
+
+Formal contracts catch bugs that tests miss. Consider:
+
+```
+// Without contracts: this silently succeeds — the bug only shows up later
+task.status = "Todo";  // Was "Done" — should be forbidden!
+
+// With contracts: immediate, clear error
+changeStatus(taskId, "Todo");
+// → ContractError: Invalid transition: Done → Todo
+```
+
+The spec also serves as **living documentation** — it precisely describes what each agent does, what it expects, and what it guarantees, in a way that never goes out of sync with the code.
+
+契約なしでは、Done→Todoの不正な遷移が静かに成功し、バグは後で発覚します。契約ありでは即座に明確なエラーが出ます。仕様はそのまま「生きたドキュメント」にもなります。
+
+A complete working example is available in [`examples/task-manager/`](examples/task-manager/).
+
+完全な動作例は [`examples/task-manager/`](examples/task-manager/) にあります。
+
 ## Setup / セットアップ
 
 ### VDMJ (Required / 必須)
