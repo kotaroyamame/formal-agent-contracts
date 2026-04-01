@@ -185,6 +185,195 @@ A complete working example is available in [`examples/task-manager/`](examples/t
 
 完全な動作例は [`examples/task-manager/`](examples/task-manager/) にあります。
 
+## Prompt Templates / プロンプトテンプレート
+
+Ready-made prompts to get started quickly. Replace `{...}` placeholders with your own domain.
+
+すぐに始められるプロンプトの雛形です。`{...}` の部分を自分のドメインに書き換えて使ってください。
+
+### Template 1: Simple (Single Agent) / シンプル（単一エージェント）
+
+Start minimal and let Claude ask follow-up questions to refine the spec.
+
+最小限の情報で始め、Claudeとの対話で深掘りするパターンです。
+
+```
+{AgentName}エージェントを定義して。
+
+【扱うデータ】
+- {Entity}には{Field1}・{Field2}・{Field3}がある
+- {ステータスや列挙型があれば: ステータスは{Value1}/{Value2}/{Value3}}
+
+【やりたい操作】
+- {Operation 1}
+- {Operation 2}
+
+【守りたいルール】
+- {Business rule 1}
+- {Business rule 2}
+```
+
+**Example / 記入例:**
+
+```
+在庫管理エージェントを定義して。
+
+【扱うデータ】
+- 商品には商品ID・商品名・在庫数・カテゴリがある
+- カテゴリは食品/日用品/家電
+
+【やりたい操作】
+- 入荷（指定数を在庫に加算）
+- 出荷（指定数を在庫から減算）
+- 在庫照会（商品IDで現在の在庫数を返す）
+
+【守りたいルール】
+- 在庫数は0未満にならない
+- 出荷数は現在の在庫数を超えられない
+- 商品名は空文字を許可しない
+```
+
+### Template 2: Multi-Agent / マルチエージェント
+
+For systems where multiple agents collaborate. Explicitly state inter-agent dependencies.
+
+複数エージェントが協調するシステム向け。エージェント間の依存関係を明示します。
+
+```
+以下のマルチエージェントシステムの契約を定義して。
+
+【システム概要】
+{What the system does — 1-2 sentences}
+
+【エージェント構成】
+1. {Agent A} — {Role}
+2. {Agent B} — {Role}
+3. {Agent C} — {Role}
+
+【エージェント間の依存】
+- {Agent A}の{OperationX}の完了後に{Agent B}の{OperationY}が呼ばれる
+- {Agent B}は{Agent C}の{OperationZ}を呼び出して結果を受け取る
+
+【共有するデータ型】
+- {TypeName}: {Description}
+
+【各エージェントの主要ルール】
+- {Agent A}: {Constraint}
+- {Agent B}: {Constraint}
+- {Agent C}: {Constraint}
+```
+
+**Example / 記入例:**
+
+```
+以下のマルチエージェントシステムの契約を定義して。
+
+【システム概要】
+ECサイトの注文処理。注文→在庫引当→決済の3エージェントが協調する。
+
+【エージェント構成】
+1. OrderAgent — 注文の受付・管理
+2. InventoryAgent — 在庫の引当と解放
+3. PaymentAgent — 決済処理
+
+【エージェント間の依存】
+- OrderAgentがConfirmOrderした後、InventoryAgentのReserveStockが呼ばれる
+- ReserveStock成功後、PaymentAgentのChargeが呼ばれる
+- Charge失敗時はInventoryAgentのReleaseStockで在庫を戻す
+
+【共有するデータ型】
+- OrderId: 注文の一意識別子
+- ProductItem: 商品ID・数量のペア
+- OrderStatus: Pending / Confirmed / Paid / Cancelled
+
+【各エージェントの主要ルール】
+- OrderAgent: Paid状態の注文はキャンセルできない
+- InventoryAgent: 在庫数は0未満にならない。引当数は現在庫を超えない
+- PaymentAgent: 与信確認済みでないと売上確定できない
+```
+
+### Template 3: Integrated Workflow / 統合ワークフロー（一気通貫）
+
+Run the full pipeline — define, verify, prove, generate, test — in one shot.
+
+定義から検証・証明・コード生成・テストまで一発で回します。
+
+```
+統合ワークフローで{SystemName}を開発して。
+
+【ドメイン】
+{What the system is for}
+
+【データ】
+- {Entity and its fields}
+
+【操作】
+- {OperationName}: {What it does}（{Precondition if any}）
+
+【絶対に守るルール】
+- {Invariant / business rule}
+
+【生成言語】
+{TypeScript / Python}
+```
+
+**Example / 記入例:**
+
+```
+統合ワークフローで予約管理システムを開発して。
+
+【ドメイン】
+会議室の予約管理。ダブルブッキングを仕様レベルで防ぎたい。
+
+【データ】
+- 会議室: 室ID・名前・定員
+- 予約: 予約ID・室ID・開始時刻・終了時刻・予約者名
+
+【操作】
+- CreateReservation: 新規予約を作成（同じ部屋の時間帯が重複していないこと）
+- CancelReservation: 予約をキャンセル（予約が存在すること）
+- ListByRoom: 指定部屋の予約一覧を返す
+
+【絶対に守るルール】
+- 同一部屋で時間帯が重なる予約は存在できない（不変条件）
+- 開始時刻 < 終了時刻
+- 定員は1以上
+
+【生成言語】
+TypeScript
+```
+
+### Template 4: Formalize Existing Spec / 既存仕様の形式化
+
+When you already have a natural-language spec or API definition, paste it directly.
+
+すでに自然言語の仕様書やAPI定義がある場合、そのまま貼り付けます。
+
+```
+以下の仕様をVDM-SLの形式仕様に変換して。
+
+---
+{Paste your existing spec, API definition, or interface here}
+---
+
+特に以下の点を形式化してほしい:
+- {Ambiguous area 1}
+- {Ambiguous area 2}
+
+形式化したら検証まで実行して。
+```
+
+### Tips for Writing Prompts / プロンプトを書くときのコツ
+
+1. **Be specific about rules** — "Stock must not go below 0" is better than "validate stock". Boundary values become precise pre/post/invariant conditions.
+2. **State inter-agent call order** — For multi-agent systems, "A.post triggers B.pre" is the core of the contract. Making this explicit enables cross-agent verification.
+3. **Start small** — Use Template 1 and let Claude ask follow-up questions. The verify phase will surface missing edge cases.
+4. **Use "統合ワークフローで" for end-to-end** — This triggers the full pipeline (define → verify → prove → generate → test) with automatic error recovery.
+
+See [`prompt-templates.md`](prompt-templates.md) for more details.
+
+プロンプトテンプレートの詳細は [`prompt-templates.md`](prompt-templates.md) を参照してください。
+
 ## Setup / セットアップ
 
 ### VDMJ (Required / 必須)
