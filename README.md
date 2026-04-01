@@ -13,8 +13,9 @@ With Claude's assistance, even developers without formal methods expertise can:
 - **Prove** proof obligations automatically by converting to SMT-LIB and solving with Z3 (v0.2.0)
 - **Generate** TypeScript/Python code scaffolds from VDM-SL specs with runtime contract checks (v0.3.0)
 - **Integrate** the full pipeline — define, verify, prove, generate, and test — in a single guided session (v1.0.0)
+- **Extract** provisional specs from existing code and **refine** them through dialogue to uncover the true specification (v1.1.0–v1.4.0) 🆕
 
-形式手法の知識がない開発者でも、Claudeの支援により、エージェント間インターフェースの厳密な定義、仕様の自動検証、POのSMT自動証明、仕様からのコード自動生成、そして統合ワークフローによる一気通貫開発が可能です。
+形式手法の知識がない開発者でも、Claudeの支援により、エージェント間インターフェースの厳密な定義、仕様の自動検証、POのSMT自動証明、仕様からのコード自動生成、統合ワークフローによる一気通貫開発、さらに既存コードからの仕様あぶり出しと対話的な真の仕様の発見が可能です。
 
 ## Skills / スキル一覧
 
@@ -65,6 +66,38 @@ Provides background knowledge on VDM-SL syntax, type system, and the meaning of 
 VDM-SLの文法、型システム、PO種別の意味など、形式手法の背景知識を提供します。
 
 **Triggers**: "explain VDM-SL syntax", "what is a pre-condition"
+
+### extract-spec — Provisional Spec Extraction / 仮仕様抽出 *(v1.1.0)* 🆕
+
+Read existing source code and extract a **provisional** VDM-SL specification. The extracted spec reflects what the code *currently does*, not what it *should do*. Every item is tagged `[PROVISIONAL]` and framed as a question for user dialogue.
+
+既存のソースコードを読み取り、**仮の** VDM-SL仕様を抽出します。抽出された仕様はコードの「現在の動作」を反映しており、「あるべき動作」ではありません。全項目に `[PROVISIONAL]` タグが付き、ユーザーとの対話のための問いとして提示されます。
+
+**Triggers**: "extract spec from code", "reverse engineer the specification", 「既存のコードから仕様を抽出して」
+
+### refine-spec — Dialogue-Driven Spec Refinement / 対話的仕様あぶり出し *(v1.2.0)* 🆕
+
+The core of the reverse workflow. Takes a provisional spec as a scaffold and conducts structured dialogue with the user to uncover the **true specification** in their mind. Differences between code behavior and user intent are recorded as Findings (Bug / Spec Gap / Intentional / Debt).
+
+リバースワークフローの核心。仮仕様を叩き台として、ユーザーとの構造化された対話を通じて**真の仕様**をあぶり出します。コードの振る舞いとユーザーの意図の食い違いを「発見事項（Finding）」として記録します。
+
+**Triggers**: "refine the spec", "review the provisional spec", 「仕様を磨きたい」「コードの意図を確認したい」
+
+### reconcile-code — Code Reconciliation / コード照合・修正 *(v1.3.0)* 🆕
+
+Compare the confirmed (true) spec against existing code item-by-item. Generate a diff report, produce prioritized code fixes, and auto-generate tests for every spec condition.
+
+確定仕様と既存コードを項目ごとに照合します。差分レポートを生成し、優先度付きのコード修正案を提示し、仕様の各条件に対応するテストを自動生成します。
+
+**Triggers**: "reconcile code with spec", "fix code to match spec", 「仕様とコードを照合して」「コードを直して」
+
+### reverse-workflow — Reverse Engineering Workflow / リバースワークフロー *(v1.4.0)* 🆕
+
+Orchestrates the full reverse pipeline: **Extract → Refine → Reconcile**, then optionally connects to the existing forward pipeline (Verify → Prove → Generate). The counterpart to `integrated-workflow` for existing codebases.
+
+リバースパイプライン全体を統合実行: **抽出→磨き上げ→照合**。完了後、既存のフォワードパイプライン（検証→証明→生成）に接続可能。既存コードベース版の `integrated-workflow` です。
+
+**Triggers**: "reverse workflow", "extract and refine spec from code", 「リバースワークフローで」「コードの仕様を明確にしたい」
 
 ## Quick Start: Usage Example / 使い方の例
 
@@ -404,6 +437,10 @@ Or download binaries from https://github.com/Z3Prover/z3/releases
 - [x] v0.2.0 — SMT-LIB auto-conversion and Z3 automated proving (VDM-SMT Bridge Phase 1)
 - [x] v0.3.0 — Code scaffold generation from specs (TypeScript/Python with runtime contract checks)
 - [x] v1.0.0 — Integrated workflow (define → verify → prove → generate → test, end-to-end)
+- [x] v1.1.0 — Provisional spec extraction from existing code (extract-spec) 🆕
+- [x] v1.2.0 — Dialogue-driven spec refinement to uncover true specifications (refine-spec) 🆕
+- [x] v1.3.0 — Code reconciliation with confirmed specs, auto-test generation (reconcile-code) 🆕
+- [x] v1.4.0 — Reverse workflow orchestrator with forward pipeline connection (reverse-workflow) 🆕
 
 ## Author / 作者
 
