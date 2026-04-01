@@ -1,0 +1,29 @@
+{
+  "name": "formal-agent-contracts",
+  "owner": {
+    "name": "IID Systems",
+    "email": "ando@iid.systems"
+  },
+  "metadata": {
+    "description": "Formal methods toolkit for multi-agent development using VDM-SL",
+    "version": "1.5.0"
+  },
+  "plugins": [
+    {
+      "name": "formal-agent-contracts",
+      "source": ".",
+      "description": "Define agent contracts in VDM-SL, verify specifications, auto-prove with Z3, generate code scaffolds with runtime contract checks, run end-to-end integrated workflows, and reverse-engineer specifications from existing code. Includes evaluation framework with comparative benchmarks.",
+      "version": "1.5.0",
+      "author": {
+        "name": "IID Systems",
+        "email": "ando@iid.systems"
+      },
+      "homepage": "https://iid.systems/formal-agent-contracts/",
+      "repository": "https://github.com/kotaroyamame/formal-agent-contracts",
+      "license": "MIT",
+      "keywords": ["formal-methods", "vdm-sl", "multi-agent", "contracts", "verification", "proof-obligations", "code-generation", "integrated-workflow", "reverse-engineering", "evaluation"],
+      "category": "engineering",
+      "tags": ["formal-methods", "specification", "verification", "multi-agent", "vdm-sl", "z3", "code-generation"]
+    }
+  ]
+}
