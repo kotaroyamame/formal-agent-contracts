@@ -1,0 +1,242 @@
+{
+  "traps": [
+    {
+      "id": "T3-01",
+      "title": "Cascading Time Extensions (Unbounded Retrigger)",
+      "description": "終了5分前に入札があると終了時刻が5分延長される。では、延長後の5分前に再び入札があった場合、さらに5分延長されるか。この動作に上限があるか。理論的には無限延長の可能性がある。",
+      "category": "time_semantics",
+      "severity": "critical",
+      "expected_behavior": [
+        "Case A（無制限延長）: 毎回5分延長",
+        "Case B（上限あり）: 最大N回まで延長",
+        "Case C（段階削減）: 延長幅が減少（5分 → 3分 → 1分）",
+        "仕様で明確に定義すること"
+      ],
+      "scoring": {
+        "correct": 5,
+        "incorrect": -5,
+        "ambiguous": -2
+      }
+    },
+    {
+      "id": "T3-02",
+      "title": "Simultaneous Bids at Exact Same Time",
+      "description": "複数の入札者が同一ミリ秒に同じ金額で入札した場合、どちらが優先されるか。タイムスタンプが同一の場合の順序付けルールが不明。",
+      "category": "concurrency",
+      "severity": "critical",
+      "expected_behavior": [
+        "先着順（受信順序で判定）",
+        "両入札を拒否",
+        "タイムスタンプの分解能を上げる",
+        "明確なルールを定義すること"
+      ],
+      "scoring": {
+        "correct": 5,
+        "incorrect": -5,
+        "ambiguous": -2
+      }
+    },
+    {
+      "id": "T3-03",
+      "title": "Cancel After Payment Timeout (Next Highest Bidder)",
+      "description": "落札後72時間以内に支払いがなくキャンセルされた場合、次点者（2番目の入札者）が自動的に落札するのか、それともオークションが終了するのか、再度入札が開始されるのか。",
+      "category": "state_transition",
+      "severity": "high",
+      "expected_behavior": [
+        "Option A: 次点者が自動落札（その点での金額で決済）",
+        "Option B: 次点者に落札権を提供（支払い期限を設定）",
+        "Option C: オークションは完全に終了",
+        "Option D: 自動再出品（新規オークション開始）",
+        "仕様で明確に定義すること"
+      ],
+      "scoring": {
+        "correct": 5,
+        "incorrect": -5,
+        "partial": 2
+      }
+    },
+    {
+      "id": "T3-04",
+      "title": "Re-listing from Cancelled State",
+      "description": "Cancelledの状態になったオークションを、同じIDで再度Activeに戻すことができるのか。キャンセル状態からの復帰ルール不明。",
+      "category": "state_transition",
+      "severity": "medium",
+      "expected_behavior": [
+        "Cancelled状態からの復帰は不可（新規出品として新IDを付与）",
+        "管理者のみ復帰可能",
+        "明確なルール定義"
+      ],
+      "scoring": {
+        "correct": 3,
+        "incorrect": -3
+      }
+    },
+    {
+      "id": "T3-05",
+      "title": "Bid Withdrawal (Not Mentioned in Spec)",
+      "description": "仕様では入札の取り消し（ウィズドロー）について記載されていない。入札後に取り消せるのか、できないのか不明。多くのオークションシステムでは通常不可だが明示的な禁止がない。",
+      "category": "implicit_behavior",
+      "severity": "high",
+      "expected_behavior": [
+        "入札の取り消し: 不可（最高額の場合は次点者が昇格、非最高額の場合は単純削除）",
+        "取り消し完全禁止",
+        "仕様に明示すること"
+      ],
+      "scoring": {
+        "correct": 4,
+        "incorrect": -4
+      }
+    },
+    {
+      "id": "T3-06",
+      "title": "Minimum Bid Unit Rounding",
+      "description": "最低入札単位は現在価格の1%（最低100円）。現在価格が150円の場合、1%は1.5円になる。これを2円に切り上げるのか、100円の方が大きいため100円にするのか。丸めルールが不明。",
+      "category": "arithmetic",
+      "severity": "medium",
+      "expected_behavior": [
+        "max(current_price * 0.01, 100) を常に適用",
+        "小数点は四捨五入 vs 常に切り上げ vs 常に切り下げ",
+        "明示的なルール定義"
+      ],
+      "scoring": {
+        "correct": 4,
+        "incorrect": -3
+      }
+    },
+    {
+      "id": "T3-07",
+      "title": "First Bid on Starting Price",
+      "description": "最初の入札は開始価格と同じ金額でよいのか（first_bid >= starting_price）、開始価格を上回る必要があるのか（first_bid > starting_price）。\"開始価格より高くなければならない\"の解釈が曖昧。",
+      "category": "semantics",
+      "severity": "medium",
+      "expected_behavior": [
+        "first_bid >= starting_price を許可",
+        "first_bid > starting_price を強制",
+        "明確に定義すること"
+      ],
+      "scoring": {
+        "correct": 4,
+        "incorrect": -3
+      }
+    },
+    {
+      "id": "T3-08",
+      "title": "Bid at Exact End Time (Boundary Semantics)",
+      "description": "オークション終了時刻が14:00:00.000 UTCの場合、14:00:00.000 UTCちょうどに到着した入札は受け入れるのか（境界を含む）、拒否するのか（境界を除く）。タイムスタンプが完全に同じ場合の扱い。",
+      "category": "time_semantics",
+      "severity": "medium",
+      "expected_behavior": [
+        "end_time以前の入札を受け入れ（end_timeを含む）",
+        "end_timeを超える入札を拒否",
+        "または逆の仕様",
+        "明確に定義すること"
+      ],
+      "scoring": {
+        "correct": 4,
+        "incorrect": -3
+      }
+    },
+    {
+      "id": "T3-09",
+      "title": "Payment at Exactly 72 Hours (Boundary Test)",
+      "description": "落札から正確に72時間後の支払いは期限内か期限超過か。\"72時間以内\"は72時間を含むのか（<= 72h）、含まないのか（< 72h）。ミリ秒の違いが重要。",
+      "category": "time_semantics",
+      "severity": "medium",
+      "expected_behavior": [
+        "payment_time <= settlement_time + 72h は OK",
+        "payment_time > settlement_time + 72h は NG",
+        "正確な不等号を定義すること"
+      ],
+      "scoring": {
+        "correct": 4,
+        "incorrect": -3
+      }
+    },
+    {
+      "id": "T3-10",
+      "title": "Shipping Confirmation Without Payment (Invalid Transition)",
+      "description": "支払い前に商品発送確認操作を試みた場合、どうなるか。状態が Ended → Shipped（Paid をスキップ）への遷移は禁止か。",
+      "category": "state_transition",
+      "severity": "high",
+      "expected_behavior": [
+        "状態遷移を拒否（Ended → Shipped は不可、必ず Paid を経由）",
+        "エラーメッセージを返す",
+        "不正な遷移は明示的に禁止"
+      ],
+      "scoring": {
+        "correct": 5,
+        "incorrect": -5
+      }
+    },
+    {
+      "id": "T3-11",
+      "title": "State Transition from Draft Directly to Cancelled",
+      "description": "仕様では \"Active → Cancelled（入札がない場合のみ）\" と記載。Draft→Cancelled の遷移は許可されるのか。出品直後に出品者がキャンセルしたい場合。",
+      "category": "state_transition",
+      "severity": "low",
+      "expected_behavior": [
+        "Draft → Cancelled を許可（出品前キャンセル）",
+        "Draft → Cancelled を禁止（Active開始後のみキャンセル可能）",
+        "明確に定義すること"
+      ],
+      "scoring": {
+        "correct": 3,
+        "incorrect": -2
+      }
+    },
+    {
+      "id": "T3-12",
+      "title": "Bid by Different Account of Same Seller (Proxy Bidding)",
+      "description": "出品者が複数のアカウントを所有している場合、別アカウントから入札することで間接的に自分の商品に入札できるか（プロキシビッディング）。仕様では \"出品者自身は入札できない\" だが、\"同一法人の別アカウント\" の扱いが不明。",
+      "category": "business_rule",
+      "severity": "high",
+      "expected_behavior": [
+        "同一出品者IDの全アカウントからの入札を禁止",
+        "同一IP/デバイスからの入札をフラグ（検出は困難）",
+        "ユーザーの定義範囲を明確化"
+      ],
+      "scoring": {
+        "correct": 5,
+        "incorrect": -4
+      }
+    },
+    {
+      "id": "T3-13",
+      "title": "Zero or Negative Starting Price",
+      "description": "開始価格として0円以下の値を設定できるのか。仕様では \"開始価格\" について負の値を明示的に禁止していない。",
+      "category": "input_validation",
+      "severity": "medium",
+      "expected_behavior": [
+        "starting_price > 0 の制約を強制",
+        "starting_price >= 100 など最小値を定義",
+        "入力検証を明確化"
+      ],
+      "scoring": {
+        "correct": 4,
+        "incorrect": -3
+      }
+    },
+    {
+      "id": "T3-14",
+      "title": "Auction with Zero or Negative Duration",
+      "description": "オークション期間として0秒またはマイナス値を指定できるのか。期間がない状態での状態遷移の挙動。",
+      "category": "input_validation",
+      "severity": "medium",
+      "expected_behavior": [
+        "duration > 0 を強制（例: 最小1秒、1分など）",
+        "duration < 0 は入力検証で拒否",
+        "期間の下限を明確化"
+      ],
+      "scoring": {
+        "correct": 4,
+        "incorrect": -3
+      }
+    }
+  ],
+  "metadata": {
+    "task": "task3-auction",
+    "total_traps": 14,
+    "difficulty": "critical",
+    "note": "This is the hardest task in the benchmark. Traps cover state machine complexity, time semantics, concurrency, and numerous boundary cases. A correct spec must address all 14 traps explicitly."
+  }
+}

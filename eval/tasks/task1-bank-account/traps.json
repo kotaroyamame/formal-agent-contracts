@@ -1,0 +1,166 @@
+{
+  "traps": [
+    {
+      "id": "T1-01",
+      "name": "Negative Initial Balance",
+      "description": "Attempting to create an account with negative initial balance. Tests whether the system validates that balances cannot be negative at creation time.",
+      "category": "boundary_value",
+      "severity": "critical",
+      "specification_gap": "The prompt does not explicitly state whether negative initial balances are rejected at account creation or only at withdrawal/transfer.",
+      "expected_behavior": "Account creation with negative initial balance should be rejected. The system should enforce the invariant that balance >= 0 at all times, including at account creation.",
+      "scoring_criteria": {
+        "0": "Accepts negative initial balance and creates account",
+        "1": "Rejects negative initial balance but error message is unclear or error type is inappropriate",
+        "2": "Rejects negative initial balance with clear error but rule is documented only in code comments",
+        "3": "Rejects negative initial balance, error is clear, and rule is explicitly documented in specification"
+      }
+    },
+    {
+      "id": "T1-02",
+      "name": "Zero-Amount Deposit",
+      "description": "Attempting to deposit 0 yen. Tests interpretation of what constitutes a valid deposit operation.",
+      "category": "edge_case",
+      "severity": "minor",
+      "specification_gap": "The prompt states deposits add amount to balance but does not specify behavior for zero or negative amounts.",
+      "expected_behavior": "Zero-amount deposits should be either explicitly accepted (as they don't violate balance invariants) or explicitly rejected with clear rationale. Either choice is acceptable if consistently documented.",
+      "scoring_criteria": {
+        "0": "Behavior is undefined or crashes",
+        "1": "Handles zero deposit but without any validation or documentation",
+        "2": "Handles zero deposit consistently and validates, but rationale is not documented",
+        "3": "Zero deposit is handled with explicit validation, clear error message or acceptance, and documented rationale"
+      }
+    },
+    {
+      "id": "T1-03",
+      "name": "Zero-Amount Withdrawal",
+      "description": "Attempting to withdraw 0 yen. Tests interpretation of what constitutes a valid withdrawal operation.",
+      "category": "edge_case",
+      "severity": "minor",
+      "specification_gap": "The prompt states withdrawals subtract amount from balance but does not specify behavior for zero or negative amounts.",
+      "expected_behavior": "Zero-amount withdrawals should be either explicitly accepted (as they don't violate balance invariants) or explicitly rejected. Either choice is acceptable if consistently documented.",
+      "scoring_criteria": {
+        "0": "Behavior is undefined or crashes",
+        "1": "Handles zero withdrawal but without any validation or documentation",
+        "2": "Handles zero withdrawal consistently and validates, but rationale is not documented",
+        "3": "Zero withdrawal is handled with explicit validation, clear error message or acceptance, and documented rationale"
+      }
+    },
+    {
+      "id": "T1-04",
+      "name": "Withdrawal Exactly Equal to Balance",
+      "description": "Withdrawing an amount exactly equal to the current balance, resulting in a zero balance. Tests boundary condition at the lower limit of the balance invariant.",
+      "category": "boundary_value",
+      "severity": "major",
+      "specification_gap": "The prompt requires balance >= 0 but does not explicitly test the boundary case of resulting balance = 0.",
+      "expected_behavior": "Withdrawal should succeed if withdrawal_amount <= current_balance. The resulting balance of 0 is valid and should be accepted.",
+      "scoring_criteria": {
+        "0": "Incorrectly rejects the withdrawal or crashes",
+        "1": "Accepts the withdrawal but with incorrect final balance",
+        "2": "Correctly allows withdrawal to zero balance but behavior not explicitly documented",
+        "3": "Correctly allows withdrawal to zero balance, verified by test, and documented in specification"
+      }
+    },
+    {
+      "id": "T1-05",
+      "name": "Withdrawal at Exact Limit (1,000,000 yen)",
+      "description": "Withdrawing exactly 1,000,000 yen, the stated maximum per withdrawal. Tests the upper boundary of the withdrawal limit.",
+      "category": "boundary_value",
+      "severity": "critical",
+      "specification_gap": "The prompt states 1回の出金上限は100万円 but does not clarify whether the limit is inclusive (<=) or exclusive (<).",
+      "expected_behavior": "Withdrawal of exactly 1,000,000 yen should be accepted (limit is inclusive: amount <= 1,000,000). The withdrawal should succeed if the account has sufficient balance.",
+      "scoring_criteria": {
+        "0": "Incorrectly rejects a 1,000,000 yen withdrawal or crashes",
+        "1": "Accepts it but with incorrect balance or documentation",
+        "2": "Accepts 1,000,000 yen withdrawal correctly but limit is not explicitly tested or documented",
+        "3": "Accepts 1,000,000 yen withdrawal, has explicit test case, and limit boundary is documented"
+      }
+    },
+    {
+      "id": "T1-06",
+      "name": "Withdrawal Above Limit (1,000,001 yen)",
+      "description": "Attempting to withdraw 1,000,001 yen, which exceeds the maximum of 1,000,000 yen. Tests rejection of amounts outside the limit.",
+      "category": "boundary_value",
+      "severity": "critical",
+      "specification_gap": "The prompt specifies the limit but does not detail the error condition or exception type.",
+      "expected_behavior": "Withdrawal should be rejected with a clear error indicating the withdrawal exceeds the maximum single-transaction limit. The balance should remain unchanged.",
+      "scoring_criteria": {
+        "0": "Incorrectly accepts a withdrawal over 1,000,001 yen",
+        "1": "Rejects but with unclear error or inconsistent behavior",
+        "2": "Correctly rejects with adequate error but test or documentation could be clearer",
+        "3": "Correctly rejects, has explicit test case at boundary, clear error message, and documented limit"
+      }
+    },
+    {
+      "id": "T1-07",
+      "name": "Transfer Atomicity",
+      "description": "Testing atomicity: if debit from source succeeds but credit to destination fails, the system should handle this failure correctly. Tests whether transfer is truly atomic or if partial transfers are possible.",
+      "category": "atomicity",
+      "severity": "critical",
+      "specification_gap": "The prompt states transfers should move money but does not specify what happens if the destination account doesn't exist, is invalid, or if the second operation fails.",
+      "expected_behavior": "Transfers should be atomic: either both debit and credit succeed, or both fail and balances remain unchanged. If the destination account is invalid or credit fails, the source should not be debited. Alternatively, if the system uses explicit error handling, both operations should be rolled back on any failure.",
+      "scoring_criteria": {
+        "0": "Partial transfer possible (money debited but not credited)",
+        "1": "Some atomicity enforcement but with potential edge cases or unclear implementation",
+        "2": "Atomicity is generally enforced but not explicitly documented or tested comprehensively",
+        "3": "Atomicity is explicitly enforced, documented in specification, and tested with both success and failure scenarios"
+      }
+    },
+    {
+      "id": "T1-08",
+      "name": "Self-Transfer (Same Source and Destination)",
+      "description": "Attempting to transfer from an account to itself. Tests whether the business rule that 'source and destination must be different' is enforced.",
+      "category": "ambiguity",
+      "severity": "major",
+      "specification_gap": "The prompt states source and destination must be different but does not specify what happens if the user attempts to transfer to self (semantically could be a no-op or an error).",
+      "expected_behavior": "Self-transfers should be rejected with a clear error message. This prevents logical errors and ambiguity in operation intent. The account balance should remain unchanged.",
+      "scoring_criteria": {
+        "0": "Allows self-transfer or crashes",
+        "1": "Rejects self-transfer but with unclear error or inconsistent behavior",
+        "2": "Correctly rejects self-transfer but rule enforcement not explicitly documented",
+        "3": "Rejects self-transfer with clear error, has explicit test case, and rule is documented"
+      }
+    },
+    {
+      "id": "T1-09",
+      "name": "Transfer Amount Exceeding Withdrawal Limit",
+      "description": "Attempting a transfer of an amount greater than 1,000,000 yen. Tests whether the withdrawal limit applies to transfers. This is ambiguous: the prompt specifies a withdrawal limit but does not clarify if transfers (which include a debit component) are subject to the same limit.",
+      "category": "ambiguity",
+      "severity": "major",
+      "specification_gap": "The prompt specifies '1回の出金上限は100万円' for withdrawals but does not state whether this limit applies to the debit side of a transfer operation.",
+      "expected_behavior": "Two reasonable interpretations exist: (A) The limit applies only to explicit withdrawals, not transfers. (B) The limit applies to all debit operations, including transfers. Either interpretation is acceptable if explicitly documented and consistently enforced.",
+      "scoring_criteria": {
+        "0": "Behavior is inconsistent or undefined (applies limit sometimes but not always)",
+        "1": "Implements one interpretation but does not document which one or why",
+        "2": "Consistently implements one interpretation and documents it in comments",
+        "3": "Explicitly documents the chosen interpretation in specification with clear rationale, and has test cases for both limit enforcement and transfers"
+      }
+    },
+    {
+      "id": "T1-10",
+      "name": "Whitespace-Only Account Name",
+      "description": "Creating an account with a name containing only whitespace (spaces, tabs, newlines). Tests the boundary between empty string and whitespace-only string.",
+      "category": "edge_case",
+      "severity": "minor",
+      "specification_gap": "The prompt states account name cannot be empty string but does not address whitespace-only strings, which are technically non-empty but semantically vacuous.",
+      "expected_behavior": "Either: (A) Reject whitespace-only names as invalid (treating them semantically like empty strings), or (B) Accept them as technically valid. Either approach is acceptable if explicitly documented. Approach (A) is more robust.",
+      "scoring_criteria": {
+        "0": "Behavior is undefined or inconsistent",
+        "1": "Handles whitespace-only names but without explicit validation or documentation",
+        "2": "Handles whitespace-only names consistently and validates, but treatment is not documented",
+        "3": "Explicitly handles whitespace-only names with clear validation (trim or reject), documented in specification with rationale"
+      }
+    }
+  ],
+  "trap_summary": {
+    "total_traps": 10,
+    "critical": 4,
+    "major": 3,
+    "minor": 3,
+    "by_category": {
+      "boundary_value": 4,
+      "atomicity": 1,
+      "ambiguity": 3,
+      "edge_case": 2
+    }
+  }
+}

@@ -1,0 +1,205 @@
+{
+  "traps": [
+    {
+      "id": "T2-01",
+      "title": "Reservation system for checked-out books",
+      "description": "A member attempts to place a reservation on a book that is currently checked out. The system does not have reservation functionality defined in the requirements, but an incomplete implementation might try to handle it.",
+      "category": "undefined_feature",
+      "severity": "high",
+      "rule_violated": "Specifications do not include reservation system",
+      "expected_behavior": "System should reject reservation request with clear error or inform user that reservations are not supported",
+      "test_scenario": "Try to reserve a book with stock=0 (all copies checked out)",
+      "scoring": {
+        "correct_handling": 10,
+        "incorrect_handling": 0,
+        "partial_handling": 3
+      }
+    },
+    {
+      "id": "T2-02",
+      "title": "Return from overdue → immediate re-borrowing eligibility",
+      "description": "A member returns an overdue book. The question is: does the overdue flag clear immediately, or must there be a waiting period? Does the member become eligible for new loans immediately after returning?",
+      "category": "overdue_resolution",
+      "severity": "high",
+      "rule_violated": "Rule: 延滞中の会員は新規貸出不可",
+      "expected_behavior": "Upon return of overdue book, if no other loans are still overdue, the member's overdue status should be cleared immediately, making them eligible for new loans",
+      "test_scenario": "Borrow book → don't return by day 14 → check overdue flag (true) → return book → check if eligible for new loan",
+      "scoring": {
+        "correct_handling": 10,
+        "incorrect_handling": 0,
+        "partial_handling": 2
+      }
+    },
+    {
+      "id": "T2-03",
+      "title": "5 books out, return 1, borrow 1 — loan count correctness",
+      "description": "Member has exactly 5 books checked out (at the boundary). They return 1 book. The system must correctly decrement the count. Then they borrow another. The count must correctly stay at 5.",
+      "category": "state_consistency",
+      "severity": "high",
+      "rule_violated": "Rule: 会員は最大5冊まで同時貸出可能",
+      "expected_behavior": "After return: loan_count = 4. After new borrow: loan_count = 5. Never exceed 5.",
+      "test_scenario": "Create member, borrow 5 books, return 1 (assert count=4), borrow 1 more (assert count=5), try to borrow 6th (should fail)",
+      "scoring": {
+        "correct_handling": 10,
+        "incorrect_handling": 0,
+        "partial_handling": 4
+      }
+    },
+    {
+      "id": "T2-04",
+      "title": "Catalog stock vs Loan stock consistency across agents",
+      "description": "CatalogAgent tracks total stock. LoanAgent tracks who has loaned what. When a book is loaned, CatalogAgent's stock should decrease. When returned, it should increase. Inconsistency can occur if one agent's update fails while the other succeeds.",
+      "category": "cross_agent_consistency",
+      "severity": "critical",
+      "rule_violated": "Implicit: stock management consistency",
+      "expected_behavior": "After successful borrow, CatalogAgent.stock[bookId] decreases by 1 and LoanAgent.loans[memberId] increases by 1. After return, both increment/decrement correctly.",
+      "test_scenario": "Check initial stock → borrow book → verify CatalogAgent stock decreased → check LoanAgent loan record exists → return book → verify both agents updated",
+      "scoring": {
+        "correct_handling": 10,
+        "incorrect_handling": 0,
+        "partial_handling": 2
+      }
+    },
+    {
+      "id": "T2-05",
+      "title": "Extension of already-extended loan (double extension attempt)",
+      "description": "A loan can be extended once (adding 7 days). The spec says 延長は1回まで. If a member tries to extend a loan that has already been extended, the system should reject it. An incomplete implementation might allow multiple extensions.",
+      "category": "state_violation",
+      "severity": "high",
+      "rule_violated": "Rule: 延長は1回まで（追加7日）",
+      "expected_behavior": "First extension succeeds. Second extension attempt on the same loan fails with error.",
+      "test_scenario": "Borrow book → extend once (assert success) → try to extend again (assert failure)",
+      "scoring": {
+        "correct_handling": 10,
+        "incorrect_handling": 0,
+        "partial_handling": 3
+      }
+    },
+    {
+      "id": "T2-06",
+      "title": "Late return of an extended loan — overdue calculation",
+      "description": "A book is borrowed (14-day period), then extended (+7 days = 21 days total). If returned after day 21, how is overdue calculated? The system must track the correct due date after extension.",
+      "category": "due_date_calculation",
+      "severity": "high",
+      "rule_violated": "Rule: 貸出期間は14日。延長は1回まで（追加7日）",
+      "expected_behavior": "Original due date: day 14. After extension: day 21. If returned on day 22, overdue by 1 day. System must calculate correctly.",
+      "test_scenario": "Borrow on day 0 → extend on day 10 → set current date to day 22 → return book → check overdue days = 1",
+      "scoring": {
+        "correct_handling": 10,
+        "incorrect_handling": 0,
+        "partial_handling": 3
+      }
+    },
+    {
+      "id": "T2-07",
+      "title": "Multiple copies of same book — stock tracking",
+      "description": "A library might have multiple copies of the same book (e.g., 3 copies of 'Harry Potter'). When one is borrowed, stock should decrease to 2. The system must correctly track per-book stock, not confuse copies.",
+      "category": "inventory_management",
+      "severity": "high",
+      "rule_violated": "Rule: 在庫が0の書籍は貸出不可",
+      "expected_behavior": "Borrow copy 1: stock 3→2. Borrow copy 2: stock 2→1. Borrow copy 3: stock 1→0. Borrow attempt on 4th: fail (stock=0).",
+      "test_scenario": "Register book with stock=3 → borrow 3 times → assert all succeed → attempt 4th borrow on same book → assert fail",
+      "scoring": {
+        "correct_handling": 10,
+        "incorrect_handling": 0,
+        "partial_handling": 3
+      }
+    },
+    {
+      "id": "T2-08",
+      "title": "Borrowing the last copy (boundary: stock goes to 0)",
+      "description": "When a book has stock=1 (last copy) and a member borrows it, stock should become 0. The next member should not be able to borrow this book. The system must correctly handle the transition to 0.",
+      "category": "boundary_value",
+      "severity": "high",
+      "rule_violated": "Rule: 在庫が0の書籍は貸出不可",
+      "expected_behavior": "Before: stock=1, borrow succeeds, stock becomes 0. Next borrow fails.",
+      "test_scenario": "Register book with stock=1 → member 1 borrows (assert success, stock=0) → member 2 tries to borrow (assert failure)",
+      "scoring": {
+        "correct_handling": 10,
+        "incorrect_handling": 0,
+        "partial_handling": 2
+      }
+    },
+    {
+      "id": "T2-09",
+      "title": "Registering a member with duplicate information",
+      "description": "If a member with the same ID or email is registered twice, should the system reject the duplicate or overwrite? The spec does not explicitly address this. An incomplete implementation might allow duplicates.",
+      "category": "data_integrity",
+      "severity": "medium",
+      "rule_violated": "Implicit: member uniqueness",
+      "expected_behavior": "Attempt to register member with existing ID should fail with 'member already exists' error. Alternative: if email-based, duplicates should be rejected.",
+      "test_scenario": "Register member M1 → try to register M1 again with same ID → assert failure",
+      "scoring": {
+        "correct_handling": 10,
+        "incorrect_handling": 0,
+        "partial_handling": 4
+      }
+    },
+    {
+      "id": "T2-10",
+      "title": "Returning a book that wasn't borrowed (invalid return)",
+      "description": "A member attempts to return a book they never borrowed. The system should detect this and reject the return. An incomplete implementation might not validate loan ownership.",
+      "category": "invalid_operation",
+      "severity": "high",
+      "rule_violated": "Implicit: return must correspond to valid loan",
+      "expected_behavior": "Return request should fail with error 'loan not found' or 'member does not have this book'.",
+      "test_scenario": "Register book B1, member M1 → try to return B1 without borrowing it first → assert failure",
+      "scoring": {
+        "correct_handling": 10,
+        "incorrect_handling": 0,
+        "partial_handling": 2
+      }
+    },
+    {
+      "id": "T2-11",
+      "title": "Precious book loan attempt (should be rejected)",
+      "description": "Books with category='貴重' (precious) should not be loaned out. Only 館内閲覧 (in-library viewing) is allowed. A member might attempt to borrow a precious book; the system should reject it.",
+      "category": "category_constraint",
+      "severity": "high",
+      "rule_violated": "Rule: 貴重書籍は館内閲覧のみ（貸出不可）",
+      "expected_behavior": "Borrow request for precious book should fail with error 'precious books cannot be loaned'.",
+      "test_scenario": "Register precious book (category='貴重') → member tries to borrow → assert failure",
+      "scoring": {
+        "correct_handling": 10,
+        "incorrect_handling": 0,
+        "partial_handling": 1
+      }
+    },
+    {
+      "id": "T2-12",
+      "title": "Loan on day 14 (boundary: is day 14 the due date or overdue?)",
+      "description": "If a book is borrowed on day 0 with a 14-day loan period, the due date is day 14. If returned exactly on day 14, it should not be overdue. If returned on day 15, it is overdue. The system must handle the boundary correctly.",
+      "category": "boundary_value",
+      "severity": "high",
+      "rule_violated": "Rule: 貸出期間は14日",
+      "expected_behavior": "Return on day 14: not overdue. Return on day 15: overdue by 1 day. System must compare return_date <= due_date correctly.",
+      "test_scenario": "Borrow on day 0 (due=day 14) → return on day 14 → assert not overdue. Borrow another, return on day 15 → assert overdue by 1 day.",
+      "scoring": {
+        "correct_handling": 10,
+        "incorrect_handling": 0,
+        "partial_handling": 3
+      }
+    }
+  ],
+  "summary": {
+    "total_traps": 12,
+    "by_category": {
+      "undefined_feature": 1,
+      "overdue_resolution": 1,
+      "state_consistency": 1,
+      "cross_agent_consistency": 1,
+      "state_violation": 1,
+      "due_date_calculation": 1,
+      "inventory_management": 1,
+      "boundary_value": 3,
+      "data_integrity": 1,
+      "invalid_operation": 1,
+      "category_constraint": 1
+    },
+    "by_severity": {
+      "critical": 1,
+      "high": 10,
+      "medium": 1
+    }
+  }
+}

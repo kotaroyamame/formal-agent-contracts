@@ -1,0 +1,445 @@
+-- ============================================================================
+-- Task 2: 図書館貸出管理システム (Library Loan System)
+-- Gold Standard VDM-SL Formal Specification
+-- ============================================================================
+-- Multi-Agent Formal Specification: CatalogAgent, MemberAgent, LoanAgent
+-- Covers all business rules, cross-agent contracts, and 12 trap scenarios
+-- ============================================================================
+
+module SharedTypes
+exports all
+definitions
+
+types
+  -- Basic identifiers
+  ISBN = seq of char;
+  MemberId = seq of char;
+  LoanId = seq of char;
+
+  -- Book category enumeration
+  Category = <General> | <Reference> | <Precious>;
+
+  -- Book information
+  Book :: isbn : ISBN
+          title : seq of char
+          author : seq of char
+          category : Category
+          stock : nat
+  inv b == b.stock >= 0;
+
+  -- Member information
+  Member :: id : MemberId
+            name : seq of char
+            contact : seq of char
+            is_overdue : bool
+  inv m == true;
+
+  -- Loan record
+  Loan :: loan_id : LoanId
+          member_id : MemberId
+          isbn : ISBN
+          borrow_date : nat
+          due_date : nat
+          return_date : [nat]
+          is_extended : bool
+  inv l == l.borrow_date <= l.due_date and
+           (l.return_date <> nil => l.return_date >= l.borrow_date);
+
+  -- Date type (represented as days since epoch)
+  Date = nat;
+
+end SharedTypes
+
+-- ============================================================================
+-- CatalogAgent: Book Registration, Search, Stock Management
+-- ============================================================================
+
+module CatalogAgent
+exports all
+definitions
+
+imports
+  SharedTypes renamed all
+
+types
+  -- Catalog state
+  Catalog :: books : map ISBN to Book
+  inv cat == forall isbn in set dom cat.books &
+             cat.books(isbn).isbn = isbn;
+
+state CatalogState of
+  catalog : Catalog
+end
+
+operations
+  -- Register a new book
+  -- Pre: isbn not in catalog
+  -- Post: new book added to catalog with given stock
+  register_book(isbn : ISBN, title : seq of char, author : seq of char,
+                category : Category, initial_stock : nat)
+  pre isbn not in set dom catalog.books
+  post let new_book = mk_Book(isbn, title, author, category, initial_stock)
+       in catalog.books = catalog~.books ++ {isbn |-> new_book};
+
+  -- Search book by ISBN
+  -- Pre: true (may not exist)
+  -- Post: returns book if found, or nil
+  search_by_isbn(isbn : ISBN) result : [Book]
+  post if isbn in set dom catalog~.books
+       then result = catalog~.books(isbn)
+       else result = nil;
+
+  -- Get available stock for a book
+  -- Pre: book must exist
+  -- Post: returns stock value
+  get_stock(isbn : ISBN) result : nat
+  pre isbn in set dom catalog.books
+  post result = catalog.books(isbn).stock;
+
+  -- Check if a book can be loaned (stock > 0 and not precious)
+  -- Pre: book exists
+  -- Post: returns true if stock > 0 and category != <Precious>
+  can_be_loaned(isbn : ISBN) result : bool
+  pre isbn in set dom catalog.books
+  post let book = catalog.books(isbn)
+       in result = (book.stock > 0 and book.category <> <Precious>);
+
+  -- Get book category
+  -- Pre: book exists
+  -- Post: returns category
+  get_category(isbn : ISBN) result : Category
+  pre isbn in set dom catalog.books
+  post result = catalog.books(isbn).category;
+
+  -- Decrease stock (called by LoanAgent after successful borrow)
+  -- Pre: isbn exists, stock > 0
+  -- Post: stock decreases by 1
+  decrease_stock(isbn : ISBN)
+  pre isbn in set dom catalog.books and
+      catalog.books(isbn).stock > 0
+  post catalog.books(isbn).stock = catalog~.books(isbn).stock - 1;
+
+  -- Increase stock (called by LoanAgent after return)
+  -- Pre: isbn exists
+  -- Post: stock increases by 1
+  increase_stock(isbn : ISBN)
+  pre isbn in set dom catalog.books
+  post catalog.books(isbn).stock = catalog~.books(isbn).stock + 1;
+
+end CatalogAgent
+
+-- ============================================================================
+-- MemberAgent: Member Registration, Eligibility Management
+-- ============================================================================
+
+module MemberAgent
+exports all
+definitions
+
+imports
+  SharedTypes renamed all
+
+types
+  -- Member registry state
+  MemberRegistry :: members : map MemberId to Member
+  inv reg == forall mid in set dom reg.members &
+             reg.members(mid).id = mid;
+
+state MemberState of
+  members : MemberRegistry
+  loan_counts : map MemberId to nat  -- T2-03: track loan count per member
+end
+
+operations
+  -- Register a new member
+  -- Pre: member_id not already registered
+  -- Post: member added with is_overdue = false
+  register_member(member_id : MemberId, name : seq of char, contact : seq of char)
+  pre member_id not in set dom members.members
+  post let new_member = mk_Member(member_id, name, contact, false)
+       in members.members = members~.members ++ {member_id |-> new_member} and
+          loan_counts = loan_counts~ ++ {member_id |-> 0};
+
+  -- Check if member is eligible for new loan
+  -- Pre: member exists
+  -- Post: returns true if not overdue and loan_count < 5
+  is_eligible_for_loan(member_id : MemberId) result : bool
+  pre member_id in set dom members.members
+  post let member = members.members(member_id),
+           count = loan_counts(member_id)
+       in result = (not member.is_overdue and count < 5);
+
+  -- Get current loan count for member (T2-03)
+  -- Pre: member exists
+  -- Post: returns loan count
+  get_loan_count(member_id : MemberId) result : nat
+  pre member_id in set dom members.members
+  post result = loan_counts(member_id);
+
+  -- Check if member is overdue
+  -- Pre: member exists
+  -- Post: returns overdue flag
+  is_overdue(member_id : MemberId) result : bool
+  pre member_id in set dom members.members
+  post result = members.members(member_id).is_overdue;
+
+  -- Set overdue flag (called by LoanAgent when loan becomes overdue)
+  -- Pre: member exists
+  -- Post: is_overdue = true
+  set_overdue(member_id : MemberId)
+  pre member_id in set dom members.members
+  post members.members(member_id).is_overdue = true;
+
+  -- Clear overdue flag (called by LoanAgent when all overdue loans are resolved)
+  -- Pre: member exists
+  -- Post: is_overdue = false
+  clear_overdue(member_id : MemberId)
+  pre member_id in set dom members.members
+  post members.members(member_id).is_overdue = false;
+
+  -- Increment loan count (T2-03: called when member borrows a book)
+  -- Pre: member exists, current count < 5
+  -- Post: loan_count increments by 1
+  increment_loan_count(member_id : MemberId)
+  pre member_id in set dom members.members and
+      loan_counts(member_id) < 5
+  post loan_counts(member_id) = loan_counts~(member_id) + 1;
+
+  -- Decrement loan count (T2-03: called when member returns a book)
+  -- Pre: member exists, current count > 0
+  -- Post: loan_count decrements by 1
+  decrement_loan_count(member_id : MemberId)
+  pre member_id in set dom members.members and
+      loan_counts(member_id) > 0
+  post loan_counts(member_id) = loan_counts~(member_id) - 1;
+
+end MemberAgent
+
+-- ============================================================================
+-- LoanAgent: Borrowing, Returning, Overdue Management
+-- ============================================================================
+
+module LoanAgent
+exports all
+definitions
+
+imports
+  SharedTypes renamed all
+
+types
+  -- Loan repository
+  LoanRepository :: loans : seq of Loan
+  inv lr == true;  -- loans are ordered by loan_id
+
+state LoanState of
+  loans : set of Loan
+  next_loan_id : nat
+end
+
+functions
+  -- Helper: check if a loan belongs to a member
+  is_member_loan(loan : Loan, member_id : MemberId) : bool ==
+    loan.member_id = member_id;
+
+  -- Helper: check if a loan is still active (not returned)
+  is_active_loan(loan : Loan) : bool ==
+    loan.return_date = nil;
+
+  -- Helper: check if a loan is overdue (return_date > due_date)
+  is_loan_overdue(loan : Loan, current_date : Date) : bool ==
+    if loan.return_date <> nil
+    then loan.return_date > loan.due_date  -- T2-12, T2-06: correct boundary
+    else current_date > loan.due_date;
+
+  -- Helper: get overdue days for a loan
+  calculate_overdue_days(loan : Loan, current_date : Date) : nat ==
+    if loan.return_date <> nil and loan.return_date > loan.due_date
+    then loan.return_date - loan.due_date  -- T2-06: overdue after return
+    else if loan.return_date = nil and current_date > loan.due_date
+    then current_date - loan.due_date
+    else 0;
+
+  -- Helper: find active loan by member_id and isbn
+  find_active_loan(member_id : MemberId, isbn : ISBN, loans_set : set of Loan)
+    : [Loan] ==
+    let matching = {l | l in set loans_set &
+                        l.member_id = member_id and
+                        l.isbn = isbn and
+                        l.return_date = nil}
+    in if matching = {} then nil else iota l in set matching & l;
+
+  -- Helper: check if loan has been extended
+  is_extended(loan : Loan) : bool ==
+    loan.is_extended;
+
+operations
+  -- Create a new loan (borrowing operation)
+  -- Pre: member_id exists (validated by MemberAgent)
+  --      isbn exists and can be loaned (validated by CatalogAgent)
+  --      member is eligible (validated by MemberAgent)
+  -- Post: new Loan added, id assigned, all fields set correctly
+  create_loan(member_id : MemberId, isbn : ISBN, borrow_date : Date, due_date : Date)
+    result : LoanId
+  pre true  -- contracts enforced by caller agents
+  post let new_loan_id = mk_(next_loan_id),
+           new_loan = mk_Loan(new_loan_id, member_id, isbn,
+                              borrow_date, due_date, nil, false)
+       in new_loan in set loans and
+          next_loan_id = next_loan_id~ + 1 and
+          result = new_loan_id;
+
+  -- Register return (returning a book)
+  -- Pre: loan exists, member has this book, return_date not already set
+  -- Post: return_date set, overdue status updated
+  return_book(member_id : MemberId, isbn : ISBN, return_date : Date)
+  pre let loan = find_active_loan(member_id, isbn, loans~)
+      in loan <> nil and
+         loan.member_id = member_id and
+         loan.isbn = isbn
+  post let loan = find_active_loan(member_id, isbn, loans~)
+       in loan.return_date = return_date;  -- T2-02, T2-10, T2-12: boundary handling
+
+  -- Check if member has any active loans
+  -- Pre: true
+  -- Post: returns count of active loans for member
+  has_active_loans(member_id : MemberId) result : nat
+  post result = card {l | l in set loans~ &
+                          l.member_id = member_id and
+                          l.return_date = nil};
+
+  -- Get all active loans for a member (for overdue check)
+  -- Pre: true
+  -- Post: returns set of active loans
+  get_active_loans(member_id : MemberId) result : set of Loan
+  post result = {l | l in set loans~ &
+                     l.member_id = member_id and
+                     l.return_date = nil};
+
+  -- Extend a loan by 7 days (T2-05: only once)
+  -- Pre: loan exists, is_extended = false
+  -- Post: due_date += 7, is_extended = true
+  extend_loan(member_id : MemberId, isbn : ISBN, extension_days : nat) result : bool
+  pre let loan = find_active_loan(member_id, isbn, loans~)
+      in loan <> nil and not is_extended(loan)
+  post let loan = find_active_loan(member_id, isbn, loans)
+       in if loan <> nil and not loan.is_extended
+          then loan.due_date = loan.due_date~ + extension_days and
+               loan.is_extended = true and
+               result = true
+          else result = false;
+
+  -- Check if any loan for a member is overdue (T2-02: after return, status clears)
+  -- Pre: true
+  -- Post: returns true if any active loan is overdue
+  has_overdue_loans(member_id : MemberId, current_date : Date) result : bool
+  post let active_loans = {l | l in set loans~ &
+                                l.member_id = member_id and
+                                l.return_date = nil}
+       in result = (exists l in set active_loans &
+                    is_loan_overdue(l, current_date));
+
+  -- Get all books currently loaned by member (T2-03: for count)
+  -- Pre: true
+  -- Post: returns set of ISBNs of books currently loaned
+  get_loaned_books(member_id : MemberId) result : set of ISBN
+  post result = {l.isbn | l in set loans~ &
+                          l.member_id = member_id and
+                          l.return_date = nil};
+
+end LoanAgent
+
+-- ============================================================================
+-- Cross-Agent Workflow Contracts
+-- ============================================================================
+-- This section specifies the interdependencies and contracts between agents.
+-- These are not executable operations but formal specifications of the expected
+-- interaction sequences and invariants.
+-- ============================================================================
+
+module CrossAgentContracts
+exports all
+definitions
+
+imports
+  SharedTypes renamed all,
+  CatalogAgent renamed all,
+  MemberAgent renamed all,
+  LoanAgent renamed all
+
+-- ============================================================================
+-- Borrow Workflow Contract
+-- ============================================================================
+-- Preconditions (checked in order by calling client):
+--   1. CatalogAgent.can_be_loaned(isbn) = true
+--   2. MemberAgent.is_eligible_for_loan(member_id) = true
+-- Postconditions (enforced by agents):
+--   1. LoanAgent creates a new Loan
+--   2. CatalogAgent.decrease_stock(isbn) executes
+--   3. MemberAgent.increment_loan_count(member_id) executes
+-- Invariants:
+--   - After borrow: stock_before = stock_after + 1
+--   - After borrow: loan_count_before = loan_count_after - 1
+--   - Cross-agent state is consistent
+-- ============================================================================
+
+-- ============================================================================
+-- Return Workflow Contract
+-- ============================================================================
+-- Preconditions (checked by caller):
+--   1. LoanAgent has an active loan for (member_id, isbn)
+--   2. Loan.return_date = nil (not yet returned)
+-- Postconditions (enforced by agents):
+--   1. LoanAgent.return_book() sets return_date
+--   2. CatalogAgent.increase_stock(isbn) executes
+--   3. MemberAgent.decrement_loan_count(member_id) executes
+--   4. If no other loans for member are overdue, MemberAgent.clear_overdue(member_id)
+-- Invariants:
+--   - After return: stock increases by 1
+--   - After return: loan_count decreases by 1
+-- ============================================================================
+
+-- ============================================================================
+-- Extension Workflow Contract
+-- ============================================================================
+-- Preconditions (checked by caller):
+--   1. LoanAgent has an active loan for (member_id, isbn)
+--   2. Loan.is_extended = false (not yet extended)
+-- Postconditions (enforced by LoanAgent):
+--   1. LoanAgent.extend_loan() sets is_extended = true
+--   2. due_date increases by 7 days
+-- Invariants:
+--   - Extension can occur at most once per loan (T2-05)
+-- ============================================================================
+
+-- ============================================================================
+-- Overdue Check Workflow Contract
+-- ============================================================================
+-- Preconditions:
+--   1. System maintains current_date
+-- Postconditions (enforced cooperatively):
+--   1. LoanAgent detects if any loan for member is overdue
+--   2. MemberAgent sets is_overdue = true if any loan overdue
+--   3. MemberAgent sets is_overdue = false only when all loans are returned or on-time
+-- Invariants:
+--   - is_overdue status reflects actual loan status
+--   - Member cannot borrow while is_overdue = true (T2-02)
+-- ============================================================================
+
+end CrossAgentContracts
+
+-- ============================================================================
+-- Trap Coverage Summary
+-- ============================================================================
+-- T2-01: Undefined reservation system — not implemented, rejected at spec level
+-- T2-02: Overdue status cleared on return of overdue book — handled by clear_overdue()
+-- T2-03: Loan count correctness — managed by increment_loan_count / decrement_loan_count
+-- T2-04: Catalog vs Loan consistency — enforced by pre/post contracts
+-- T2-05: Double extension rejection — enforced by pre-condition is_extended = false
+-- T2-06: Overdue calculation after extension — correct due_date tracking
+-- T2-07: Multiple copies tracking — per-book stock managed by CatalogAgent
+-- T2-08: Last copy boundary (stock → 0) — pre-condition stock > 0 in decrease_stock()
+-- T2-09: Duplicate member registration — pre-condition member_id not in set
+-- T2-10: Invalid return (book not borrowed) — find_active_loan() returns nil if not found
+-- T2-11: Precious book loan rejection — checked by can_be_loaned(category != <Precious>)
+-- T2-12: Day 14 due date boundary — comparison return_date > due_date (inclusive)
+-- ============================================================================

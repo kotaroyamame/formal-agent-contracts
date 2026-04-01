@@ -1,0 +1,224 @@
+-- Gold Standard VDM-SL Specification for Bank Account Agent
+-- This specification handles all business rules and all 10 traps (T1-01 through T1-10)
+
+module BankAccount
+  exports all
+definitions
+
+-- ============================================================================
+-- TYPE DEFINITIONS AND INVARIANTS
+-- ============================================================================
+
+types
+
+  -- Unique account identifier
+  AccountId = nat;
+
+  -- Account name (non-empty, not whitespace-only)
+  AccountName = seq of char
+    inv name == (len name > 0 and not IsWhitespaceOnly(name));
+
+  -- Money amount in yen (non-negative integer)
+  Money = int
+    inv m == m >= 0;
+
+  -- Account record containing name and balance
+  Account :: name : AccountName
+            balance : Money
+    inv a == (len a.name > 0 and
+              not IsWhitespaceOnly(a.name) and
+              a.balance >= 0);
+
+  -- State of the system: maps account IDs to accounts
+  BankState = map AccountId to Account
+    inv state == (forall acc in rng state & acc.balance >= 0);
+
+  -- Operation result types
+  Result = <Ok> | ErrorMsg;
+  ErrorMsg = seq of char;
+
+-- ============================================================================
+-- HELPER FUNCTIONS
+-- ============================================================================
+
+functions
+
+  -- Check if a string contains only whitespace characters
+  -- Used for trap T1-10: whitespace-only account names
+  IsWhitespaceOnly(s : seq of char) : bool ==
+    (forall i in set inds s & s(i) in set {' ', '\t', '\n', '\r'});
+
+  -- Trim leading and trailing whitespace from a string
+  Trim(s : seq of char) : seq of char ==
+    let trimmed = [c | c in seq s & c not in set {' ', '\t', '\n', '\r'}]
+    in trimmed;
+
+  -- Check if an account name is valid
+  -- Rejects: empty string, whitespace-only string, null values
+  -- Handles traps T1-01 (indirectly), T1-10 (whitespace-only)
+  IsValidAccountName(name : seq of char) : bool ==
+    len name > 0 and not IsWhitespaceOnly(name);
+
+  -- Check if a withdrawal amount is within limits
+  -- Handles trap T1-05 and T1-06: withdrawal limit of exactly 1,000,000 yen
+  IsValidWithdrawalAmount(amount : int) : bool ==
+    amount > 0 and amount <= 1000000;
+
+  -- Check if a deposit amount is valid
+  -- Handles trap T1-02: zero-amount deposit (we accept 0 as valid)
+  IsValidDepositAmount(amount : int) : bool ==
+    amount >= 0;
+
+  -- Check if a transfer amount is valid
+  -- Handles trap T1-09: transfer limit interpretation
+  -- DESIGN DECISION: Transfer amount follows withdrawal limit (amount <= 1,000,000)
+  IsValidTransferAmount(amount : int) : bool ==
+    amount > 0 and amount <= 1000000;
+
+-- ============================================================================
+-- MAIN OPERATIONS
+-- ============================================================================
+
+operations
+
+  -- Operation 1: CREATE_ACCOUNT
+  -- Creates a new account with given name and initial balance
+  -- Traps addressed:
+  --   T1-01: Negative initial balance - rejected
+  --   T1-10: Whitespace-only name - rejected
+  CreateAccount(name : AccountName, initialBalance : Money)
+    ext wr bank : BankState
+        wr nextId : AccountId
+    pre
+      -- Trap T1-10: Name must not be empty or whitespace-only
+      IsValidAccountName(name) and
+      -- Trap T1-01: Initial balance must be non-negative
+      initialBalance >= 0
+    post
+      let newAccount = mk_Account(name, initialBalance)
+      in bank = bank~ ++ {nextId~ |-> newAccount} and
+         nextId = nextId~ + 1;
+
+  -- Operation 2: DEPOSIT
+  -- Adds money to an account
+  -- Traps addressed:
+  --   T1-02: Zero-amount deposit - accepted (contributes 0 to balance)
+  Deposit(accountId : AccountId, amount : Money)
+    ext wr bank : BankState
+    pre
+      accountId in set dom bank and
+      IsValidDepositAmount(amount)
+    post
+      let account = bank~(accountId)
+      in bank(accountId) = mk_Account(account.name, account.balance + amount) and
+         forall id in set dom bank & id <> accountId => bank(id) = bank~(id);
+
+  -- Operation 3: WITHDRAWAL
+  -- Removes money from an account
+  -- Traps addressed:
+  --   T1-03: Zero-amount withdrawal - rejected (not valid)
+  --   T1-04: Withdrawal exactly equal to balance - accepted
+  --   T1-05: Withdrawal of exactly 1,000,000 yen - accepted
+  --   T1-06: Withdrawal over 1,000,001 yen - rejected
+  Withdrawal(accountId : AccountId, amount : Money)
+    ext wr bank : BankState
+    pre
+      accountId in set dom bank and
+      -- Trap T1-03: Zero-amount withdrawals are rejected
+      amount > 0 and
+      -- Trap T1-05/T1-06: Withdrawal limit is exactly 1,000,000 (inclusive)
+      amount <= 1000000 and
+      -- Balance must not go negative
+      bank(accountId).balance >= amount
+    post
+      let account = bank~(accountId)
+      in bank(accountId) = mk_Account(account.name, account.balance - amount) and
+         forall id in set dom bank & id <> accountId => bank(id) = bank~(id);
+
+  -- Operation 4: BALANCE_INQUIRY
+  -- Retrieves the current balance of an account
+  BalanceInquiry(accountId : AccountId) result : Money
+    ext rd bank : BankState
+    pre
+      accountId in set dom bank
+    post
+      result = bank(accountId).balance;
+
+  -- Operation 5: TRANSFER
+  -- Transfers money from one account to another
+  -- Traps addressed:
+  --   T1-07: Transfer atomicity - enforced by pre/post conditions
+  --   T1-08: Self-transfer prevention
+  --   T1-09: Transfer amount limit interpretation (same as withdrawal)
+  Transfer(sourceId : AccountId, destId : AccountId, amount : Money)
+    ext wr bank : BankState
+    pre
+      -- Both accounts must exist
+      sourceId in set dom bank and
+      destId in set dom bank and
+      -- Trap T1-08: Source and destination must be different
+      sourceId <> destId and
+      -- Trap T1-09: Transfer amount is subject to withdrawal limit
+      -- DESIGN DECISION: Transfers are limited to 1,000,000 yen maximum
+      IsValidTransferAmount(amount) and
+      -- Source must have sufficient balance
+      bank(sourceId).balance >= amount
+    post
+      let sourceAccount = bank~(sourceId),
+          destAccount = bank~(destId)
+      in
+      -- Trap T1-07: Both debit and credit operations must succeed (atomicity)
+      bank(sourceId) = mk_Account(sourceAccount.name, sourceAccount.balance - amount) and
+      bank(destId) = mk_Account(destAccount.name, destAccount.balance + amount) and
+      forall id in set dom bank &
+        id <> sourceId and id <> destId => bank(id) = bank~(id);
+
+-- ============================================================================
+-- IMPLEMENTATION NOTES
+-- ============================================================================
+
+-- TRAP HANDLING SUMMARY:
+--
+-- T1-01 (Negative Initial Balance):
+--   Handled in CreateAccount precondition: initialBalance >= 0
+--
+-- T1-02 (Zero-Amount Deposit):
+--   Handled in Deposit precondition: IsValidDepositAmount allows amount >= 0
+--   Zero deposits are accepted (no business rule prohibits them)
+--
+-- T1-03 (Zero-Amount Withdrawal):
+--   Handled in Withdrawal precondition: amount > 0 (zero rejected)
+--   Design decision: Zero withdrawals are semantically invalid
+--
+-- T1-04 (Withdrawal Equal to Balance):
+--   Handled in Withdrawal precondition: balance >= amount (boundary inclusive)
+--   Postcondition ensures balance becomes 0 (valid per invariants)
+--
+-- T1-05 (Withdrawal at Exact Limit 1,000,000):
+--   Handled in Withdrawal precondition: amount <= 1000000
+--   Boundary is inclusive; exactly 1,000,000 is allowed
+--
+-- T1-06 (Withdrawal Above Limit 1,000,001):
+--   Handled in Withdrawal precondition: amount <= 1000000
+--   Amounts > 1,000,000 are rejected
+--
+-- T1-07 (Transfer Atomicity):
+--   Enforced through preconditions and postconditions
+--   Both source and destination are updated in single post condition
+--   If any precondition fails, neither account is modified
+--
+-- T1-08 (Self-Transfer):
+--   Handled in Transfer precondition: sourceId <> destId
+--   Self-transfers are explicitly forbidden
+--
+-- T1-09 (Transfer Amount Exceeding Withdrawal Limit):
+--   Design decision: Transfers are subject to the same 1,000,000 limit as withdrawals
+--   Handled in Transfer precondition: IsValidTransferAmount(amount)
+--   This interpretation treats transfers as involving a withdrawal component
+--
+-- T1-10 (Whitespace-Only Account Name):
+--   Handled in AccountName invariant and IsValidAccountName function
+--   Whitespace-only names are rejected during CreateAccount validation
+--   The invariant ensures all accounts in state have valid names
+
+end BankAccount

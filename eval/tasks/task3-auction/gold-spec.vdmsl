@@ -1,0 +1,329 @@
+-- Online Auction System - Gold Specification (VDM-SL)
+-- Addresses all 14 traps with formal semantics
+
+module AUCTION_SYSTEM
+
+definitions
+
+-- ============================================================================
+-- TYPES AND STATE DEFINITIONS
+-- ============================================================================
+
+types
+
+  -- Auction State Type (addresses T3-10, T3-11)
+  AuctionState = <Draft> | <Active> | <Ended> | <Paid> | <Shipped> | <Completed> | <Cancelled>;
+
+  -- User ID (seller, bidder)
+  UserId = nat;
+
+  -- Auction ID
+  AuctionId = nat;
+
+  -- Price in Japanese Yen (addresses T3-13: must be > 0)
+  Price = nat
+    inv p == p > 0;
+
+  -- Duration in seconds (addresses T3-14: must be > 0)
+  Duration = nat
+    inv d == d > 0;
+
+  -- Timestamp in milliseconds since epoch
+  Timestamp = nat;
+
+  -- Bid record (addresses T3-02: timestamp for ordering)
+  Bid ::
+    bidder_id : UserId
+    amount : Price
+    timestamp : Timestamp  -- for ordering in case of simultaneous bids
+  inv bid == bid.bidder_id > 0 and bid.amount > 0;
+
+  -- Auction record (addresses T3-01, T3-03, T3-04)
+  Auction ::
+    auction_id : AuctionId
+    seller_id : UserId
+    product_name : seq of char
+    starting_price : Price
+    duration_seconds : Duration
+    start_time : Timestamp
+    end_time : Timestamp  -- initial end time
+    current_end_time : Timestamp  -- dynamic end time (for time extensions)
+    current_state : AuctionState
+    bid_history : seq of Bid  -- all bids, newest first
+    payment_deadline : [Timestamp]  -- set when state = Ended
+    max_extension_count : nat  -- counter for cascading extensions (T3-01)
+    max_extensions_allowed : nat  -- limit for extensions (default: 10)
+  inv auction ==
+    (auction.starting_price > 0) and
+    (auction.duration_seconds > 0) and
+    (auction.start_time < auction.end_time) and
+    (auction.current_end_time >= auction.end_time) and
+    (len auction.bid_history = 0 or
+     forall i, j in set inds auction.bid_history &
+       i < j =>
+       auction.bid_history(i).timestamp >= auction.bid_history(j).timestamp) and
+    (auction.current_state = <Ended> or auction.current_state = <Paid> =>
+     auction.payment_deadline <> nil) and
+    (auction.current_state = <Draft> or auction.current_state = <Active> =>
+     auction.payment_deadline = nil) and
+    (auction.max_extension_count <= auction.max_extensions_allowed);
+
+  -- System state
+  AuctionSystemState ::
+    auctions : map AuctionId to Auction
+    next_auction_id : AuctionId;
+
+-- ============================================================================
+-- UTILITY FUNCTIONS
+-- ============================================================================
+
+functions
+
+  -- Get current highest bid amount (addresses T3-06, T3-07)
+  get_current_bid_amount(auction : Auction) : Price =
+    if len auction.bid_history = 0
+    then auction.starting_price
+    else auction.bid_history(1).amount;
+
+  -- Calculate minimum next bid (addresses T3-06: rounding logic)
+  calculate_min_next_bid(current_amount : Price) : Price =
+    let one_percent = (current_amount * 100) / 100,  -- integer division
+        min_unit = if one_percent < 100 then 100 else one_percent
+    in current_amount + min_unit;
+
+  -- Check if timestamp is within auction period (addresses T3-08: boundary)
+  is_within_auction_period(auction : Auction, bid_time : Timestamp) : bool =
+    auction.start_time <= bid_time and bid_time <= auction.current_end_time;
+
+  -- Check if payment is within 72 hours (addresses T3-09: boundary)
+  is_payment_within_deadline(settlement_time : Timestamp, payment_time : Timestamp) : bool =
+    payment_time <= settlement_time + (72 * 60 * 60 * 1000);  -- 72 hours in milliseconds
+
+  -- Perform time extension (addresses T3-01: cascading with limit)
+  extend_auction_time(auction : Auction, current_time : Timestamp) : Auction =
+    let seconds_until_end = (auction.current_end_time - current_time) / 1000,
+        should_extend = seconds_until_end <= (5 * 60) and  -- 5 minutes
+                        auction.max_extension_count < auction.max_extensions_allowed,
+        new_end_time = if should_extend
+                       then auction.current_end_time + (5 * 60 * 1000)  -- 5 minutes in milliseconds
+                       else auction.current_end_time,
+        new_extension_count = if should_extend
+                              then auction.max_extension_count + 1
+                              else auction.max_extension_count
+    in mu(auction,
+          current_end_time |-> new_end_time,
+          max_extension_count |-> new_extension_count);
+
+  -- Get highest bidder (addresses T3-02: simultaneous bids handled by timestamp ordering)
+  get_highest_bidder(auction : Auction) : [UserId] =
+    if len auction.bid_history = 0
+    then nil
+    else auction.bid_history(1).bidder_id;
+
+  -- Get second highest bidder (addresses T3-03: next highest for payment timeout)
+  get_second_highest_bidder(auction : Auction) : [UserId] =
+    if len auction.bid_history < 2
+    then nil
+    else auction.bid_history(2).bidder_id;
+
+  -- Get second highest bid amount (addresses T3-03)
+  get_second_highest_bid(auction : Auction) : [Price] =
+    if len auction.bid_history < 2
+    then nil
+    else auction.bid_history(2).amount;
+
+-- ============================================================================
+-- STATE MACHINE OPERATIONS
+-- ============================================================================
+
+operations
+
+  -- Create new auction (addresses T3-13, T3-14 via inv)
+  create_auction(system : AuctionSystemState,
+                 seller_id : UserId,
+                 product_name : seq of char,
+                 starting_price : Price,
+                 duration_seconds : Duration,
+                 current_time : Timestamp)
+    new_system : AuctionSystemState
+  pre
+    seller_id > 0 and
+    len product_name > 0 and
+    starting_price > 0 and  -- T3-13
+    duration_seconds > 0    -- T3-14
+  post
+    let auction_id = system.next_auction_id,
+        new_auction = mk_Auction(
+          auction_id,
+          seller_id,
+          product_name,
+          starting_price,
+          duration_seconds,
+          current_time,
+          current_time + (duration_seconds * 1000),  -- convert to milliseconds
+          current_time + (duration_seconds * 1000),  -- current_end_time = end_time initially
+          <Draft>,
+          [],
+          nil,
+          0,
+          10  -- max 10 extensions per auction
+        )
+    in
+    new_system.auctions = system.auctions ++ {auction_id |-> new_auction} and
+    new_system.next_auction_id = system.next_auction_id + 1;
+
+  -- Start auction (Draft -> Active transition)
+  start_auction(system : AuctionSystemState, auction_id : AuctionId, current_time : Timestamp)
+    new_system : AuctionSystemState
+  pre
+    auction_id in set dom system.auctions and
+    system.auctions(auction_id).current_state = <Draft> and
+    current_time <= system.auctions(auction_id).start_time
+  post
+    let updated_auction = mu(system.auctions(auction_id),
+                             current_state |-> <Active>)
+    in
+    new_system.auctions = system.auctions ++ {auction_id |-> updated_auction} and
+    new_system.next_auction_id = system.next_auction_id;
+
+  -- Place bid (addresses T3-02, T3-05, T3-06, T3-07, T3-08, T3-12)
+  place_bid(system : AuctionSystemState,
+            auction_id : AuctionId,
+            bidder_id : UserId,
+            bid_amount : Price,
+            bid_time : Timestamp)
+    new_system : AuctionSystemState
+  pre
+    auction_id in set dom system.auctions and
+    bidder_id > 0 and
+    bid_amount > 0 and
+    let auction = system.auctions(auction_id)
+    in
+    -- Auction must be Active
+    auction.current_state = <Active> and
+    -- Bidder cannot be seller (addresses T3-12: no proxy bidding)
+    bidder_id <> auction.seller_id and
+    -- Bid must be within auction period (addresses T3-08: bid_time <= current_end_time)
+    bid_time <= auction.current_end_time and
+    -- Bid amount must exceed current highest (addresses T3-07)
+    bid_amount > get_current_bid_amount(auction) and
+    -- Bid amount must meet minimum increment (addresses T3-06)
+    bid_amount >= calculate_min_next_bid(get_current_bid_amount(auction)) and
+    -- No duplicate highest bids at same timestamp (addresses T3-02)
+    not exists bid in seq auction.bid_history &
+      bid.bidder_id = bidder_id and bid.timestamp = bid_time
+  post
+    let auction = system.auctions(auction_id),
+        new_bid = mk_Bid(bidder_id, bid_amount, bid_time),
+        extended_auction = extend_auction_time(auction, bid_time),
+        updated_auction = mu(extended_auction,
+                            bid_history |-> [new_bid] ^ auction.bid_history)
+    in
+    new_system.auctions = system.auctions ++ {auction_id |-> updated_auction} and
+    new_system.next_auction_id = system.next_auction_id;
+
+  -- End auction (Active -> Ended transition)
+  end_auction(system : AuctionSystemState, auction_id : AuctionId, current_time : Timestamp)
+    new_system : AuctionSystemState
+  pre
+    auction_id in set dom system.auctions and
+    let auction = system.auctions(auction_id)
+    in
+    auction.current_state = <Active> and
+    current_time > auction.current_end_time
+  post
+    let auction = system.auctions(auction_id),
+        payment_deadline_time = current_time + (72 * 60 * 60 * 1000),
+        updated_auction = mu(auction,
+                            current_state |-> <Ended>,
+                            payment_deadline |-> payment_deadline_time)
+    in
+    new_system.auctions = system.auctions ++ {auction_id |-> updated_auction} and
+    new_system.next_auction_id = system.next_auction_id;
+
+  -- Process payment (Ended -> Paid transition, addresses T3-09)
+  process_payment(system : AuctionSystemState,
+                  auction_id : AuctionId,
+                  payment_time : Timestamp)
+    new_system : AuctionSystemState
+  pre
+    auction_id in set dom system.auctions and
+    let auction = system.auctions(auction_id)
+    in
+    auction.current_state = <Ended> and
+    auction.payment_deadline <> nil and
+    is_payment_within_deadline(auction.payment_deadline - (72 * 60 * 60 * 1000),
+                                payment_time)  -- payment_deadline - 72h = settlement_time
+  post
+    let updated_auction = mu(system.auctions(auction_id),
+                            current_state |-> <Paid>)
+    in
+    new_system.auctions = system.auctions ++ {auction_id |-> updated_auction} and
+    new_system.next_auction_id = system.next_auction_id;
+
+  -- Handle payment timeout (Ended -> Cancelled, addresses T3-03)
+  -- When payment deadline passes without payment
+  apply_payment_timeout(system : AuctionSystemState,
+                       auction_id : AuctionId,
+                       current_time : Timestamp)
+    new_system : AuctionSystemState
+  pre
+    auction_id in set dom system.auctions and
+    let auction = system.auctions(auction_id)
+    in
+    auction.current_state = <Ended> and
+    auction.payment_deadline <> nil and
+    current_time > auction.payment_deadline
+  post
+    -- T3-03: Explicit design choice - mark as Cancelled (next highest bidder not auto-advanced)
+    -- This requires explicit business logic elsewhere to contact second bidder
+    let updated_auction = mu(system.auctions(auction_id),
+                            current_state |-> <Cancelled>)
+    in
+    new_system.auctions = system.auctions ++ {auction_id |-> updated_auction} and
+    new_system.next_auction_id = system.next_auction_id;
+
+  -- Confirm shipment (Paid -> Shipped transition, addresses T3-10)
+  confirm_shipment(system : AuctionSystemState, auction_id : AuctionId)
+    new_system : AuctionSystemState
+  pre
+    auction_id in set dom system.auctions and
+    -- Must be Paid state (not Ended, not Draft, etc.) - addresses T3-10
+    system.auctions(auction_id).current_state = <Paid>
+  post
+    let updated_auction = mu(system.auctions(auction_id),
+                            current_state |-> <Shipped>)
+    in
+    new_system.auctions = system.auctions ++ {auction_id |-> updated_auction} and
+    new_system.next_auction_id = system.next_auction_id;
+
+  -- Complete auction (Shipped -> Completed transition)
+  complete_auction(system : AuctionSystemState, auction_id : AuctionId)
+    new_system : AuctionSystemState
+  pre
+    auction_id in set dom system.auctions and
+    system.auctions(auction_id).current_state = <Shipped>
+  post
+    let updated_auction = mu(system.auctions(auction_id),
+                            current_state |-> <Completed>)
+    in
+    new_system.auctions = system.auctions ++ {auction_id |-> updated_auction} and
+    new_system.next_auction_id = system.next_auction_id;
+
+  -- Cancel auction (Active -> Cancelled, only if no bids, addresses T3-04, T3-11)
+  cancel_auction(system : AuctionSystemState, auction_id : AuctionId)
+    new_system : AuctionSystemState
+  pre
+    auction_id in set dom system.auctions and
+    let auction = system.auctions(auction_id)
+    in
+    (auction.current_state = <Active> or auction.current_state = <Draft>) and
+    len auction.bid_history = 0  -- only allow cancellation if no bids
+  post
+    let updated_auction = mu(system.auctions(auction_id),
+                            current_state |-> <Cancelled>)
+    in
+    new_system.auctions = system.auctions ++ {auction_id |-> updated_auction} and
+    new_system.next_auction_id = system.next_auction_id;
+
+end AUCTION_SYSTEM

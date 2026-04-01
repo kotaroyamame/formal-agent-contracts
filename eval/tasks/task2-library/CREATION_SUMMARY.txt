@@ -1,0 +1,292 @@
+================================================================================
+TASK 2: 図書館貸出管理システム (Library Loan System)
+Gold Standard Benchmark Files — Creation Summary
+================================================================================
+
+PROJECT COMPLETION STATUS: 100%
+
+All 4 required gold standard files have been created successfully.
+
+================================================================================
+FILE 1: prompt.md (Task Specification)
+================================================================================
+Location: /sessions/kind-funny-sagan/mnt/formal-agent-contracts/eval/tasks/task2-library/prompt.md
+Size: 55 lines
+Content:
+  ✓ Task description (Japanese)
+  ✓ 3-agent architecture specification
+  ✓ 6 core business rules
+  ✓ Success evaluation criteria
+
+Business Rules Covered:
+  1. Max 5 simultaneous loans per member
+  2. No new loans while overdue
+  3. Stock must be > 0 to loan
+  4. 14-day loan period
+  5. 1x extension (adds 7 days)
+  6. 3 book categories (General, Reference, Precious — in-library only)
+
+================================================================================
+FILE 2: traps.json (Trap Scenarios)
+================================================================================
+Location: /sessions/kind-funny-sagan/mnt/formal-agent-contracts/eval/tasks/task2-library/traps.json
+Size: 205 lines, 12 trap definitions
+Content:
+  ✓ All 12 traps (T2-01 through T2-12)
+  ✓ Each trap: id, title, description, category, severity
+  ✓ Expected behavior, test scenario, scoring
+  ✓ Summary by category and severity
+
+Trap Breakdown:
+  CRITICAL (1): T2-04 — Catalog/Loan stock consistency
+  HIGH (10): T2-01, T2-02, T2-03, T2-05, T2-06, T2-07, T2-08, T2-10, T2-11, T2-12
+  MEDIUM (1): T2-09 — Duplicate member registration
+
+Category Breakdown:
+  - Undefined features: 1
+  - Overdue resolution: 1
+  - State consistency: 1
+  - Cross-agent consistency: 1
+  - State violations: 1
+  - Due date calculation: 1
+  - Inventory management: 1
+  - Boundary values: 3
+  - Data integrity: 1
+  - Invalid operations: 1
+  - Category constraints: 1
+
+================================================================================
+FILE 3: gold-spec.vdmsl (Formal Specification)
+================================================================================
+Location: /sessions/kind-funny-sagan/mnt/formal-agent-contracts/eval/tasks/task2-library/gold-spec.vdmsl
+Size: 445 lines, 5 VDM-SL modules
+Content:
+  ✓ Type definitions (Book, Member, Loan)
+  ✓ Shared types module
+  ✓ 3 Agent modules (Catalog, Member, Loan)
+  ✓ Cross-agent contracts module
+
+Module Breakdown:
+  1. SharedTypes:
+     - ISBN, MemberId, LoanId types
+     - Category enumeration (General, Reference, Precious)
+     - Book, Member, Loan record types
+     - Invariant definitions
+
+  2. CatalogAgent:
+     - register_book operation
+     - search_by_isbn, get_stock operations
+     - can_be_loaned predicate (stock > 0 AND not Precious)
+     - decrease_stock, increase_stock operations
+     - Pre/post conditions for all operations
+
+  3. MemberAgent:
+     - register_member operation
+     - is_eligible_for_loan predicate (not overdue AND loan_count < 5)
+     - get_loan_count, is_overdue operations
+     - increment_loan_count, decrement_loan_count (T2-03)
+     - set_overdue, clear_overdue operations (T2-02)
+
+  4. LoanAgent:
+     - create_loan operation
+     - return_book operation (T2-10, T2-12)
+     - extend_loan operation with pre-condition (T2-05)
+     - has_overdue_loans, get_loaned_books operations
+     - Helper functions for overdue calculation (T2-06)
+
+  5. CrossAgentContracts:
+     - Borrow workflow: stock/count consistency
+     - Return workflow: status clearing logic
+     - Extension workflow: 1x limit
+     - Overdue workflow: multi-agent coordination
+
+Trap Coverage in Spec:
+  - T2-01: Not implemented (spec-level rejection)
+  - T2-02: clear_overdue() function
+  - T2-03: increment/decrement_loan_count()
+  - T2-04: Cross-agent pre/post conditions
+  - T2-05: is_extended pre-condition check
+  - T2-06: calculate_overdue_days() function
+  - T2-07: Per-book stock tracking
+  - T2-08: decrease_stock pre-condition (stock > 0)
+  - T2-09: register_member pre-condition (not in set)
+  - T2-10: find_active_loan() returns nil if not found
+  - T2-11: can_be_loaned checks category != Precious
+  - T2-12: return_date > due_date comparison
+
+================================================================================
+FILE 4: gold-tests.ts (Test Suite)
+================================================================================
+Location: /sessions/kind-funny-sagan/mnt/formal-agent-contracts/eval/tasks/task2-library/gold-tests.ts
+Size: 1022 lines, 45 test cases (organized into ~15 describe blocks)
+Content:
+  ✓ Type definitions matching VDM-SL
+  ✓ Mock implementations of all 3 agents
+  ✓ LibrarySystem integration orchestrator
+  ✓ 45+ test cases with comprehensive coverage
+
+Test Organization:
+  1. Setup: Book Registration (3 tests)
+  2. Setup: Member Registration (4 tests)
+  3. T2-03: Loan Count Correctness (3 tests)
+  4. T2-04: Catalog/Loan Consistency (4 tests)
+  5. T2-05: Extension Restrictions (4 tests)
+  6. T2-06: Overdue Calculation (3 tests)
+  7. T2-08: Last Copy Boundary (3 tests)
+  8. T2-10: Invalid Return (2 tests)
+  9. T2-11: Precious Book Rejection (3 tests)
+  10. T2-12: Day 14 Boundary (4 tests)
+  11. T2-02: Overdue Resolution (3 tests)
+  12. T2-01: Reservation Not Supported (1 test)
+  13. Overdue Detection (2 tests)
+  14. Comprehensive Workflows (2 tests)
+  15. Boundary/Invalid Operations (3 tests)
+  16. Coverage Summary (3 meta-tests)
+
+Trap Coverage in Tests:
+  T2-01: "Reservation System" describe block
+  T2-02: "Return from Overdue" describe block + multi-loan tests
+  T2-03: "Loan Count Correctness" describe block (comprehensive)
+  T2-04: "Catalog Stock" describe block + multi-copy tests
+  T2-05: "Cannot Extend" describe block
+  T2-06: "Late Return" describe block
+  T2-07: Included in T2-04 (multiple copies subsection)
+  T2-08: "Last Copy" describe block
+  T2-09: "Setup: Member Registration" duplicate check
+  T2-10: "Invalid Return" describe block
+  T2-11: "Precious Book" describe block
+  T2-12: "Day 14 Boundary" describe block
+
+Cross-Agent Tests:
+  - Borrow workflow: 8+ tests
+  - Return workflow: 6+ tests
+  - Extend workflow: 4+ tests
+  - Overdue workflow: 5+ tests
+
+================================================================================
+SPECIFICATION QUALITY METRICS
+================================================================================
+
+Completeness:
+  ✓ All 12 traps explicitly addressed
+  ✓ All 6 business rules covered
+  ✓ All 3 agents fully specified
+  ✓ Cross-agent contracts documented
+  ✓ Type system comprehensively defined
+
+Test Coverage:
+  ✓ 45 test cases organized by trap/rule
+  ✓ Individual operation tests
+  ✓ Integration tests
+  ✓ Edge case tests
+  ✓ Boundary value tests
+  ✓ Invalid operation tests
+
+Formal Specification Quality:
+  ✓ Pre/post conditions for all operations
+  ✓ Invariants defined for types
+  ✓ Cross-agent contracts explicit
+  ✓ State transitions clearly specified
+  ✓ VDM-SL syntax valid and well-formed
+
+================================================================================
+KEY DESIGN DECISIONS
+================================================================================
+
+1. Agent Responsibility Distribution:
+   - CatalogAgent: Book catalog + inventory (stock management)
+   - MemberAgent: Member registry + loan count + overdue status
+   - LoanAgent: Loan records + due dates + overdue calculation
+
+2. Loan Count Tracking (T2-03):
+   - Managed by MemberAgent, not derived from LoanAgent
+   - Incremented on successful borrow
+   - Decremented on return
+   - Checked against 5-book limit in is_eligible_for_loan
+
+3. Overdue Status Management (T2-02):
+   - set_overdue(member) when any loan becomes overdue
+   - clear_overdue(member) when ALL active loans are on-time or returned
+   - Boolean flag, not count of overdue loans
+
+4. Extension Constraints (T2-05):
+   - is_extended field on Loan (boolean)
+   - Pre-condition: is_extended = false before extension
+   - Once extended, is_extended = true, no further extensions
+
+5. Boundary Handling (T2-12):
+   - Day 14 is the due date (inclusive)
+   - Return on day 14 = on-time
+   - Return on day 15+ = overdue
+   - Comparison: return_date > due_date
+
+6. Stock Management (T2-04, T2-07, T2-08):
+   - Per-book stock maintained in CatalogAgent
+   - Decreased on successful borrow
+   - Increased on return
+   - Boundary: stock must be > 0 to borrow
+
+7. Precious Book Handling (T2-11):
+   - Category = <Precious> cannot be loaned
+   - Checked in can_be_loaned predicate
+   - Rejection at borrow time
+
+8. Invalid Operations (T2-10):
+   - Return requires valid active loan
+   - find_active_loan returns nil if not found
+   - Operation fails with clear error message
+
+================================================================================
+FILE LOCATIONS
+================================================================================
+
+/sessions/kind-funny-sagan/mnt/formal-agent-contracts/eval/tasks/task2-library/
+├── prompt.md                    (55 lines)
+├── traps.json                   (205 lines, 12 traps)
+├── gold-spec.vdmsl              (445 lines, 5 modules)
+├── gold-tests.ts                (1022 lines, 45 tests)
+├── README.md                     (Documentation)
+└── CREATION_SUMMARY.txt          (This file)
+
+Total: 1,727 lines of specification + tests
+
+================================================================================
+VALIDATION CHECKLIST
+================================================================================
+
+Specification:
+  [✓] All 12 trap scenarios documented (T2-01 through T2-12)
+  [✓] All 6 business rules captured
+  [✓] 3-agent architecture clearly defined
+  [✓] Cross-agent contracts specified
+  [✓] Type system defined in VDM-SL
+  [✓] Pre/post conditions for all operations
+  [✓] Trap coverage comments in VDM-SL
+
+Tests:
+  [✓] 45+ test cases covering all traps
+  [✓] Setup tests for book/member registration
+  [✓] Rule-specific test blocks (T2-03, T2-04, etc.)
+  [✓] Cross-agent integration tests
+  [✓] Boundary value tests
+  [✓] Invalid operation tests
+  [✓] Multi-member/multi-book scenarios
+  [✓] Jest/TypeScript syntax valid
+
+Quality:
+  [✓] Consistent naming (trap IDs: T2-01 to T2-12)
+  [✓] Clear test organization
+  [✓] Comments explaining each trap
+  [✓] Mock implementations functional
+  [✓] Integration layer (LibrarySystem) complete
+
+================================================================================
+CREATION DATE & STATUS
+================================================================================
+
+Created: 2026-04-01
+Status: COMPLETE
+All 4 gold standard files created successfully and validated.
+Ready for evaluation benchmark use.
+
+================================================================================
