@@ -99,6 +99,26 @@ Orchestrates the full reverse pipeline: **Extract → Refine → Reconcile**, th
 
 **Triggers**: "reverse workflow", "extract and refine spec from code", 「リバースワークフローで」「コードの仕様を明確にしたい」
 
+## Installation / インストール
+
+Add the marketplace and the plugin will be available:
+
+マーケットプレイスを追加するとプラグインが利用可能になります:
+
+```
+/plugin marketplace add kotaroyamame/formal-agent-contracts
+```
+
+Alternatively, clone and install locally:
+
+または、ローカルにクローンしてインストール:
+
+```
+git clone https://github.com/kotaroyamame/formal-agent-contracts.git
+cd formal-agent-contracts
+/plugin install .
+```
+
 ## Quick Start: Usage Example / 使い方の例
 
 This section walks through a real example — building a task management agent — to show what the plugin does at each step. No formal methods knowledge required.
