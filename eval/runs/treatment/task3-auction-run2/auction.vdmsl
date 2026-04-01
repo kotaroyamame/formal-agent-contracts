@@ -1,0 +1,108 @@
+-- Online Auction System - VDM-SL Formal Specification (Run 2)
+-- Focuses on bid validation and timing precision
+
+module AUCTION_BID_SYSTEM
+
+imports
+  from VDM
+
+types
+  AuctionState = <Draft> | <Active> | <Ended> | <Paid> | <Shipped> | <Completed> | <Cancelled>;
+
+  AuctionId = seq of char;
+  UserId = seq of char;
+  Money = nat;
+  Timestamp = nat;
+
+  Bid ::
+    bidder_id : UserId
+    amount : Money
+    timestamp : Timestamp
+  inv bid == bid.amount > 0;
+
+  AuctionRecord ::
+    auction_id : AuctionId
+    seller_id : UserId
+    state : AuctionState
+    starting_price : Money
+    current_highest_bid : Money
+    highest_bidder : [UserId]
+    bids : seq of Bid
+    end_time : Timestamp
+    extension_count : nat
+  inv rec ==
+    rec.starting_price > 0 and
+    rec.extension_count <= 10 and
+    (rec.state = <Active> => len rec.bids >= 0) and
+    (rec.highest_bidder <> nil => rec.highest_bidder <> rec.seller_id) and
+    (forall i in set inds rec.bids & rec.bids(i).bidder_id <> rec.seller_id) and
+    (len rec.bids > 0 => rec.current_highest_bid >= rec.starting_price) and
+    (forall i in set inds rec.bids, j in set inds rec.bids &
+      i < j => rec.bids(i).timestamp <= rec.bids(j).timestamp and
+      (rec.bids(i).timestamp = rec.bids(j).timestamp => i >= j));
+
+state BidSystem of
+  records : map AuctionId to AuctionRecord
+init state == state`records = {|->}
+end
+
+operations
+  -- Create auction record
+  Create(id : AuctionId, seller : UserId, starting : Money, end_t : Timestamp) id : AuctionId
+  pre starting > 0 and id not in set dom records and end_t > 0
+  post let new_rec = mk_AuctionRecord(id, seller, <Draft>, starting, 0, nil, [], end_t, 0)
+       in records = records~ union {id |-> new_rec}
+  return id;
+
+  -- Validate and place bid with strong preconditions
+  ValidateBid(id : AuctionId, bidder : UserId, amount : Money, now : Timestamp) valid : bool
+  pre id in set dom records and
+      let rec = records(id)
+      in amount > 0 and
+         bidder <> rec.seller_id and
+         rec.state = <Active> and
+         now < rec.end_time and
+         (len rec.bids = 0 => amount >= rec.starting_price) and
+         (len rec.bids > 0 => amount > rec.current_highest_bid and
+            amount >= rec.current_highest_bid + max_val(floor_val(rec.current_highest_bid / 100), 100))
+  post let rec = records~(id),
+           min_inc = max_val(floor_val(rec.current_highest_bid / 100), 100)
+       in records(id).highest_bidder = bidder and
+          records(id).current_highest_bid = amount and
+          len records(id).bids = len rec.bids + 1;
+
+  -- Time-aware extension
+  ExtendOnBid(id : AuctionId, now : Timestamp) extended : bool
+  pre id in set dom records and
+      let rec = records(id)
+      in rec.state = <Active> and
+         (rec.end_time - now) <= 300 and
+         rec.extension_count < 10
+  post let rec = records~(id)
+       in records(id).end_time = rec.end_time + 300 and
+          records(id).extension_count = rec.extension_count + 1;
+
+  -- Transition Active -> Ended with strict timing
+  Finalize(id : AuctionId, now : Timestamp) finalized : bool
+  pre id in set dom records and
+      records(id).state = <Active> and
+      now >= records(id).end_time
+  post records(id).state = <Ended>;
+
+  -- Payment window enforcement (72 hours = 259200 seconds for timestamp)
+  ClosePayment(id : AuctionId, now : Timestamp) closed : bool
+  pre id in set dom records and
+      records(id).state = <Ended> and
+      now > records(id).end_time + 259200
+  post records(id).state = <Cancelled>
+
+end AUCTION_BID_SYSTEM
+
+functions
+  floor_val : nat -> nat
+  floor_val(n) == floor(n);
+
+  max_val : nat * nat -> nat
+  max_val(a, b) == if a >= b then a else b
+
+end AUCTION_BID_SYSTEM

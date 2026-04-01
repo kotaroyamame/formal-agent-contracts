@@ -1,0 +1,300 @@
+-- ============================================================================
+-- LIBRARY LOAN MANAGEMENT SYSTEM - VDM-SL FORMAL SPECIFICATION
+-- RUN 1: Full 3-Module Architecture with Comprehensive Inter-Agent Contracts
+-- ============================================================================
+-- This specification defines formal contracts between three specialized agents:
+-- CatalogAgent (inventory management), MemberAgent (patron management),
+-- and LoanAgent (loan lifecycle management).
+-- ============================================================================
+
+module CATALOG_AGENT
+
+exports all
+
+definitions
+
+types
+  BookId = nat;
+  Category = <NORMAL> | <PRECIOUS>;
+
+  Book ::
+    id : BookId
+    title : seq of char
+    category : Category
+    total_copies : nat
+    available_copies : nat
+  inv b == b.available_copies <= b.total_copies;
+
+  Catalog = map BookId to Book;
+
+state CatalogState of
+  catalog : Catalog
+  inv cs ==
+    forall bookId in set dom cs.catalog &
+      cs.catalog(bookId).available_copies <= cs.catalog(bookId).total_copies
+end
+
+operations
+  -- Add book to catalog. Precondition: BookId not already in catalog.
+  -- Postcondition: Book added with given copies, all available.
+  AddBook(bookId : BookId, title : seq of char, category : Category, copies : nat)
+    ext wr catalog : Catalog
+    pre bookId not in set dom catalog /\ copies > 0
+    post catalog = catalog~ union {bookId |->
+           mk_Book(bookId, title, category, copies, copies)};
+
+  -- Decrease available copies. Precondition: Book exists, available > 0.
+  -- Postcondition: available_copies decremented by 1.
+  ReserveBook(bookId : BookId)
+    ext wr catalog : Catalog
+    pre bookId in set dom catalog /\
+        catalog(bookId).available_copies > 0
+    post catalog(bookId) =
+      mk_Book(
+        catalog(bookId).id,
+        catalog(bookId).title,
+        catalog(bookId).category,
+        catalog(bookId).total_copies,
+        catalog(bookId).available_copies - 1);
+
+  -- Return copy to catalog. Precondition: Book exists.
+  -- Postcondition: available_copies incremented by 1, not exceeding total.
+  ReturnBook(bookId : BookId)
+    ext wr catalog : Catalog
+    pre bookId in set dom catalog /\
+        catalog(bookId).available_copies < catalog(bookId).total_copies
+    post catalog(bookId) =
+      mk_Book(
+        catalog(bookId).id,
+        catalog(bookId).title,
+        catalog(bookId).category,
+        catalog(bookId).total_copies,
+        catalog(bookId).available_copies + 1);
+
+  -- Query book availability. Precondition: Book exists.
+  -- Returns available copy count.
+  GetAvailableCopies(bookId : BookId) res : nat
+    ext rd catalog : Catalog
+    pre bookId in set dom catalog
+    post res = catalog(bookId).available_copies;
+
+  -- Check if book is precious (read-only access only).
+  IsPrecious(bookId : BookId) res : bool
+    ext rd catalog : Catalog
+    pre bookId in set dom catalog
+    post res <=> catalog(bookId).category = <PRECIOUS>;
+
+  -- Get book details. Precondition: Book exists.
+  GetBookDetails(bookId : BookId) res : Book
+    ext rd catalog : Catalog
+    pre bookId in set dom catalog
+    post res = catalog(bookId)
+
+end CATALOG_AGENT
+
+-- ============================================================================
+
+module MEMBER_AGENT
+
+exports all
+
+definitions
+
+types
+  MemberId = nat;
+  Member ::
+    id : MemberId
+    name : seq of char
+    has_overdue : bool
+    loan_count : nat
+  inv m == m.loan_count >= 0;
+
+  Members = map MemberId to Member;
+
+state MemberState of
+  members : Members
+  inv ms == forall memberId in set dom ms.members &
+    ms.members(memberId).loan_count >= 0
+end
+
+operations
+  -- Register new member. Precondition: MemberId not already registered.
+  -- Postcondition: New member added with no loans, no overdue status.
+  RegisterMember(memberId : MemberId, name : seq of char)
+    ext wr members : Members
+    pre memberId not in set dom members
+    post members = members~ union {memberId |->
+           mk_Member(memberId, name, false, 0)};
+
+  -- Increment loan count. Precondition: Member exists, count < MAX_LOANS (5).
+  -- Postcondition: loan_count incremented.
+  IncrementLoanCount(memberId : MemberId)
+    ext wr members : Members
+    pre memberId in set dom members /\
+        members(memberId).loan_count < 5
+    post members(memberId).loan_count = members(memberId).loan_count~ + 1;
+
+  -- Decrement loan count. Precondition: Member exists, count > 0.
+  -- Postcondition: loan_count decremented.
+  DecrementLoanCount(memberId : MemberId)
+    ext wr members : Members
+    pre memberId in set dom members /\
+        members(memberId).loan_count > 0
+    post members(memberId).loan_count = members(memberId).loan_count~ - 1;
+
+  -- Set overdue flag. Precondition: Member exists.
+  -- Postcondition: has_overdue flag set to true.
+  SetOverdue(memberId : MemberId)
+    ext wr members : Members
+    pre memberId in set dom members
+    post members(memberId).has_overdue = true;
+
+  -- Clear overdue flag. Precondition: Member exists.
+  -- Postcondition: has_overdue flag set to false.
+  ClearOverdue(memberId : MemberId)
+    ext wr members : Members
+    pre memberId in set dom members
+    post members(memberId).has_overdue = false;
+
+  -- Check if member has overdue loans. Precondition: Member exists.
+  HasOverdue(memberId : MemberId) res : bool
+    ext rd members : Members
+    pre memberId in set dom members
+    post res <=> members(memberId).has_overdue;
+
+  -- Get current loan count. Precondition: Member exists.
+  GetLoanCount(memberId : MemberId) res : nat
+    ext rd members : Members
+    pre memberId in set dom members
+    post res = members(memberId).loan_count;
+
+  -- Check if member can borrow. Precondition: Member exists.
+  -- Postcondition: true iff loan_count < 5 AND has_overdue = false.
+  CanBorrow(memberId : MemberId) res : bool
+    ext rd members : Members
+    pre memberId in set dom members
+    post res <=> (members(memberId).loan_count < 5 /\
+                  members(memberId).has_overdue = false)
+
+end MEMBER_AGENT
+
+-- ============================================================================
+
+module LOAN_AGENT
+
+exports all
+
+definitions
+
+types
+  BookId = nat;
+  MemberId = nat;
+  LoanId = nat;
+
+  Loan ::
+    id : LoanId
+    book_id : BookId
+    member_id : MemberId
+    borrow_date : nat
+    due_date : nat
+    extended : bool
+    is_returned : bool
+  inv l == l.due_date > l.borrow_date;
+
+  ActiveLoans = map LoanId to Loan;
+
+state LoanState of
+  active_loans : ActiveLoans
+  loan_counter : nat
+  inv ls == ls.loan_counter >= 0
+end
+
+operations
+  -- Create new loan. Precondition: Book not precious, member can borrow,
+  -- book has available copies. Postcondition: New loan created, due_date =
+  -- borrow_date + 14, extended = false, is_returned = false.
+  CreateLoan(
+    book_id : BookId,
+    member_id : MemberId,
+    borrow_date : nat,
+    is_precious : bool,
+    can_member_borrow : bool,
+    has_available_copies : bool
+  ) res : LoanId
+    ext wr active_loans : ActiveLoans,
+        wr loan_counter : nat
+    pre not is_precious /\
+        can_member_borrow /\
+        has_available_copies
+    post active_loans = active_loans~ union
+           {loan_counter~ |-> mk_Loan(
+             loan_counter~,
+             book_id,
+             member_id,
+             borrow_date,
+             borrow_date + 14,
+             false,
+             false
+           )} /\
+         res = loan_counter~ /\
+         loan_counter = loan_counter~ + 1;
+
+  -- Extend loan by 7 days. Precondition: Loan exists, not yet extended,
+  -- not returned. Postcondition: due_date += 7, extended = true.
+  ExtendLoan(loan_id : LoanId)
+    ext wr active_loans : ActiveLoans
+    pre loan_id in set dom active_loans /\
+        active_loans(loan_id).extended = false /\
+        active_loans(loan_id).is_returned = false
+    post active_loans(loan_id) =
+      mk_Loan(
+        active_loans(loan_id).id,
+        active_loans(loan_id).book_id,
+        active_loans(loan_id).member_id,
+        active_loans(loan_id).borrow_date,
+        active_loans(loan_id).due_date + 7,
+        true,
+        active_loans(loan_id).is_returned
+      );
+
+  -- Return loan. Precondition: Loan exists, not yet returned.
+  -- Postcondition: is_returned = true.
+  ReturnLoan(loan_id : LoanId)
+    ext wr active_loans : ActiveLoans
+    pre loan_id in set dom active_loans /\
+        active_loans(loan_id).is_returned = false
+    post active_loans(loan_id) =
+      mk_Loan(
+        active_loans(loan_id).id,
+        active_loans(loan_id).book_id,
+        active_loans(loan_id).member_id,
+        active_loans(loan_id).borrow_date,
+        active_loans(loan_id).due_date,
+        active_loans(loan_id).extended,
+        true
+      );
+
+  -- Get active loans for member. Precondition: None.
+  -- Returns set of LoanIds for given member.
+  GetMemberLoans(member_id : MemberId) res : set of LoanId
+    ext rd active_loans : ActiveLoans
+    post res = {lid in set dom active_loans &
+                active_loans(lid).member_id = member_id /\
+                active_loans(lid).is_returned = false};
+
+  -- Check if loan is overdue. Precondition: Loan exists.
+  -- Returns true if due_date < current_date and not returned.
+  IsOverdue(loan_id : LoanId, current_date : nat) res : bool
+    ext rd active_loans : ActiveLoans
+    pre loan_id in set dom active_loans
+    post res <=> (active_loans(loan_id).due_date < current_date /\
+                  active_loans(loan_id).is_returned = false);
+
+  -- Get count of active non-returned loans for member.
+  GetActiveLoanCount(member_id : MemberId) res : nat
+    ext rd active_loans : ActiveLoans
+    post res = card {lid in set dom active_loans &
+                     active_loans(lid).member_id = member_id /\
+                     active_loans(lid).is_returned = false}
+
+end LOAN_AGENT

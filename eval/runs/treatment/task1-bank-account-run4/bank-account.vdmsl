@@ -1,0 +1,154 @@
+-- VDM-SL Specification for Bank Account System (Run 4)
+-- Emphasis on explicit and implicit validation functions
+
+types
+  AccountId = nat1
+  Money = nat
+  AccountName = seq of char
+
+  Account :: id : AccountId
+            name : AccountName
+            balance : Money
+
+  ValidationError :: name : seq of char
+                      message : seq of char
+
+  BankState :: accounts : map AccountId to Account
+
+state BankState of
+  accounts : map AccountId to Account
+  nextAccountId : nat1
+init bs == (bs.accounts = {} and bs.nextAccountId = 1)
+end
+
+functions
+  -- Explicit validation functions (implicit in spec, must check)
+
+  isValidName : AccountName -> bool
+  isValidName(name) ==
+    len name > 0 and
+    (forall i : nat1 & i <= len name => name(i) <> ' ')
+
+  isValidNameAfterTrim : seq of char -> bool
+  isValidNameAfterTrim(name) ==
+    len name > 0 and
+    exists n : seq of char &
+      n = trim(name) and len n > 0
+
+  isValidMoney : Money -> bool
+  isValidMoney(m) ==
+    m >= 0 and m < 1000000000
+
+  isValidAccountId : nat1 -> bool
+  isValidAccountId(id) == id > 0
+
+  isValidBalance : Money -> bool
+  isValidBalance(bal) ==
+    bal >= 0 and bal < 1000000000
+
+  isWithdrawable : Money -> Money -> bool
+  isWithdrawable(balance, amount) ==
+    amount > 0 and
+    amount <= 1000000 and
+    amount <= balance
+
+  isTransferable : Money -> Money -> bool
+  isTransferable(fromBalance, amount) ==
+    amount > 0 and
+    amount <= 1000000 and
+    amount <= fromBalance
+
+  canDeposit : Money -> Money -> bool
+  canDeposit(currentBalance, depositAmount) ==
+    depositAmount > 0 and
+    currentBalance + depositAmount < 1000000000
+
+  -- Helper: trim whitespace
+  trim : seq of char -> seq of char
+  trim(s) ==
+    if s = [] then []
+    else if hd s = ' ' then trim(tl s)
+    else if last s = ' ' then trim(reverse(tl(reverse s)))
+    else s
+
+  -- Helper: string equality
+  strEqual : seq of char -> seq of char -> bool
+  strEqual(s1, s2) ==
+    (len s1 = len s2) and
+    (forall i : nat1 & i <= len s1 => s1(i) = s2(i))
+
+values
+  MAX_WITHDRAWAL : nat = 1000000
+  MAX_BALANCE : nat = 1000000000
+
+operations
+  -- OpenAccount: Create account with validation
+  OpenAccount(name : seq of char, initialBalance : Money)
+  ext rd accounts : map AccountId to Account
+      wr nextAccountId : nat1
+  pre isValidNameAfterTrim(name) and
+      isValidBalance(initialBalance)
+  post (let newId : nat1 = nextAccountId~
+        in (newId in set dom accounts and
+            accounts(newId).name = trim(name) and
+            accounts(newId).balance = initialBalance and
+            nextAccountId = nextAccountId~ + 1))
+
+  -- Deposit: Add amount with validation
+  Deposit(accountId : AccountId, amount : Money)
+  ext wr accounts : map AccountId to Account
+  pre accountId in set dom accounts and
+      canDeposit(accounts(accountId).balance, amount)
+  post (let oldBalance = accounts~(accountId).balance
+        in accounts(accountId).balance = oldBalance + amount)
+
+  -- Withdraw: Remove amount with explicit validation
+  Withdraw(accountId : AccountId, amount : Money)
+  ext wr accounts : map AccountId to Account
+  pre accountId in set dom accounts and
+      isWithdrawable(accounts(accountId).balance, amount)
+  post (let oldBalance = accounts~(accountId).balance
+        in accounts(accountId).balance = oldBalance - amount)
+
+  -- GetBalance: Query balance
+  GetBalance(accountId : AccountId) result : Money
+  ext rd accounts : map AccountId to Account
+  pre accountId in set dom accounts
+  post result = accounts(accountId).balance
+
+  -- Transfer: Move money with explicit validation
+  Transfer(fromId : AccountId, toId : AccountId, amount : Money)
+  ext wr accounts : map AccountId to Account
+  pre fromId in set dom accounts and
+      toId in set dom accounts and
+      fromId <> toId and
+      isTransferable(accounts(fromId).balance, amount)
+  post (let oldFromBalance = accounts~(fromId).balance,
+            oldToBalance = accounts~(toId).balance
+        in (accounts(fromId).balance = oldFromBalance - amount and
+            accounts(toId).balance = oldToBalance + amount and
+            (forall a : AccountId &
+              a <> fromId and a <> toId =>
+                accounts(a) = accounts~(a))))
+
+  -- ValidateName: Check if name is valid (implicit validation)
+  ValidateName(name : seq of char) result : bool
+  post result = isValidNameAfterTrim(name)
+
+  -- ValidateBalance: Check if balance is valid (implicit validation)
+  ValidateBalance(balance : Money) result : bool
+  post result = isValidBalance(balance)
+
+  -- ValidateDeposit: Check if deposit operation is valid (implicit validation)
+  ValidateDeposit(currentBalance : Money, amount : Money) result : bool
+  post result = canDeposit(currentBalance, amount)
+
+  -- ValidateWithdraw: Check if withdrawal is valid (implicit validation)
+  ValidateWithdraw(balance : Money, amount : Money) result : bool
+  post result = isWithdrawable(balance, amount)
+
+  -- ValidateTransfer: Check if transfer is valid (implicit validation)
+  ValidateTransfer(fromBalance : Money, toBalance : Money, amount : Money)
+  result : bool
+  post result = (isTransferable(fromBalance, amount) and
+                 toBalance + amount < MAX_BALANCE)

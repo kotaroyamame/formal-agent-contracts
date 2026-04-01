@@ -1,0 +1,4752 @@
+[
+  {
+    "task": "task1-bank-account",
+    "condition": "control",
+    "run": 1,
+    "metrics": [
+      {
+        "metric": "M1_ContractViolationDetectionRate",
+        "score": 28,
+        "max_score": 30,
+        "percentage": 93.33333333333333,
+        "details": {
+          "trap_scores": [
+            {
+              "trap_id": "T1-01",
+              "score": 3,
+              "evidence": "Source handles trap (4 hits) AND test exists (5 hits)"
+            },
+            {
+              "trap_id": "T1-02",
+              "score": 3,
+              "evidence": "Source handles trap (1 hits) AND test exists (2 hits)"
+            },
+            {
+              "trap_id": "T1-03",
+              "score": 3,
+              "evidence": "Source handles trap (2 hits) AND test exists (3 hits)"
+            },
+            {
+              "trap_id": "T1-04",
+              "score": 3,
+              "evidence": "Source handles trap (1 hits) AND test exists (3 hits)"
+            },
+            {
+              "trap_id": "T1-05",
+              "score": 3,
+              "evidence": "Source handles trap (3 hits) AND test exists (3 hits)"
+            },
+            {
+              "trap_id": "T1-06",
+              "score": 3,
+              "evidence": "Source handles trap (1 hits) AND test exists (2 hits)"
+            },
+            {
+              "trap_id": "T1-07",
+              "score": 3,
+              "evidence": "Source handles trap (1 hits) AND test exists (2 hits)"
+            },
+            {
+              "trap_id": "T1-08",
+              "score": 3,
+              "evidence": "Source handles trap (1 hits) AND test exists (2 hits)"
+            },
+            {
+              "trap_id": "T1-09",
+              "score": 3,
+              "evidence": "Source handles trap (2 hits) AND test exists (2 hits)"
+            },
+            {
+              "trap_id": "T1-10",
+              "score": 1,
+              "evidence": "Mentioned in spec/test (0/2 hits) but source doesn't handle"
+            }
+          ]
+        }
+      },
+      {
+        "metric": "M2_SpecificationCoverage",
+        "score": 8,
+        "max_score": 12,
+        "percentage": 66.66666666666666,
+        "details": {
+          "rule_scores": [
+            {
+              "rule": "残高は0未満にならない",
+              "score": 2,
+              "form": "explicit_validation"
+            },
+            {
+              "rule": "1回の出金上限は100万円",
+              "score": 2,
+              "form": "explicit_validation"
+            },
+            {
+              "rule": "口座名義は空文字不可",
+              "score": 2,
+              "form": "explicit_validation"
+            },
+            {
+              "rule": "送金は送金元と送金先が異なること",
+              "score": 2,
+              "form": "explicit_validation"
+            }
+          ]
+        }
+      },
+      {
+        "metric": "M4_SpecificationExplicitness",
+        "score": 0,
+        "max_score": 3,
+        "percentage": 0,
+        "details": {
+          "counts": {
+            "formal_spec": 0,
+            "code_contracts": 0,
+            "comments": 0,
+            "jsdoc": 0
+          }
+        }
+      },
+      {
+        "metric": "M6_TestEffectiveness",
+        "score": 100,
+        "max_score": 100,
+        "percentage": 100,
+        "details": {
+          "num_tests": 120,
+          "num_describes": 26,
+          "edge_case_keyword_hits": 12,
+          "test_density_score": 1,
+          "edge_coverage_score": 1
+        }
+      }
+    ],
+    "timestamp": "2026-04-01T12:32:07.317Z"
+  },
+  {
+    "task": "task1-bank-account",
+    "condition": "control",
+    "run": 2,
+    "metrics": [
+      {
+        "metric": "M1_ContractViolationDetectionRate",
+        "score": 27,
+        "max_score": 30,
+        "percentage": 90,
+        "details": {
+          "trap_scores": [
+            {
+              "trap_id": "T1-01",
+              "score": 3,
+              "evidence": "Source handles trap (5 hits) AND test exists (2 hits)"
+            },
+            {
+              "trap_id": "T1-02",
+              "score": 3,
+              "evidence": "Source handles trap (1 hits) AND test exists (1 hits)"
+            },
+            {
+              "trap_id": "T1-03",
+              "score": 3,
+              "evidence": "Source handles trap (2 hits) AND test exists (2 hits)"
+            },
+            {
+              "trap_id": "T1-04",
+              "score": 3,
+              "evidence": "Source handles trap (1 hits) AND test exists (1 hits)"
+            },
+            {
+              "trap_id": "T1-05",
+              "score": 3,
+              "evidence": "Source handles trap (3 hits) AND test exists (3 hits)"
+            },
+            {
+              "trap_id": "T1-06",
+              "score": 3,
+              "evidence": "Source handles trap (1 hits) AND test exists (1 hits)"
+            },
+            {
+              "trap_id": "T1-07",
+              "score": 0,
+              "evidence": "No evidence of trap handling found"
+            },
+            {
+              "trap_id": "T1-08",
+              "score": 3,
+              "evidence": "Source handles trap (1 hits) AND test exists (1 hits)"
+            },
+            {
+              "trap_id": "T1-09",
+              "score": 3,
+              "evidence": "Source handles trap (2 hits) AND test exists (2 hits)"
+            },
+            {
+              "trap_id": "T1-10",
+              "score": 3,
+              "evidence": "Source handles trap (1 hits) AND test exists (2 hits)"
+            }
+          ]
+        }
+      },
+      {
+        "metric": "M2_SpecificationCoverage",
+        "score": 8,
+        "max_score": 12,
+        "percentage": 66.66666666666666,
+        "details": {
+          "rule_scores": [
+            {
+              "rule": "残高は0未満にならない",
+              "score": 2,
+              "form": "explicit_validation"
+            },
+            {
+              "rule": "1回の出金上限は100万円",
+              "score": 2,
+              "form": "explicit_validation"
+            },
+            {
+              "rule": "口座名義は空文字不可",
+              "score": 2,
+              "form": "explicit_validation"
+            },
+            {
+              "rule": "送金は送金元と送金先が異なること",
+              "score": 2,
+              "form": "explicit_validation"
+            }
+          ]
+        }
+      },
+      {
+        "metric": "M4_SpecificationExplicitness",
+        "score": 0,
+        "max_score": 3,
+        "percentage": 0,
+        "details": {
+          "counts": {
+            "formal_spec": 0,
+            "code_contracts": 0,
+            "comments": 0,
+            "jsdoc": 0
+          }
+        }
+      },
+      {
+        "metric": "M6_TestEffectiveness",
+        "score": 85,
+        "max_score": 100,
+        "percentage": 85,
+        "details": {
+          "num_tests": 36,
+          "num_describes": 8,
+          "edge_case_keyword_hits": 7,
+          "test_density_score": 1,
+          "edge_coverage_score": 0.7
+        }
+      }
+    ],
+    "timestamp": "2026-04-01T12:32:07.324Z"
+  },
+  {
+    "task": "task1-bank-account",
+    "condition": "control",
+    "run": 3,
+    "metrics": [
+      {
+        "metric": "M1_ContractViolationDetectionRate",
+        "score": 28,
+        "max_score": 30,
+        "percentage": 93.33333333333333,
+        "details": {
+          "trap_scores": [
+            {
+              "trap_id": "T1-01",
+              "score": 3,
+              "evidence": "Source handles trap (5 hits) AND test exists (2 hits)"
+            },
+            {
+              "trap_id": "T1-02",
+              "score": 3,
+              "evidence": "Source handles trap (2 hits) AND test exists (1 hits)"
+            },
+            {
+              "trap_id": "T1-03",
+              "score": 3,
+              "evidence": "Source handles trap (3 hits) AND test exists (2 hits)"
+            },
+            {
+              "trap_id": "T1-04",
+              "score": 3,
+              "evidence": "Source handles trap (1 hits) AND test exists (3 hits)"
+            },
+            {
+              "trap_id": "T1-05",
+              "score": 3,
+              "evidence": "Source handles trap (1 hits) AND test exists (1 hits)"
+            },
+            {
+              "trap_id": "T1-06",
+              "score": 3,
+              "evidence": "Source handles trap (1 hits) AND test exists (2 hits)"
+            },
+            {
+              "trap_id": "T1-07",
+              "score": 3,
+              "evidence": "Source handles trap (2 hits) AND test exists (2 hits)"
+            },
+            {
+              "trap_id": "T1-08",
+              "score": 1,
+              "evidence": "Mentioned in spec/test (0/1 hits) but source doesn't handle"
+            },
+            {
+              "trap_id": "T1-09",
+              "score": 3,
+              "evidence": "Source handles trap (1 hits) AND test exists (1 hits)"
+            },
+            {
+              "trap_id": "T1-10",
+              "score": 3,
+              "evidence": "Source handles trap (1 hits) AND test exists (1 hits)"
+            }
+          ]
+        }
+      },
+      {
+        "metric": "M2_SpecificationCoverage",
+        "score": 4,
+        "max_score": 12,
+        "percentage": 33.33333333333333,
+        "details": {
+          "rule_scores": [
+            {
+              "rule": "残高は0未満にならない",
+              "score": 1,
+              "form": "type_constraint"
+            },
+            {
+              "rule": "1回の出金上限は100万円",
+              "score": 1,
+              "form": "type_constraint"
+            },
+            {
+              "rule": "口座名義は空文字不可",
+              "score": 1,
+              "form": "type_constraint"
+            },
+            {
+              "rule": "送金は送金元と送金先が異なること",
+              "score": 1,
+              "form": "type_constraint"
+            }
+          ]
+        }
+      },
+      {
+        "metric": "M4_SpecificationExplicitness",
+        "score": 1,
+        "max_score": 3,
+        "percentage": 33.33333333333333,
+        "details": {
+          "counts": {
+            "formal_spec": 0,
+            "code_contracts": 0,
+            "comments": 1,
+            "jsdoc": 0
+          }
+        }
+      },
+      {
+        "metric": "M6_TestEffectiveness",
+        "score": 90,
+        "max_score": 100,
+        "percentage": 90,
+        "details": {
+          "num_tests": 70,
+          "num_describes": 8,
+          "edge_case_keyword_hits": 8,
+          "test_density_score": 1,
+          "edge_coverage_score": 0.8
+        }
+      }
+    ],
+    "timestamp": "2026-04-01T12:32:07.334Z"
+  },
+  {
+    "task": "task1-bank-account",
+    "condition": "control",
+    "run": 4,
+    "metrics": [
+      {
+        "metric": "M1_ContractViolationDetectionRate",
+        "score": 21,
+        "max_score": 30,
+        "percentage": 70,
+        "details": {
+          "trap_scores": [
+            {
+              "trap_id": "T1-01",
+              "score": 3,
+              "evidence": "Source handles trap (4 hits) AND test exists (1 hits)"
+            },
+            {
+              "trap_id": "T1-02",
+              "score": 0,
+              "evidence": "No evidence of trap handling found"
+            },
+            {
+              "trap_id": "T1-03",
+              "score": 3,
+              "evidence": "Source handles trap (1 hits) AND test exists (1 hits)"
+            },
+            {
+              "trap_id": "T1-04",
+              "score": 3,
+              "evidence": "Source handles trap (1 hits) AND test exists (1 hits)"
+            },
+            {
+              "trap_id": "T1-05",
+              "score": 3,
+              "evidence": "Source handles trap (3 hits) AND test exists (2 hits)"
+            },
+            {
+              "trap_id": "T1-06",
+              "score": 3,
+              "evidence": "Source handles trap (1 hits) AND test exists (1 hits)"
+            },
+            {
+              "trap_id": "T1-07",
+              "score": 2,
+              "evidence": "Source handles trap (1 hits) but no test found"
+            },
+            {
+              "trap_id": "T1-08",
+              "score": 1,
+              "evidence": "Mentioned in spec/test (0/1 hits) but source doesn't handle"
+            },
+            {
+              "trap_id": "T1-09",
+              "score": 3,
+              "evidence": "Source handles trap (2 hits) AND test exists (2 hits)"
+            },
+            {
+              "trap_id": "T1-10",
+              "score": 0,
+              "evidence": "No evidence of trap handling found"
+            }
+          ]
+        }
+      },
+      {
+        "metric": "M2_SpecificationCoverage",
+        "score": 8,
+        "max_score": 12,
+        "percentage": 66.66666666666666,
+        "details": {
+          "rule_scores": [
+            {
+              "rule": "残高は0未満にならない",
+              "score": 2,
+              "form": "explicit_validation"
+            },
+            {
+              "rule": "1回の出金上限は100万円",
+              "score": 2,
+              "form": "explicit_validation"
+            },
+            {
+              "rule": "口座名義は空文字不可",
+              "score": 2,
+              "form": "explicit_validation"
+            },
+            {
+              "rule": "送金は送金元と送金先が異なること",
+              "score": 2,
+              "form": "explicit_validation"
+            }
+          ]
+        }
+      },
+      {
+        "metric": "M4_SpecificationExplicitness",
+        "score": 0,
+        "max_score": 3,
+        "percentage": 0,
+        "details": {
+          "counts": {
+            "formal_spec": 0,
+            "code_contracts": 0,
+            "comments": 0,
+            "jsdoc": 0
+          }
+        }
+      },
+      {
+        "metric": "M6_TestEffectiveness",
+        "score": 53,
+        "max_score": 100,
+        "percentage": 52.5,
+        "details": {
+          "num_tests": 11,
+          "num_describes": 1,
+          "edge_case_keyword_hits": 5,
+          "test_density_score": 0.55,
+          "edge_coverage_score": 0.5
+        }
+      }
+    ],
+    "timestamp": "2026-04-01T12:32:07.342Z"
+  },
+  {
+    "task": "task1-bank-account",
+    "condition": "control",
+    "run": 5,
+    "metrics": [
+      {
+        "metric": "M1_ContractViolationDetectionRate",
+        "score": 28,
+        "max_score": 30,
+        "percentage": 93.33333333333333,
+        "details": {
+          "trap_scores": [
+            {
+              "trap_id": "T1-01",
+              "score": 3,
+              "evidence": "Source handles trap (5 hits) AND test exists (2 hits)"
+            },
+            {
+              "trap_id": "T1-02",
+              "score": 3,
+              "evidence": "Source handles trap (1 hits) AND test exists (1 hits)"
+            },
+            {
+              "trap_id": "T1-03",
+              "score": 3,
+              "evidence": "Source handles trap (2 hits) AND test exists (2 hits)"
+            },
+            {
+              "trap_id": "T1-04",
+              "score": 3,
+              "evidence": "Source handles trap (1 hits) AND test exists (2 hits)"
+            },
+            {
+              "trap_id": "T1-05",
+              "score": 3,
+              "evidence": "Source handles trap (2 hits) AND test exists (1 hits)"
+            },
+            {
+              "trap_id": "T1-06",
+              "score": 3,
+              "evidence": "Source handles trap (1 hits) AND test exists (1 hits)"
+            },
+            {
+              "trap_id": "T1-07",
+              "score": 3,
+              "evidence": "Source handles trap (2 hits) AND test exists (1 hits)"
+            },
+            {
+              "trap_id": "T1-08",
+              "score": 1,
+              "evidence": "Mentioned in spec/test (0/1 hits) but source doesn't handle"
+            },
+            {
+              "trap_id": "T1-09",
+              "score": 3,
+              "evidence": "Source handles trap (2 hits) AND test exists (2 hits)"
+            },
+            {
+              "trap_id": "T1-10",
+              "score": 3,
+              "evidence": "Source handles trap (1 hits) AND test exists (2 hits)"
+            }
+          ]
+        }
+      },
+      {
+        "metric": "M2_SpecificationCoverage",
+        "score": 8,
+        "max_score": 12,
+        "percentage": 66.66666666666666,
+        "details": {
+          "rule_scores": [
+            {
+              "rule": "残高は0未満にならない",
+              "score": 2,
+              "form": "explicit_validation"
+            },
+            {
+              "rule": "1回の出金上限は100万円",
+              "score": 2,
+              "form": "explicit_validation"
+            },
+            {
+              "rule": "口座名義は空文字不可",
+              "score": 2,
+              "form": "explicit_validation"
+            },
+            {
+              "rule": "送金は送金元と送金先が異なること",
+              "score": 2,
+              "form": "explicit_validation"
+            }
+          ]
+        }
+      },
+      {
+        "metric": "M4_SpecificationExplicitness",
+        "score": 1,
+        "max_score": 3,
+        "percentage": 33.33333333333333,
+        "details": {
+          "counts": {
+            "formal_spec": 0,
+            "code_contracts": 0,
+            "comments": 0,
+            "jsdoc": 6
+          }
+        }
+      },
+      {
+        "metric": "M6_TestEffectiveness",
+        "score": 85,
+        "max_score": 100,
+        "percentage": 85,
+        "details": {
+          "num_tests": 44,
+          "num_describes": 8,
+          "edge_case_keyword_hits": 7,
+          "test_density_score": 1,
+          "edge_coverage_score": 0.7
+        }
+      }
+    ],
+    "timestamp": "2026-04-01T12:32:07.351Z"
+  },
+  {
+    "task": "task1-bank-account",
+    "condition": "treatment",
+    "run": 1,
+    "metrics": [
+      {
+        "metric": "M1_ContractViolationDetectionRate",
+        "score": 24,
+        "max_score": 30,
+        "percentage": 80,
+        "details": {
+          "trap_scores": [
+            {
+              "trap_id": "T1-01",
+              "score": 3,
+              "evidence": "Source handles trap (3 hits) AND test exists (2 hits)"
+            },
+            {
+              "trap_id": "T1-02",
+              "score": 1,
+              "evidence": "Mentioned in spec/test (0/1 hits) but source doesn't handle"
+            },
+            {
+              "trap_id": "T1-03",
+              "score": 3,
+              "evidence": "Source handles trap (1 hits) AND test exists (2 hits)"
+            },
+            {
+              "trap_id": "T1-04",
+              "score": 3,
+              "evidence": "Source handles trap (1 hits) AND test exists (1 hits)"
+            },
+            {
+              "trap_id": "T1-05",
+              "score": 3,
+              "evidence": "Source handles trap (3 hits) AND test exists (3 hits)"
+            },
+            {
+              "trap_id": "T1-06",
+              "score": 3,
+              "evidence": "Source handles trap (1 hits) AND test exists (2 hits)"
+            },
+            {
+              "trap_id": "T1-07",
+              "score": 3,
+              "evidence": "Source handles trap (1 hits) AND test exists (1 hits)"
+            },
+            {
+              "trap_id": "T1-08",
+              "score": 1,
+              "evidence": "Mentioned in spec/test (0/1 hits) but source doesn't handle"
+            },
+            {
+              "trap_id": "T1-09",
+              "score": 3,
+              "evidence": "Source handles trap (2 hits) AND test exists (2 hits)"
+            },
+            {
+              "trap_id": "T1-10",
+              "score": 1,
+              "evidence": "Mentioned in spec/test (0/1 hits) but source doesn't handle"
+            }
+          ]
+        }
+      },
+      {
+        "metric": "M2_SpecificationCoverage",
+        "score": 12,
+        "max_score": 12,
+        "percentage": 100,
+        "details": {
+          "rule_scores": [
+            {
+              "rule": "残高は0未満にならない",
+              "score": 3,
+              "form": "formal_spec"
+            },
+            {
+              "rule": "1回の出金上限は100万円",
+              "score": 3,
+              "form": "formal_spec"
+            },
+            {
+              "rule": "口座名義は空文字不可",
+              "score": 3,
+              "form": "formal_spec"
+            },
+            {
+              "rule": "送金は送金元と送金先が異なること",
+              "score": 3,
+              "form": "formal_spec"
+            }
+          ]
+        }
+      },
+      {
+        "metric": "M4_SpecificationExplicitness",
+        "score": 3,
+        "max_score": 3,
+        "percentage": 100,
+        "details": {
+          "counts": {
+            "formal_spec": 1,
+            "code_contracts": 29,
+            "comments": 14,
+            "jsdoc": 0
+          }
+        }
+      },
+      {
+        "metric": "M6_TestEffectiveness",
+        "score": 100,
+        "max_score": 100,
+        "percentage": 100,
+        "details": {
+          "num_tests": 57,
+          "num_describes": 7,
+          "edge_case_keyword_hits": 10,
+          "test_density_score": 1,
+          "edge_coverage_score": 1
+        }
+      }
+    ],
+    "timestamp": "2026-04-01T12:32:07.359Z"
+  },
+  {
+    "task": "task1-bank-account",
+    "condition": "treatment",
+    "run": 2,
+    "metrics": [
+      {
+        "metric": "M1_ContractViolationDetectionRate",
+        "score": 27,
+        "max_score": 30,
+        "percentage": 90,
+        "details": {
+          "trap_scores": [
+            {
+              "trap_id": "T1-01",
+              "score": 2,
+              "evidence": "Source handles trap (4 hits) but no test found"
+            },
+            {
+              "trap_id": "T1-02",
+              "score": 3,
+              "evidence": "Source handles trap (1 hits) AND test exists (1 hits)"
+            },
+            {
+              "trap_id": "T1-03",
+              "score": 3,
+              "evidence": "Source handles trap (2 hits) AND test exists (2 hits)"
+            },
+            {
+              "trap_id": "T1-04",
+              "score": 3,
+              "evidence": "Source handles trap (1 hits) AND test exists (1 hits)"
+            },
+            {
+              "trap_id": "T1-05",
+              "score": 3,
+              "evidence": "Source handles trap (3 hits) AND test exists (3 hits)"
+            },
+            {
+              "trap_id": "T1-06",
+              "score": 3,
+              "evidence": "Source handles trap (1 hits) AND test exists (2 hits)"
+            },
+            {
+              "trap_id": "T1-07",
+              "score": 3,
+              "evidence": "Source handles trap (1 hits) AND test exists (1 hits)"
+            },
+            {
+              "trap_id": "T1-08",
+              "score": 1,
+              "evidence": "Mentioned in spec/test (0/1 hits) but source doesn't handle"
+            },
+            {
+              "trap_id": "T1-09",
+              "score": 3,
+              "evidence": "Source handles trap (2 hits) AND test exists (2 hits)"
+            },
+            {
+              "trap_id": "T1-10",
+              "score": 3,
+              "evidence": "Source handles trap (2 hits) AND test exists (2 hits)"
+            }
+          ]
+        }
+      },
+      {
+        "metric": "M2_SpecificationCoverage",
+        "score": 12,
+        "max_score": 12,
+        "percentage": 100,
+        "details": {
+          "rule_scores": [
+            {
+              "rule": "残高は0未満にならない",
+              "score": 3,
+              "form": "formal_spec"
+            },
+            {
+              "rule": "1回の出金上限は100万円",
+              "score": 3,
+              "form": "formal_spec"
+            },
+            {
+              "rule": "口座名義は空文字不可",
+              "score": 3,
+              "form": "formal_spec"
+            },
+            {
+              "rule": "送金は送金元と送金先が異なること",
+              "score": 3,
+              "form": "formal_spec"
+            }
+          ]
+        }
+      },
+      {
+        "metric": "M4_SpecificationExplicitness",
+        "score": 3,
+        "max_score": 3,
+        "percentage": 100,
+        "details": {
+          "counts": {
+            "formal_spec": 1,
+            "code_contracts": 0,
+            "comments": 15,
+            "jsdoc": 0
+          }
+        }
+      },
+      {
+        "metric": "M6_TestEffectiveness",
+        "score": 95,
+        "max_score": 100,
+        "percentage": 95,
+        "details": {
+          "num_tests": 45,
+          "num_describes": 10,
+          "edge_case_keyword_hits": 9,
+          "test_density_score": 1,
+          "edge_coverage_score": 0.9
+        }
+      }
+    ],
+    "timestamp": "2026-04-01T12:32:07.371Z"
+  },
+  {
+    "task": "task1-bank-account",
+    "condition": "treatment",
+    "run": 3,
+    "metrics": [
+      {
+        "metric": "M1_ContractViolationDetectionRate",
+        "score": 26,
+        "max_score": 30,
+        "percentage": 86.66666666666667,
+        "details": {
+          "trap_scores": [
+            {
+              "trap_id": "T1-01",
+              "score": 2,
+              "evidence": "Source handles trap (4 hits) but no test found"
+            },
+            {
+              "trap_id": "T1-02",
+              "score": 3,
+              "evidence": "Source handles trap (1 hits) AND test exists (1 hits)"
+            },
+            {
+              "trap_id": "T1-03",
+              "score": 3,
+              "evidence": "Source handles trap (2 hits) AND test exists (2 hits)"
+            },
+            {
+              "trap_id": "T1-04",
+              "score": 3,
+              "evidence": "Source handles trap (1 hits) AND test exists (1 hits)"
+            },
+            {
+              "trap_id": "T1-05",
+              "score": 3,
+              "evidence": "Source handles trap (3 hits) AND test exists (2 hits)"
+            },
+            {
+              "trap_id": "T1-06",
+              "score": 3,
+              "evidence": "Source handles trap (1 hits) AND test exists (2 hits)"
+            },
+            {
+              "trap_id": "T1-07",
+              "score": 3,
+              "evidence": "Source handles trap (3 hits) AND test exists (3 hits)"
+            },
+            {
+              "trap_id": "T1-08",
+              "score": 1,
+              "evidence": "Mentioned in spec/test (0/1 hits) but source doesn't handle"
+            },
+            {
+              "trap_id": "T1-09",
+              "score": 3,
+              "evidence": "Source handles trap (2 hits) AND test exists (2 hits)"
+            },
+            {
+              "trap_id": "T1-10",
+              "score": 2,
+              "evidence": "Source handles trap (1 hits) but no test found"
+            }
+          ]
+        }
+      },
+      {
+        "metric": "M2_SpecificationCoverage",
+        "score": 12,
+        "max_score": 12,
+        "percentage": 100,
+        "details": {
+          "rule_scores": [
+            {
+              "rule": "残高は0未満にならない",
+              "score": 3,
+              "form": "formal_spec"
+            },
+            {
+              "rule": "1回の出金上限は100万円",
+              "score": 3,
+              "form": "formal_spec"
+            },
+            {
+              "rule": "口座名義は空文字不可",
+              "score": 3,
+              "form": "formal_spec"
+            },
+            {
+              "rule": "送金は送金元と送金先が異なること",
+              "score": 3,
+              "form": "formal_spec"
+            }
+          ]
+        }
+      },
+      {
+        "metric": "M4_SpecificationExplicitness",
+        "score": 3,
+        "max_score": 3,
+        "percentage": 100,
+        "details": {
+          "counts": {
+            "formal_spec": 1,
+            "code_contracts": 0,
+            "comments": 2,
+            "jsdoc": 0
+          }
+        }
+      },
+      {
+        "metric": "M6_TestEffectiveness",
+        "score": 100,
+        "max_score": 100,
+        "percentage": 100,
+        "details": {
+          "num_tests": 27,
+          "num_describes": 7,
+          "edge_case_keyword_hits": 10,
+          "test_density_score": 1,
+          "edge_coverage_score": 1
+        }
+      }
+    ],
+    "timestamp": "2026-04-01T12:32:07.388Z"
+  },
+  {
+    "task": "task1-bank-account",
+    "condition": "treatment",
+    "run": 4,
+    "metrics": [
+      {
+        "metric": "M1_ContractViolationDetectionRate",
+        "score": 25,
+        "max_score": 30,
+        "percentage": 83.33333333333334,
+        "details": {
+          "trap_scores": [
+            {
+              "trap_id": "T1-01",
+              "score": 3,
+              "evidence": "Source handles trap (3 hits) AND test exists (2 hits)"
+            },
+            {
+              "trap_id": "T1-02",
+              "score": 3,
+              "evidence": "Source handles trap (1 hits) AND test exists (1 hits)"
+            },
+            {
+              "trap_id": "T1-03",
+              "score": 3,
+              "evidence": "Source handles trap (2 hits) AND test exists (2 hits)"
+            },
+            {
+              "trap_id": "T1-04",
+              "score": 3,
+              "evidence": "Source handles trap (1 hits) AND test exists (1 hits)"
+            },
+            {
+              "trap_id": "T1-05",
+              "score": 3,
+              "evidence": "Source handles trap (3 hits) AND test exists (3 hits)"
+            },
+            {
+              "trap_id": "T1-06",
+              "score": 3,
+              "evidence": "Source handles trap (1 hits) AND test exists (2 hits)"
+            },
+            {
+              "trap_id": "T1-07",
+              "score": 0,
+              "evidence": "No evidence of trap handling found"
+            },
+            {
+              "trap_id": "T1-08",
+              "score": 1,
+              "evidence": "Mentioned in spec/test (0/1 hits) but source doesn't handle"
+            },
+            {
+              "trap_id": "T1-09",
+              "score": 3,
+              "evidence": "Source handles trap (2 hits) AND test exists (2 hits)"
+            },
+            {
+              "trap_id": "T1-10",
+              "score": 3,
+              "evidence": "Source handles trap (1 hits) AND test exists (2 hits)"
+            }
+          ]
+        }
+      },
+      {
+        "metric": "M2_SpecificationCoverage",
+        "score": 12,
+        "max_score": 12,
+        "percentage": 100,
+        "details": {
+          "rule_scores": [
+            {
+              "rule": "残高は0未満にならない",
+              "score": 3,
+              "form": "formal_spec"
+            },
+            {
+              "rule": "1回の出金上限は100万円",
+              "score": 3,
+              "form": "formal_spec"
+            },
+            {
+              "rule": "口座名義は空文字不可",
+              "score": 3,
+              "form": "formal_spec"
+            },
+            {
+              "rule": "送金は送金元と送金先が異なること",
+              "score": 3,
+              "form": "formal_spec"
+            }
+          ]
+        }
+      },
+      {
+        "metric": "M4_SpecificationExplicitness",
+        "score": 3,
+        "max_score": 3,
+        "percentage": 100,
+        "details": {
+          "counts": {
+            "formal_spec": 1,
+            "code_contracts": 0,
+            "comments": 1,
+            "jsdoc": 0
+          }
+        }
+      },
+      {
+        "metric": "M6_TestEffectiveness",
+        "score": 95,
+        "max_score": 100,
+        "percentage": 95,
+        "details": {
+          "num_tests": 75,
+          "num_describes": 16,
+          "edge_case_keyword_hits": 9,
+          "test_density_score": 1,
+          "edge_coverage_score": 0.9
+        }
+      }
+    ],
+    "timestamp": "2026-04-01T12:32:07.396Z"
+  },
+  {
+    "task": "task1-bank-account",
+    "condition": "treatment",
+    "run": 5,
+    "metrics": [
+      {
+        "metric": "M1_ContractViolationDetectionRate",
+        "score": 25,
+        "max_score": 30,
+        "percentage": 83.33333333333334,
+        "details": {
+          "trap_scores": [
+            {
+              "trap_id": "T1-01",
+              "score": 3,
+              "evidence": "Source handles trap (5 hits) AND test exists (3 hits)"
+            },
+            {
+              "trap_id": "T1-02",
+              "score": 3,
+              "evidence": "Source handles trap (1 hits) AND test exists (1 hits)"
+            },
+            {
+              "trap_id": "T1-03",
+              "score": 3,
+              "evidence": "Source handles trap (2 hits) AND test exists (2 hits)"
+            },
+            {
+              "trap_id": "T1-04",
+              "score": 3,
+              "evidence": "Source handles trap (1 hits) AND test exists (2 hits)"
+            },
+            {
+              "trap_id": "T1-05",
+              "score": 3,
+              "evidence": "Source handles trap (3 hits) AND test exists (3 hits)"
+            },
+            {
+              "trap_id": "T1-06",
+              "score": 3,
+              "evidence": "Source handles trap (1 hits) AND test exists (2 hits)"
+            },
+            {
+              "trap_id": "T1-07",
+              "score": 3,
+              "evidence": "Source handles trap (1 hits) AND test exists (1 hits)"
+            },
+            {
+              "trap_id": "T1-08",
+              "score": 0,
+              "evidence": "No evidence of trap handling found"
+            },
+            {
+              "trap_id": "T1-09",
+              "score": 3,
+              "evidence": "Source handles trap (2 hits) AND test exists (2 hits)"
+            },
+            {
+              "trap_id": "T1-10",
+              "score": 1,
+              "evidence": "Mentioned in spec/test (0/1 hits) but source doesn't handle"
+            }
+          ]
+        }
+      },
+      {
+        "metric": "M2_SpecificationCoverage",
+        "score": 12,
+        "max_score": 12,
+        "percentage": 100,
+        "details": {
+          "rule_scores": [
+            {
+              "rule": "残高は0未満にならない",
+              "score": 3,
+              "form": "formal_spec"
+            },
+            {
+              "rule": "1回の出金上限は100万円",
+              "score": 3,
+              "form": "formal_spec"
+            },
+            {
+              "rule": "口座名義は空文字不可",
+              "score": 3,
+              "form": "formal_spec"
+            },
+            {
+              "rule": "送金は送金元と送金先が異なること",
+              "score": 3,
+              "form": "formal_spec"
+            }
+          ]
+        }
+      },
+      {
+        "metric": "M4_SpecificationExplicitness",
+        "score": 3,
+        "max_score": 3,
+        "percentage": 100,
+        "details": {
+          "counts": {
+            "formal_spec": 1,
+            "code_contracts": 0,
+            "comments": 2,
+            "jsdoc": 0
+          }
+        }
+      },
+      {
+        "metric": "M6_TestEffectiveness",
+        "score": 90,
+        "max_score": 100,
+        "percentage": 90,
+        "details": {
+          "num_tests": 56,
+          "num_describes": 20,
+          "edge_case_keyword_hits": 8,
+          "test_density_score": 1,
+          "edge_coverage_score": 0.8
+        }
+      }
+    ],
+    "timestamp": "2026-04-01T12:32:07.407Z"
+  },
+  {
+    "task": "task2-library",
+    "condition": "control",
+    "run": 1,
+    "metrics": [
+      {
+        "metric": "M1_ContractViolationDetectionRate",
+        "score": 21,
+        "max_score": 36,
+        "percentage": 58.333333333333336,
+        "details": {
+          "trap_scores": [
+            {
+              "trap_id": "T2-01",
+              "score": 2,
+              "evidence": "Source handles trap (1 hits) but no test found"
+            },
+            {
+              "trap_id": "T2-02",
+              "score": 3,
+              "evidence": "Source handles trap (3 hits) AND test exists (2 hits)"
+            },
+            {
+              "trap_id": "T2-03",
+              "score": 3,
+              "evidence": "Source handles trap (2 hits) AND test exists (1 hits)"
+            },
+            {
+              "trap_id": "T2-04",
+              "score": 3,
+              "evidence": "Source handles trap (2 hits) AND test exists (1 hits)"
+            },
+            {
+              "trap_id": "T2-05",
+              "score": 2,
+              "evidence": "Source handles trap (1 hits) but no test found"
+            },
+            {
+              "trap_id": "T2-06",
+              "score": 0,
+              "evidence": "No evidence of trap handling found"
+            },
+            {
+              "trap_id": "T2-07",
+              "score": 2,
+              "evidence": "Source handles trap (1 hits) but no test found"
+            },
+            {
+              "trap_id": "T2-08",
+              "score": 0,
+              "evidence": "No evidence of trap handling found"
+            },
+            {
+              "trap_id": "T2-09",
+              "score": 3,
+              "evidence": "Source handles trap (1 hits) AND test exists (1 hits)"
+            },
+            {
+              "trap_id": "T2-10",
+              "score": 0,
+              "evidence": "No evidence of trap handling found"
+            },
+            {
+              "trap_id": "T2-11",
+              "score": 3,
+              "evidence": "Source handles trap (2 hits) AND test exists (2 hits)"
+            },
+            {
+              "trap_id": "T2-12",
+              "score": 0,
+              "evidence": "No evidence of trap handling found"
+            }
+          ]
+        }
+      },
+      {
+        "metric": "M2_SpecificationCoverage",
+        "score": 6,
+        "max_score": 18,
+        "percentage": 33.33333333333333,
+        "details": {
+          "rule_scores": [
+            {
+              "rule": "会員は最大5冊まで同時貸出可能",
+              "score": 1,
+              "form": "type_constraint"
+            },
+            {
+              "rule": "延滞中の会員は新規貸出不可",
+              "score": 1,
+              "form": "type_constraint"
+            },
+            {
+              "rule": "在庫が0の書籍は貸出不可",
+              "score": 1,
+              "form": "type_constraint"
+            },
+            {
+              "rule": "貸出期間は14日",
+              "score": 1,
+              "form": "type_constraint"
+            },
+            {
+              "rule": "延長は1回まで",
+              "score": 1,
+              "form": "type_constraint"
+            },
+            {
+              "rule": "貴重書籍は館内閲覧のみ",
+              "score": 1,
+              "form": "type_constraint"
+            }
+          ]
+        }
+      },
+      {
+        "metric": "M4_SpecificationExplicitness",
+        "score": 1,
+        "max_score": 3,
+        "percentage": 33.33333333333333,
+        "details": {
+          "counts": {
+            "formal_spec": 0,
+            "code_contracts": 0,
+            "comments": 1,
+            "jsdoc": 0
+          }
+        }
+      },
+      {
+        "metric": "M6_TestEffectiveness",
+        "score": 60,
+        "max_score": 100,
+        "percentage": 60,
+        "details": {
+          "num_tests": 20,
+          "num_describes": 6,
+          "edge_case_keyword_hits": 2,
+          "test_density_score": 1,
+          "edge_coverage_score": 0.2
+        }
+      }
+    ],
+    "timestamp": "2026-04-01T12:32:07.419Z"
+  },
+  {
+    "task": "task2-library",
+    "condition": "control",
+    "run": 2,
+    "metrics": [
+      {
+        "metric": "M1_ContractViolationDetectionRate",
+        "score": 18,
+        "max_score": 36,
+        "percentage": 50,
+        "details": {
+          "trap_scores": [
+            {
+              "trap_id": "T2-01",
+              "score": 0,
+              "evidence": "No evidence of trap handling found"
+            },
+            {
+              "trap_id": "T2-02",
+              "score": 3,
+              "evidence": "Source handles trap (3 hits) AND test exists (2 hits)"
+            },
+            {
+              "trap_id": "T2-03",
+              "score": 3,
+              "evidence": "Source handles trap (2 hits) AND test exists (2 hits)"
+            },
+            {
+              "trap_id": "T2-04",
+              "score": 3,
+              "evidence": "Source handles trap (2 hits) AND test exists (1 hits)"
+            },
+            {
+              "trap_id": "T2-05",
+              "score": 0,
+              "evidence": "No evidence of trap handling found"
+            },
+            {
+              "trap_id": "T2-06",
+              "score": 0,
+              "evidence": "No evidence of trap handling found"
+            },
+            {
+              "trap_id": "T2-07",
+              "score": 3,
+              "evidence": "Source handles trap (2 hits) AND test exists (1 hits)"
+            },
+            {
+              "trap_id": "T2-08",
+              "score": 0,
+              "evidence": "No evidence of trap handling found"
+            },
+            {
+              "trap_id": "T2-09",
+              "score": 3,
+              "evidence": "Source handles trap (2 hits) AND test exists (1 hits)"
+            },
+            {
+              "trap_id": "T2-10",
+              "score": 0,
+              "evidence": "No evidence of trap handling found"
+            },
+            {
+              "trap_id": "T2-11",
+              "score": 3,
+              "evidence": "Source handles trap (2 hits) AND test exists (2 hits)"
+            },
+            {
+              "trap_id": "T2-12",
+              "score": 0,
+              "evidence": "No evidence of trap handling found"
+            }
+          ]
+        }
+      },
+      {
+        "metric": "M2_SpecificationCoverage",
+        "score": 6,
+        "max_score": 18,
+        "percentage": 33.33333333333333,
+        "details": {
+          "rule_scores": [
+            {
+              "rule": "会員は最大5冊まで同時貸出可能",
+              "score": 1,
+              "form": "type_constraint"
+            },
+            {
+              "rule": "延滞中の会員は新規貸出不可",
+              "score": 1,
+              "form": "type_constraint"
+            },
+            {
+              "rule": "在庫が0の書籍は貸出不可",
+              "score": 1,
+              "form": "type_constraint"
+            },
+            {
+              "rule": "貸出期間は14日",
+              "score": 1,
+              "form": "type_constraint"
+            },
+            {
+              "rule": "延長は1回まで",
+              "score": 1,
+              "form": "type_constraint"
+            },
+            {
+              "rule": "貴重書籍は館内閲覧のみ",
+              "score": 1,
+              "form": "type_constraint"
+            }
+          ]
+        }
+      },
+      {
+        "metric": "M4_SpecificationExplicitness",
+        "score": 1,
+        "max_score": 3,
+        "percentage": 33.33333333333333,
+        "details": {
+          "counts": {
+            "formal_spec": 0,
+            "code_contracts": 0,
+            "comments": 1,
+            "jsdoc": 0
+          }
+        }
+      },
+      {
+        "metric": "M6_TestEffectiveness",
+        "score": 65,
+        "max_score": 100,
+        "percentage": 65,
+        "details": {
+          "num_tests": 20,
+          "num_describes": 6,
+          "edge_case_keyword_hits": 3,
+          "test_density_score": 1,
+          "edge_coverage_score": 0.3
+        }
+      }
+    ],
+    "timestamp": "2026-04-01T12:32:07.429Z"
+  },
+  {
+    "task": "task2-library",
+    "condition": "control",
+    "run": 3,
+    "metrics": [
+      {
+        "metric": "M1_ContractViolationDetectionRate",
+        "score": 23,
+        "max_score": 36,
+        "percentage": 63.888888888888886,
+        "details": {
+          "trap_scores": [
+            {
+              "trap_id": "T2-01",
+              "score": 2,
+              "evidence": "Source handles trap (1 hits) but no test found"
+            },
+            {
+              "trap_id": "T2-02",
+              "score": 3,
+              "evidence": "Source handles trap (2 hits) AND test exists (2 hits)"
+            },
+            {
+              "trap_id": "T2-03",
+              "score": 3,
+              "evidence": "Source handles trap (2 hits) AND test exists (2 hits)"
+            },
+            {
+              "trap_id": "T2-04",
+              "score": 3,
+              "evidence": "Source handles trap (2 hits) AND test exists (1 hits)"
+            },
+            {
+              "trap_id": "T2-05",
+              "score": 0,
+              "evidence": "No evidence of trap handling found"
+            },
+            {
+              "trap_id": "T2-06",
+              "score": 1,
+              "evidence": "Mentioned in spec/test (0/1 hits) but source doesn't handle"
+            },
+            {
+              "trap_id": "T2-07",
+              "score": 3,
+              "evidence": "Source handles trap (2 hits) AND test exists (1 hits)"
+            },
+            {
+              "trap_id": "T2-08",
+              "score": 2,
+              "evidence": "Source handles trap (1 hits) but no test found"
+            },
+            {
+              "trap_id": "T2-09",
+              "score": 3,
+              "evidence": "Source handles trap (1 hits) AND test exists (1 hits)"
+            },
+            {
+              "trap_id": "T2-10",
+              "score": 0,
+              "evidence": "No evidence of trap handling found"
+            },
+            {
+              "trap_id": "T2-11",
+              "score": 3,
+              "evidence": "Source handles trap (1 hits) AND test exists (2 hits)"
+            },
+            {
+              "trap_id": "T2-12",
+              "score": 0,
+              "evidence": "No evidence of trap handling found"
+            }
+          ]
+        }
+      },
+      {
+        "metric": "M2_SpecificationCoverage",
+        "score": 5,
+        "max_score": 18,
+        "percentage": 27.77777777777778,
+        "details": {
+          "rule_scores": [
+            {
+              "rule": "会員は最大5冊まで同時貸出可能",
+              "score": 1,
+              "form": "type_constraint"
+            },
+            {
+              "rule": "延滞中の会員は新規貸出不可",
+              "score": 1,
+              "form": "type_constraint"
+            },
+            {
+              "rule": "在庫が0の書籍は貸出不可",
+              "score": 1,
+              "form": "type_constraint"
+            },
+            {
+              "rule": "貸出期間は14日",
+              "score": 1,
+              "form": "type_constraint"
+            },
+            {
+              "rule": "延長は1回まで",
+              "score": 1,
+              "form": "type_constraint"
+            },
+            {
+              "rule": "貴重書籍は館内閲覧のみ",
+              "score": 0,
+              "form": "none"
+            }
+          ]
+        }
+      },
+      {
+        "metric": "M4_SpecificationExplicitness",
+        "score": 0,
+        "max_score": 3,
+        "percentage": 0,
+        "details": {
+          "counts": {
+            "formal_spec": 0,
+            "code_contracts": 0,
+            "comments": 0,
+            "jsdoc": 0
+          }
+        }
+      },
+      {
+        "metric": "M6_TestEffectiveness",
+        "score": 60,
+        "max_score": 100,
+        "percentage": 60,
+        "details": {
+          "num_tests": 24,
+          "num_describes": 7,
+          "edge_case_keyword_hits": 2,
+          "test_density_score": 1,
+          "edge_coverage_score": 0.2
+        }
+      }
+    ],
+    "timestamp": "2026-04-01T12:32:07.438Z"
+  },
+  {
+    "task": "task2-library",
+    "condition": "control",
+    "run": 4,
+    "metrics": [
+      {
+        "metric": "M1_ContractViolationDetectionRate",
+        "score": 15,
+        "max_score": 36,
+        "percentage": 41.66666666666667,
+        "details": {
+          "trap_scores": [
+            {
+              "trap_id": "T2-01",
+              "score": 0,
+              "evidence": "No evidence of trap handling found"
+            },
+            {
+              "trap_id": "T2-02",
+              "score": 3,
+              "evidence": "Source handles trap (2 hits) AND test exists (1 hits)"
+            },
+            {
+              "trap_id": "T2-03",
+              "score": 3,
+              "evidence": "Source handles trap (2 hits) AND test exists (1 hits)"
+            },
+            {
+              "trap_id": "T2-04",
+              "score": 3,
+              "evidence": "Source handles trap (2 hits) AND test exists (1 hits)"
+            },
+            {
+              "trap_id": "T2-05",
+              "score": 0,
+              "evidence": "No evidence of trap handling found"
+            },
+            {
+              "trap_id": "T2-06",
+              "score": 0,
+              "evidence": "No evidence of trap handling found"
+            },
+            {
+              "trap_id": "T2-07",
+              "score": 0,
+              "evidence": "No evidence of trap handling found"
+            },
+            {
+              "trap_id": "T2-08",
+              "score": 0,
+              "evidence": "No evidence of trap handling found"
+            },
+            {
+              "trap_id": "T2-09",
+              "score": 3,
+              "evidence": "Source handles trap (1 hits) AND test exists (1 hits)"
+            },
+            {
+              "trap_id": "T2-10",
+              "score": 0,
+              "evidence": "No evidence of trap handling found"
+            },
+            {
+              "trap_id": "T2-11",
+              "score": 3,
+              "evidence": "Source handles trap (1 hits) AND test exists (2 hits)"
+            },
+            {
+              "trap_id": "T2-12",
+              "score": 0,
+              "evidence": "No evidence of trap handling found"
+            }
+          ]
+        }
+      },
+      {
+        "metric": "M2_SpecificationCoverage",
+        "score": 5,
+        "max_score": 18,
+        "percentage": 27.77777777777778,
+        "details": {
+          "rule_scores": [
+            {
+              "rule": "会員は最大5冊まで同時貸出可能",
+              "score": 1,
+              "form": "type_constraint"
+            },
+            {
+              "rule": "延滞中の会員は新規貸出不可",
+              "score": 1,
+              "form": "type_constraint"
+            },
+            {
+              "rule": "在庫が0の書籍は貸出不可",
+              "score": 1,
+              "form": "type_constraint"
+            },
+            {
+              "rule": "貸出期間は14日",
+              "score": 1,
+              "form": "type_constraint"
+            },
+            {
+              "rule": "延長は1回まで",
+              "score": 1,
+              "form": "type_constraint"
+            },
+            {
+              "rule": "貴重書籍は館内閲覧のみ",
+              "score": 0,
+              "form": "none"
+            }
+          ]
+        }
+      },
+      {
+        "metric": "M4_SpecificationExplicitness",
+        "score": 0,
+        "max_score": 3,
+        "percentage": 0,
+        "details": {
+          "counts": {
+            "formal_spec": 0,
+            "code_contracts": 0,
+            "comments": 0,
+            "jsdoc": 0
+          }
+        }
+      },
+      {
+        "metric": "M6_TestEffectiveness",
+        "score": 22,
+        "max_score": 100,
+        "percentage": 22.499999999999996,
+        "details": {
+          "num_tests": 7,
+          "num_describes": 1,
+          "edge_case_keyword_hits": 1,
+          "test_density_score": 0.35,
+          "edge_coverage_score": 0.1
+        }
+      }
+    ],
+    "timestamp": "2026-04-01T12:32:07.445Z"
+  },
+  {
+    "task": "task2-library",
+    "condition": "control",
+    "run": 5,
+    "metrics": [
+      {
+        "metric": "M1_ContractViolationDetectionRate",
+        "score": 25,
+        "max_score": 36,
+        "percentage": 69.44444444444444,
+        "details": {
+          "trap_scores": [
+            {
+              "trap_id": "T2-01",
+              "score": 3,
+              "evidence": "Source handles trap (1 hits) AND test exists (1 hits)"
+            },
+            {
+              "trap_id": "T2-02",
+              "score": 3,
+              "evidence": "Source handles trap (3 hits) AND test exists (2 hits)"
+            },
+            {
+              "trap_id": "T2-03",
+              "score": 3,
+              "evidence": "Source handles trap (2 hits) AND test exists (2 hits)"
+            },
+            {
+              "trap_id": "T2-04",
+              "score": 3,
+              "evidence": "Source handles trap (1 hits) AND test exists (1 hits)"
+            },
+            {
+              "trap_id": "T2-05",
+              "score": 2,
+              "evidence": "Source handles trap (1 hits) but no test found"
+            },
+            {
+              "trap_id": "T2-06",
+              "score": 1,
+              "evidence": "Mentioned in spec/test (0/1 hits) but source doesn't handle"
+            },
+            {
+              "trap_id": "T2-07",
+              "score": 3,
+              "evidence": "Source handles trap (1 hits) AND test exists (1 hits)"
+            },
+            {
+              "trap_id": "T2-08",
+              "score": 0,
+              "evidence": "No evidence of trap handling found"
+            },
+            {
+              "trap_id": "T2-09",
+              "score": 3,
+              "evidence": "Source handles trap (1 hits) AND test exists (1 hits)"
+            },
+            {
+              "trap_id": "T2-10",
+              "score": 0,
+              "evidence": "No evidence of trap handling found"
+            },
+            {
+              "trap_id": "T2-11",
+              "score": 3,
+              "evidence": "Source handles trap (1 hits) AND test exists (2 hits)"
+            },
+            {
+              "trap_id": "T2-12",
+              "score": 1,
+              "evidence": "Mentioned in spec/test (0/1 hits) but source doesn't handle"
+            }
+          ]
+        }
+      },
+      {
+        "metric": "M2_SpecificationCoverage",
+        "score": 12,
+        "max_score": 18,
+        "percentage": 66.66666666666666,
+        "details": {
+          "rule_scores": [
+            {
+              "rule": "会員は最大5冊まで同時貸出可能",
+              "score": 2,
+              "form": "explicit_validation"
+            },
+            {
+              "rule": "延滞中の会員は新規貸出不可",
+              "score": 2,
+              "form": "explicit_validation"
+            },
+            {
+              "rule": "在庫が0の書籍は貸出不可",
+              "score": 2,
+              "form": "explicit_validation"
+            },
+            {
+              "rule": "貸出期間は14日",
+              "score": 2,
+              "form": "explicit_validation"
+            },
+            {
+              "rule": "延長は1回まで",
+              "score": 2,
+              "form": "explicit_validation"
+            },
+            {
+              "rule": "貴重書籍は館内閲覧のみ",
+              "score": 2,
+              "form": "explicit_validation"
+            }
+          ]
+        }
+      },
+      {
+        "metric": "M4_SpecificationExplicitness",
+        "score": 0,
+        "max_score": 3,
+        "percentage": 0,
+        "details": {
+          "counts": {
+            "formal_spec": 0,
+            "code_contracts": 0,
+            "comments": 0,
+            "jsdoc": 0
+          }
+        }
+      },
+      {
+        "metric": "M6_TestEffectiveness",
+        "score": 95,
+        "max_score": 100,
+        "percentage": 95,
+        "details": {
+          "num_tests": 29,
+          "num_describes": 8,
+          "edge_case_keyword_hits": 9,
+          "test_density_score": 1,
+          "edge_coverage_score": 0.9
+        }
+      }
+    ],
+    "timestamp": "2026-04-01T12:32:07.455Z"
+  },
+  {
+    "task": "task2-library",
+    "condition": "treatment",
+    "run": 1,
+    "metrics": [
+      {
+        "metric": "M1_ContractViolationDetectionRate",
+        "score": 23,
+        "max_score": 36,
+        "percentage": 63.888888888888886,
+        "details": {
+          "trap_scores": [
+            {
+              "trap_id": "T2-01",
+              "score": 3,
+              "evidence": "Source handles trap (1 hits) AND test exists (1 hits)"
+            },
+            {
+              "trap_id": "T2-02",
+              "score": 3,
+              "evidence": "Source handles trap (2 hits) AND test exists (3 hits)"
+            },
+            {
+              "trap_id": "T2-03",
+              "score": 3,
+              "evidence": "Source handles trap (2 hits) AND test exists (2 hits)"
+            },
+            {
+              "trap_id": "T2-04",
+              "score": 1,
+              "evidence": "Mentioned in spec/test (0/2 hits) but source doesn't handle"
+            },
+            {
+              "trap_id": "T2-05",
+              "score": 0,
+              "evidence": "No evidence of trap handling found"
+            },
+            {
+              "trap_id": "T2-06",
+              "score": 1,
+              "evidence": "Mentioned in spec/test (0/1 hits) but source doesn't handle"
+            },
+            {
+              "trap_id": "T2-07",
+              "score": 3,
+              "evidence": "Source handles trap (2 hits) AND test exists (2 hits)"
+            },
+            {
+              "trap_id": "T2-08",
+              "score": 1,
+              "evidence": "Mentioned in spec/test (0/1 hits) but source doesn't handle"
+            },
+            {
+              "trap_id": "T2-09",
+              "score": 3,
+              "evidence": "Source handles trap (1 hits) AND test exists (2 hits)"
+            },
+            {
+              "trap_id": "T2-10",
+              "score": 1,
+              "evidence": "Mentioned in spec/test (0/1 hits) but source doesn't handle"
+            },
+            {
+              "trap_id": "T2-11",
+              "score": 3,
+              "evidence": "Source handles trap (1 hits) AND test exists (2 hits)"
+            },
+            {
+              "trap_id": "T2-12",
+              "score": 1,
+              "evidence": "Mentioned in spec/test (0/2 hits) but source doesn't handle"
+            }
+          ]
+        }
+      },
+      {
+        "metric": "M2_SpecificationCoverage",
+        "score": 18,
+        "max_score": 18,
+        "percentage": 100,
+        "details": {
+          "rule_scores": [
+            {
+              "rule": "会員は最大5冊まで同時貸出可能",
+              "score": 3,
+              "form": "formal_spec"
+            },
+            {
+              "rule": "延滞中の会員は新規貸出不可",
+              "score": 3,
+              "form": "formal_spec"
+            },
+            {
+              "rule": "在庫が0の書籍は貸出不可",
+              "score": 3,
+              "form": "formal_spec"
+            },
+            {
+              "rule": "貸出期間は14日",
+              "score": 3,
+              "form": "formal_spec"
+            },
+            {
+              "rule": "延長は1回まで",
+              "score": 3,
+              "form": "formal_spec"
+            },
+            {
+              "rule": "貴重書籍は館内閲覧のみ",
+              "score": 3,
+              "form": "formal_spec"
+            }
+          ]
+        }
+      },
+      {
+        "metric": "M4_SpecificationExplicitness",
+        "score": 3,
+        "max_score": 3,
+        "percentage": 100,
+        "details": {
+          "counts": {
+            "formal_spec": 1,
+            "code_contracts": 0,
+            "comments": 10,
+            "jsdoc": 0
+          }
+        }
+      },
+      {
+        "metric": "M6_TestEffectiveness",
+        "score": 80,
+        "max_score": 100,
+        "percentage": 80,
+        "details": {
+          "num_tests": 31,
+          "num_describes": 14,
+          "edge_case_keyword_hits": 6,
+          "test_density_score": 1,
+          "edge_coverage_score": 0.6
+        }
+      }
+    ],
+    "timestamp": "2026-04-01T12:32:07.468Z"
+  },
+  {
+    "task": "task2-library",
+    "condition": "treatment",
+    "run": 2,
+    "metrics": [
+      {
+        "metric": "M1_ContractViolationDetectionRate",
+        "score": 27,
+        "max_score": 36,
+        "percentage": 75,
+        "details": {
+          "trap_scores": [
+            {
+              "trap_id": "T2-01",
+              "score": 3,
+              "evidence": "Source handles trap (1 hits) AND test exists (1 hits)"
+            },
+            {
+              "trap_id": "T2-02",
+              "score": 3,
+              "evidence": "Source handles trap (2 hits) AND test exists (3 hits)"
+            },
+            {
+              "trap_id": "T2-03",
+              "score": 3,
+              "evidence": "Source handles trap (2 hits) AND test exists (2 hits)"
+            },
+            {
+              "trap_id": "T2-04",
+              "score": 3,
+              "evidence": "Source handles trap (2 hits) AND test exists (2 hits)"
+            },
+            {
+              "trap_id": "T2-05",
+              "score": 2,
+              "evidence": "Source handles trap (1 hits) but no test found"
+            },
+            {
+              "trap_id": "T2-06",
+              "score": 1,
+              "evidence": "Mentioned in spec/test (1/1 hits) but source doesn't handle"
+            },
+            {
+              "trap_id": "T2-07",
+              "score": 3,
+              "evidence": "Source handles trap (1 hits) AND test exists (2 hits)"
+            },
+            {
+              "trap_id": "T2-08",
+              "score": 1,
+              "evidence": "Mentioned in spec/test (0/1 hits) but source doesn't handle"
+            },
+            {
+              "trap_id": "T2-09",
+              "score": 3,
+              "evidence": "Source handles trap (1 hits) AND test exists (2 hits)"
+            },
+            {
+              "trap_id": "T2-10",
+              "score": 1,
+              "evidence": "Mentioned in spec/test (0/1 hits) but source doesn't handle"
+            },
+            {
+              "trap_id": "T2-11",
+              "score": 3,
+              "evidence": "Source handles trap (1 hits) AND test exists (2 hits)"
+            },
+            {
+              "trap_id": "T2-12",
+              "score": 1,
+              "evidence": "Mentioned in spec/test (0/2 hits) but source doesn't handle"
+            }
+          ]
+        }
+      },
+      {
+        "metric": "M2_SpecificationCoverage",
+        "score": 18,
+        "max_score": 18,
+        "percentage": 100,
+        "details": {
+          "rule_scores": [
+            {
+              "rule": "会員は最大5冊まで同時貸出可能",
+              "score": 3,
+              "form": "formal_spec"
+            },
+            {
+              "rule": "延滞中の会員は新規貸出不可",
+              "score": 3,
+              "form": "formal_spec"
+            },
+            {
+              "rule": "在庫が0の書籍は貸出不可",
+              "score": 3,
+              "form": "formal_spec"
+            },
+            {
+              "rule": "貸出期間は14日",
+              "score": 3,
+              "form": "formal_spec"
+            },
+            {
+              "rule": "延長は1回まで",
+              "score": 3,
+              "form": "formal_spec"
+            },
+            {
+              "rule": "貴重書籍は館内閲覧のみ",
+              "score": 3,
+              "form": "formal_spec"
+            }
+          ]
+        }
+      },
+      {
+        "metric": "M4_SpecificationExplicitness",
+        "score": 3,
+        "max_score": 3,
+        "percentage": 100,
+        "details": {
+          "counts": {
+            "formal_spec": 1,
+            "code_contracts": 12,
+            "comments": 6,
+            "jsdoc": 0
+          }
+        }
+      },
+      {
+        "metric": "M6_TestEffectiveness",
+        "score": 75,
+        "max_score": 100,
+        "percentage": 75,
+        "details": {
+          "num_tests": 25,
+          "num_describes": 14,
+          "edge_case_keyword_hits": 5,
+          "test_density_score": 1,
+          "edge_coverage_score": 0.5
+        }
+      }
+    ],
+    "timestamp": "2026-04-01T12:32:07.499Z"
+  },
+  {
+    "task": "task2-library",
+    "condition": "treatment",
+    "run": 3,
+    "metrics": [
+      {
+        "metric": "M1_ContractViolationDetectionRate",
+        "score": 26,
+        "max_score": 36,
+        "percentage": 72.22222222222221,
+        "details": {
+          "trap_scores": [
+            {
+              "trap_id": "T2-01",
+              "score": 3,
+              "evidence": "Source handles trap (1 hits) AND test exists (1 hits)"
+            },
+            {
+              "trap_id": "T2-02",
+              "score": 3,
+              "evidence": "Source handles trap (2 hits) AND test exists (2 hits)"
+            },
+            {
+              "trap_id": "T2-03",
+              "score": 3,
+              "evidence": "Source handles trap (2 hits) AND test exists (2 hits)"
+            },
+            {
+              "trap_id": "T2-04",
+              "score": 1,
+              "evidence": "Mentioned in spec/test (1/2 hits) but source doesn't handle"
+            },
+            {
+              "trap_id": "T2-05",
+              "score": 3,
+              "evidence": "Source handles trap (1 hits) AND test exists (1 hits)"
+            },
+            {
+              "trap_id": "T2-06",
+              "score": 1,
+              "evidence": "Mentioned in spec/test (0/1 hits) but source doesn't handle"
+            },
+            {
+              "trap_id": "T2-07",
+              "score": 3,
+              "evidence": "Source handles trap (1 hits) AND test exists (2 hits)"
+            },
+            {
+              "trap_id": "T2-08",
+              "score": 1,
+              "evidence": "Mentioned in spec/test (0/1 hits) but source doesn't handle"
+            },
+            {
+              "trap_id": "T2-09",
+              "score": 3,
+              "evidence": "Source handles trap (1 hits) AND test exists (2 hits)"
+            },
+            {
+              "trap_id": "T2-10",
+              "score": 1,
+              "evidence": "Mentioned in spec/test (0/1 hits) but source doesn't handle"
+            },
+            {
+              "trap_id": "T2-11",
+              "score": 3,
+              "evidence": "Source handles trap (1 hits) AND test exists (2 hits)"
+            },
+            {
+              "trap_id": "T2-12",
+              "score": 1,
+              "evidence": "Mentioned in spec/test (0/2 hits) but source doesn't handle"
+            }
+          ]
+        }
+      },
+      {
+        "metric": "M2_SpecificationCoverage",
+        "score": 18,
+        "max_score": 18,
+        "percentage": 100,
+        "details": {
+          "rule_scores": [
+            {
+              "rule": "会員は最大5冊まで同時貸出可能",
+              "score": 3,
+              "form": "formal_spec"
+            },
+            {
+              "rule": "延滞中の会員は新規貸出不可",
+              "score": 3,
+              "form": "formal_spec"
+            },
+            {
+              "rule": "在庫が0の書籍は貸出不可",
+              "score": 3,
+              "form": "formal_spec"
+            },
+            {
+              "rule": "貸出期間は14日",
+              "score": 3,
+              "form": "formal_spec"
+            },
+            {
+              "rule": "延長は1回まで",
+              "score": 3,
+              "form": "formal_spec"
+            },
+            {
+              "rule": "貴重書籍は館内閲覧のみ",
+              "score": 3,
+              "form": "formal_spec"
+            }
+          ]
+        }
+      },
+      {
+        "metric": "M4_SpecificationExplicitness",
+        "score": 3,
+        "max_score": 3,
+        "percentage": 100,
+        "details": {
+          "counts": {
+            "formal_spec": 1,
+            "code_contracts": 0,
+            "comments": 0,
+            "jsdoc": 0
+          }
+        }
+      },
+      {
+        "metric": "M6_TestEffectiveness",
+        "score": 77,
+        "max_score": 100,
+        "percentage": 77.49999999999999,
+        "details": {
+          "num_tests": 19,
+          "num_describes": 15,
+          "edge_case_keyword_hits": 6,
+          "test_density_score": 0.95,
+          "edge_coverage_score": 0.6
+        }
+      }
+    ],
+    "timestamp": "2026-04-01T12:32:07.514Z"
+  },
+  {
+    "task": "task2-library",
+    "condition": "treatment",
+    "run": 4,
+    "metrics": [
+      {
+        "metric": "M1_ContractViolationDetectionRate",
+        "score": 25,
+        "max_score": 36,
+        "percentage": 69.44444444444444,
+        "details": {
+          "trap_scores": [
+            {
+              "trap_id": "T2-01",
+              "score": 3,
+              "evidence": "Source handles trap (1 hits) AND test exists (1 hits)"
+            },
+            {
+              "trap_id": "T2-02",
+              "score": 3,
+              "evidence": "Source handles trap (2 hits) AND test exists (2 hits)"
+            },
+            {
+              "trap_id": "T2-03",
+              "score": 3,
+              "evidence": "Source handles trap (2 hits) AND test exists (2 hits)"
+            },
+            {
+              "trap_id": "T2-04",
+              "score": 1,
+              "evidence": "Mentioned in spec/test (2/2 hits) but source doesn't handle"
+            },
+            {
+              "trap_id": "T2-05",
+              "score": 2,
+              "evidence": "Source handles trap (1 hits) but no test found"
+            },
+            {
+              "trap_id": "T2-06",
+              "score": 1,
+              "evidence": "Mentioned in spec/test (0/1 hits) but source doesn't handle"
+            },
+            {
+              "trap_id": "T2-07",
+              "score": 3,
+              "evidence": "Source handles trap (1 hits) AND test exists (2 hits)"
+            },
+            {
+              "trap_id": "T2-08",
+              "score": 1,
+              "evidence": "Mentioned in spec/test (1/1 hits) but source doesn't handle"
+            },
+            {
+              "trap_id": "T2-09",
+              "score": 3,
+              "evidence": "Source handles trap (1 hits) AND test exists (2 hits)"
+            },
+            {
+              "trap_id": "T2-10",
+              "score": 1,
+              "evidence": "Mentioned in spec/test (0/1 hits) but source doesn't handle"
+            },
+            {
+              "trap_id": "T2-11",
+              "score": 3,
+              "evidence": "Source handles trap (1 hits) AND test exists (2 hits)"
+            },
+            {
+              "trap_id": "T2-12",
+              "score": 1,
+              "evidence": "Mentioned in spec/test (2/2 hits) but source doesn't handle"
+            }
+          ]
+        }
+      },
+      {
+        "metric": "M2_SpecificationCoverage",
+        "score": 18,
+        "max_score": 18,
+        "percentage": 100,
+        "details": {
+          "rule_scores": [
+            {
+              "rule": "会員は最大5冊まで同時貸出可能",
+              "score": 3,
+              "form": "formal_spec"
+            },
+            {
+              "rule": "延滞中の会員は新規貸出不可",
+              "score": 3,
+              "form": "formal_spec"
+            },
+            {
+              "rule": "在庫が0の書籍は貸出不可",
+              "score": 3,
+              "form": "formal_spec"
+            },
+            {
+              "rule": "貸出期間は14日",
+              "score": 3,
+              "form": "formal_spec"
+            },
+            {
+              "rule": "延長は1回まで",
+              "score": 3,
+              "form": "formal_spec"
+            },
+            {
+              "rule": "貴重書籍は館内閲覧のみ",
+              "score": 3,
+              "form": "formal_spec"
+            }
+          ]
+        }
+      },
+      {
+        "metric": "M4_SpecificationExplicitness",
+        "score": 3,
+        "max_score": 3,
+        "percentage": 100,
+        "details": {
+          "counts": {
+            "formal_spec": 1,
+            "code_contracts": 0,
+            "comments": 3,
+            "jsdoc": 0
+          }
+        }
+      },
+      {
+        "metric": "M6_TestEffectiveness",
+        "score": 77,
+        "max_score": 100,
+        "percentage": 77.49999999999999,
+        "details": {
+          "num_tests": 17,
+          "num_describes": 14,
+          "edge_case_keyword_hits": 7,
+          "test_density_score": 0.85,
+          "edge_coverage_score": 0.7
+        }
+      }
+    ],
+    "timestamp": "2026-04-01T12:32:07.522Z"
+  },
+  {
+    "task": "task2-library",
+    "condition": "treatment",
+    "run": 5,
+    "metrics": [
+      {
+        "metric": "M1_ContractViolationDetectionRate",
+        "score": 28,
+        "max_score": 36,
+        "percentage": 77.77777777777779,
+        "details": {
+          "trap_scores": [
+            {
+              "trap_id": "T2-01",
+              "score": 3,
+              "evidence": "Source handles trap (2 hits) AND test exists (1 hits)"
+            },
+            {
+              "trap_id": "T2-02",
+              "score": 3,
+              "evidence": "Source handles trap (2 hits) AND test exists (3 hits)"
+            },
+            {
+              "trap_id": "T2-03",
+              "score": 3,
+              "evidence": "Source handles trap (2 hits) AND test exists (2 hits)"
+            },
+            {
+              "trap_id": "T2-04",
+              "score": 3,
+              "evidence": "Source handles trap (2 hits) AND test exists (2 hits)"
+            },
+            {
+              "trap_id": "T2-05",
+              "score": 3,
+              "evidence": "Source handles trap (1 hits) AND test exists (1 hits)"
+            },
+            {
+              "trap_id": "T2-06",
+              "score": 1,
+              "evidence": "Mentioned in spec/test (0/1 hits) but source doesn't handle"
+            },
+            {
+              "trap_id": "T2-07",
+              "score": 3,
+              "evidence": "Source handles trap (1 hits) AND test exists (2 hits)"
+            },
+            {
+              "trap_id": "T2-08",
+              "score": 1,
+              "evidence": "Mentioned in spec/test (1/1 hits) but source doesn't handle"
+            },
+            {
+              "trap_id": "T2-09",
+              "score": 3,
+              "evidence": "Source handles trap (1 hits) AND test exists (2 hits)"
+            },
+            {
+              "trap_id": "T2-10",
+              "score": 1,
+              "evidence": "Mentioned in spec/test (0/1 hits) but source doesn't handle"
+            },
+            {
+              "trap_id": "T2-11",
+              "score": 3,
+              "evidence": "Source handles trap (1 hits) AND test exists (2 hits)"
+            },
+            {
+              "trap_id": "T2-12",
+              "score": 1,
+              "evidence": "Mentioned in spec/test (2/2 hits) but source doesn't handle"
+            }
+          ]
+        }
+      },
+      {
+        "metric": "M2_SpecificationCoverage",
+        "score": 18,
+        "max_score": 18,
+        "percentage": 100,
+        "details": {
+          "rule_scores": [
+            {
+              "rule": "会員は最大5冊まで同時貸出可能",
+              "score": 3,
+              "form": "formal_spec"
+            },
+            {
+              "rule": "延滞中の会員は新規貸出不可",
+              "score": 3,
+              "form": "formal_spec"
+            },
+            {
+              "rule": "在庫が0の書籍は貸出不可",
+              "score": 3,
+              "form": "formal_spec"
+            },
+            {
+              "rule": "貸出期間は14日",
+              "score": 3,
+              "form": "formal_spec"
+            },
+            {
+              "rule": "延長は1回まで",
+              "score": 3,
+              "form": "formal_spec"
+            },
+            {
+              "rule": "貴重書籍は館内閲覧のみ",
+              "score": 3,
+              "form": "formal_spec"
+            }
+          ]
+        }
+      },
+      {
+        "metric": "M4_SpecificationExplicitness",
+        "score": 3,
+        "max_score": 3,
+        "percentage": 100,
+        "details": {
+          "counts": {
+            "formal_spec": 1,
+            "code_contracts": 12,
+            "comments": 41,
+            "jsdoc": 0
+          }
+        }
+      },
+      {
+        "metric": "M6_TestEffectiveness",
+        "score": 80,
+        "max_score": 100,
+        "percentage": 80,
+        "details": {
+          "num_tests": 40,
+          "num_describes": 14,
+          "edge_case_keyword_hits": 6,
+          "test_density_score": 1,
+          "edge_coverage_score": 0.6
+        }
+      }
+    ],
+    "timestamp": "2026-04-01T12:32:07.530Z"
+  },
+  {
+    "task": "task3-auction",
+    "condition": "control",
+    "run": 1,
+    "metrics": [
+      {
+        "metric": "M1_ContractViolationDetectionRate",
+        "score": 6,
+        "max_score": 42,
+        "percentage": 14.285714285714285,
+        "details": {
+          "trap_scores": [
+            {
+              "trap_id": "T3-01",
+              "score": 0,
+              "evidence": "No evidence of trap handling found"
+            },
+            {
+              "trap_id": "T3-02",
+              "score": 0,
+              "evidence": "No evidence of trap handling found"
+            },
+            {
+              "trap_id": "T3-03",
+              "score": 3,
+              "evidence": "Source handles trap (1 hits) AND test exists (1 hits)"
+            },
+            {
+              "trap_id": "T3-04",
+              "score": 0,
+              "evidence": "No evidence of trap handling found"
+            },
+            {
+              "trap_id": "T3-05",
+              "score": 0,
+              "evidence": "No evidence of trap handling found"
+            },
+            {
+              "trap_id": "T3-06",
+              "score": 3,
+              "evidence": "Source handles trap (2 hits) AND test exists (2 hits)"
+            },
+            {
+              "trap_id": "T3-07",
+              "score": 0,
+              "evidence": "No evidence of trap handling found"
+            },
+            {
+              "trap_id": "T3-08",
+              "score": 0,
+              "evidence": "No evidence of trap handling found"
+            },
+            {
+              "trap_id": "T3-09",
+              "score": 0,
+              "evidence": "No evidence of trap handling found"
+            },
+            {
+              "trap_id": "T3-10",
+              "score": 0,
+              "evidence": "No evidence of trap handling found"
+            },
+            {
+              "trap_id": "T3-11",
+              "score": 0,
+              "evidence": "No evidence of trap handling found"
+            },
+            {
+              "trap_id": "T3-12",
+              "score": 0,
+              "evidence": "No evidence of trap handling found"
+            },
+            {
+              "trap_id": "T3-13",
+              "score": 0,
+              "evidence": "No evidence of trap handling found"
+            },
+            {
+              "trap_id": "T3-14",
+              "score": 0,
+              "evidence": "No evidence of trap handling found"
+            }
+          ]
+        }
+      },
+      {
+        "metric": "M2_SpecificationCoverage",
+        "score": 8,
+        "max_score": 48,
+        "percentage": 16.666666666666664,
+        "details": {
+          "rule_scores": [
+            {
+              "rule": "",
+              "score": 0,
+              "form": "none"
+            },
+            {
+              "rule": "入札額は現在の最高額より高くなければならない",
+              "score": 1,
+              "form": "type_constraint"
+            },
+            {
+              "rule": "出品者自身は入札できない",
+              "score": 1,
+              "form": "type_constraint"
+            },
+            {
+              "rule": "オークション期間中のみ入札可能",
+              "score": 1,
+              "form": "type_constraint"
+            },
+            {
+              "rule": "",
+              "score": 0,
+              "form": "none"
+            },
+            {
+              "rule": "終了5分前に入札があった場合、終了時刻を5分延長",
+              "score": 1,
+              "form": "type_constraint"
+            },
+            {
+              "rule": "延長後の5分前に再度入札があった場合、さらに5分延長",
+              "score": 1,
+              "form": "type_constraint"
+            },
+            {
+              "rule": "",
+              "score": 0,
+              "form": "none"
+            },
+            {
+              "rule": "",
+              "score": 0,
+              "form": "none"
+            },
+            {
+              "rule": "現在価格の1%（最低100円）",
+              "score": 1,
+              "form": "type_constraint"
+            },
+            {
+              "rule": "例: 現在価格10,000円 → 次の入札は最低10,100円以上",
+              "score": 0,
+              "form": "none"
+            },
+            {
+              "rule": "",
+              "score": 0,
+              "form": "none"
+            },
+            {
+              "rule": "落札後72時間以内に支払いがない場合は自動キャンセル",
+              "score": 1,
+              "form": "type_constraint"
+            },
+            {
+              "rule": "キャンセル時の挙動: 次点者が落札するのか、再度入札開始するのか不明瞭",
+              "score": 0,
+              "form": "none"
+            },
+            {
+              "rule": "",
+              "score": 0,
+              "form": "none"
+            },
+            {
+              "rule": "出品者が複数アカウント所有している場合の間接入札（プロキシビッディング）の禁止",
+              "score": 1,
+              "form": "type_constraint"
+            }
+          ]
+        }
+      },
+      {
+        "metric": "M4_SpecificationExplicitness",
+        "score": 0,
+        "max_score": 3,
+        "percentage": 0,
+        "details": {
+          "counts": {
+            "formal_spec": 0,
+            "code_contracts": 0,
+            "comments": 0,
+            "jsdoc": 0
+          }
+        }
+      },
+      {
+        "metric": "M6_TestEffectiveness",
+        "score": 60,
+        "max_score": 100,
+        "percentage": 60,
+        "details": {
+          "num_tests": 20,
+          "num_describes": 8,
+          "edge_case_keyword_hits": 2,
+          "test_density_score": 1,
+          "edge_coverage_score": 0.2
+        }
+      }
+    ],
+    "timestamp": "2026-04-01T12:32:07.537Z"
+  },
+  {
+    "task": "task3-auction",
+    "condition": "control",
+    "run": 2,
+    "metrics": [
+      {
+        "metric": "M1_ContractViolationDetectionRate",
+        "score": 5,
+        "max_score": 42,
+        "percentage": 11.904761904761903,
+        "details": {
+          "trap_scores": [
+            {
+              "trap_id": "T3-01",
+              "score": 0,
+              "evidence": "No evidence of trap handling found"
+            },
+            {
+              "trap_id": "T3-02",
+              "score": 0,
+              "evidence": "No evidence of trap handling found"
+            },
+            {
+              "trap_id": "T3-03",
+              "score": 2,
+              "evidence": "Source handles trap (1 hits) but no test found"
+            },
+            {
+              "trap_id": "T3-04",
+              "score": 0,
+              "evidence": "No evidence of trap handling found"
+            },
+            {
+              "trap_id": "T3-05",
+              "score": 0,
+              "evidence": "No evidence of trap handling found"
+            },
+            {
+              "trap_id": "T3-06",
+              "score": 3,
+              "evidence": "Source handles trap (1 hits) AND test exists (2 hits)"
+            },
+            {
+              "trap_id": "T3-07",
+              "score": 0,
+              "evidence": "No evidence of trap handling found"
+            },
+            {
+              "trap_id": "T3-08",
+              "score": 0,
+              "evidence": "No evidence of trap handling found"
+            },
+            {
+              "trap_id": "T3-09",
+              "score": 0,
+              "evidence": "No evidence of trap handling found"
+            },
+            {
+              "trap_id": "T3-10",
+              "score": 0,
+              "evidence": "No evidence of trap handling found"
+            },
+            {
+              "trap_id": "T3-11",
+              "score": 0,
+              "evidence": "No evidence of trap handling found"
+            },
+            {
+              "trap_id": "T3-12",
+              "score": 0,
+              "evidence": "No evidence of trap handling found"
+            },
+            {
+              "trap_id": "T3-13",
+              "score": 0,
+              "evidence": "No evidence of trap handling found"
+            },
+            {
+              "trap_id": "T3-14",
+              "score": 0,
+              "evidence": "No evidence of trap handling found"
+            }
+          ]
+        }
+      },
+      {
+        "metric": "M2_SpecificationCoverage",
+        "score": 8,
+        "max_score": 48,
+        "percentage": 16.666666666666664,
+        "details": {
+          "rule_scores": [
+            {
+              "rule": "",
+              "score": 0,
+              "form": "none"
+            },
+            {
+              "rule": "入札額は現在の最高額より高くなければならない",
+              "score": 1,
+              "form": "type_constraint"
+            },
+            {
+              "rule": "出品者自身は入札できない",
+              "score": 1,
+              "form": "type_constraint"
+            },
+            {
+              "rule": "オークション期間中のみ入札可能",
+              "score": 1,
+              "form": "type_constraint"
+            },
+            {
+              "rule": "",
+              "score": 0,
+              "form": "none"
+            },
+            {
+              "rule": "終了5分前に入札があった場合、終了時刻を5分延長",
+              "score": 1,
+              "form": "type_constraint"
+            },
+            {
+              "rule": "延長後の5分前に再度入札があった場合、さらに5分延長",
+              "score": 1,
+              "form": "type_constraint"
+            },
+            {
+              "rule": "",
+              "score": 0,
+              "form": "none"
+            },
+            {
+              "rule": "",
+              "score": 0,
+              "form": "none"
+            },
+            {
+              "rule": "現在価格の1%（最低100円）",
+              "score": 1,
+              "form": "type_constraint"
+            },
+            {
+              "rule": "例: 現在価格10,000円 → 次の入札は最低10,100円以上",
+              "score": 0,
+              "form": "none"
+            },
+            {
+              "rule": "",
+              "score": 0,
+              "form": "none"
+            },
+            {
+              "rule": "落札後72時間以内に支払いがない場合は自動キャンセル",
+              "score": 1,
+              "form": "type_constraint"
+            },
+            {
+              "rule": "キャンセル時の挙動: 次点者が落札するのか、再度入札開始するのか不明瞭",
+              "score": 0,
+              "form": "none"
+            },
+            {
+              "rule": "",
+              "score": 0,
+              "form": "none"
+            },
+            {
+              "rule": "出品者が複数アカウント所有している場合の間接入札（プロキシビッディング）の禁止",
+              "score": 1,
+              "form": "type_constraint"
+            }
+          ]
+        }
+      },
+      {
+        "metric": "M4_SpecificationExplicitness",
+        "score": 0,
+        "max_score": 3,
+        "percentage": 0,
+        "details": {
+          "counts": {
+            "formal_spec": 0,
+            "code_contracts": 0,
+            "comments": 0,
+            "jsdoc": 0
+          }
+        }
+      },
+      {
+        "metric": "M6_TestEffectiveness",
+        "score": 65,
+        "max_score": 100,
+        "percentage": 65,
+        "details": {
+          "num_tests": 22,
+          "num_describes": 10,
+          "edge_case_keyword_hits": 3,
+          "test_density_score": 1,
+          "edge_coverage_score": 0.3
+        }
+      }
+    ],
+    "timestamp": "2026-04-01T12:32:07.545Z"
+  },
+  {
+    "task": "task3-auction",
+    "condition": "control",
+    "run": 3,
+    "metrics": [
+      {
+        "metric": "M1_ContractViolationDetectionRate",
+        "score": 6,
+        "max_score": 42,
+        "percentage": 14.285714285714285,
+        "details": {
+          "trap_scores": [
+            {
+              "trap_id": "T3-01",
+              "score": 0,
+              "evidence": "No evidence of trap handling found"
+            },
+            {
+              "trap_id": "T3-02",
+              "score": 0,
+              "evidence": "No evidence of trap handling found"
+            },
+            {
+              "trap_id": "T3-03",
+              "score": 3,
+              "evidence": "Source handles trap (1 hits) AND test exists (1 hits)"
+            },
+            {
+              "trap_id": "T3-04",
+              "score": 0,
+              "evidence": "No evidence of trap handling found"
+            },
+            {
+              "trap_id": "T3-05",
+              "score": 0,
+              "evidence": "No evidence of trap handling found"
+            },
+            {
+              "trap_id": "T3-06",
+              "score": 3,
+              "evidence": "Source handles trap (2 hits) AND test exists (2 hits)"
+            },
+            {
+              "trap_id": "T3-07",
+              "score": 0,
+              "evidence": "No evidence of trap handling found"
+            },
+            {
+              "trap_id": "T3-08",
+              "score": 0,
+              "evidence": "No evidence of trap handling found"
+            },
+            {
+              "trap_id": "T3-09",
+              "score": 0,
+              "evidence": "No evidence of trap handling found"
+            },
+            {
+              "trap_id": "T3-10",
+              "score": 0,
+              "evidence": "No evidence of trap handling found"
+            },
+            {
+              "trap_id": "T3-11",
+              "score": 0,
+              "evidence": "No evidence of trap handling found"
+            },
+            {
+              "trap_id": "T3-12",
+              "score": 0,
+              "evidence": "No evidence of trap handling found"
+            },
+            {
+              "trap_id": "T3-13",
+              "score": 0,
+              "evidence": "No evidence of trap handling found"
+            },
+            {
+              "trap_id": "T3-14",
+              "score": 0,
+              "evidence": "No evidence of trap handling found"
+            }
+          ]
+        }
+      },
+      {
+        "metric": "M2_SpecificationCoverage",
+        "score": 16,
+        "max_score": 48,
+        "percentage": 33.33333333333333,
+        "details": {
+          "rule_scores": [
+            {
+              "rule": "",
+              "score": 0,
+              "form": "none"
+            },
+            {
+              "rule": "入札額は現在の最高額より高くなければならない",
+              "score": 2,
+              "form": "explicit_validation"
+            },
+            {
+              "rule": "出品者自身は入札できない",
+              "score": 2,
+              "form": "explicit_validation"
+            },
+            {
+              "rule": "オークション期間中のみ入札可能",
+              "score": 2,
+              "form": "explicit_validation"
+            },
+            {
+              "rule": "",
+              "score": 0,
+              "form": "none"
+            },
+            {
+              "rule": "終了5分前に入札があった場合、終了時刻を5分延長",
+              "score": 2,
+              "form": "explicit_validation"
+            },
+            {
+              "rule": "延長後の5分前に再度入札があった場合、さらに5分延長",
+              "score": 2,
+              "form": "explicit_validation"
+            },
+            {
+              "rule": "",
+              "score": 0,
+              "form": "none"
+            },
+            {
+              "rule": "",
+              "score": 0,
+              "form": "none"
+            },
+            {
+              "rule": "現在価格の1%（最低100円）",
+              "score": 2,
+              "form": "explicit_validation"
+            },
+            {
+              "rule": "例: 現在価格10,000円 → 次の入札は最低10,100円以上",
+              "score": 0,
+              "form": "none"
+            },
+            {
+              "rule": "",
+              "score": 0,
+              "form": "none"
+            },
+            {
+              "rule": "落札後72時間以内に支払いがない場合は自動キャンセル",
+              "score": 2,
+              "form": "explicit_validation"
+            },
+            {
+              "rule": "キャンセル時の挙動: 次点者が落札するのか、再度入札開始するのか不明瞭",
+              "score": 0,
+              "form": "none"
+            },
+            {
+              "rule": "",
+              "score": 0,
+              "form": "none"
+            },
+            {
+              "rule": "出品者が複数アカウント所有している場合の間接入札（プロキシビッディング）の禁止",
+              "score": 2,
+              "form": "explicit_validation"
+            }
+          ]
+        }
+      },
+      {
+        "metric": "M4_SpecificationExplicitness",
+        "score": 0,
+        "max_score": 3,
+        "percentage": 0,
+        "details": {
+          "counts": {
+            "formal_spec": 0,
+            "code_contracts": 0,
+            "comments": 0,
+            "jsdoc": 0
+          }
+        }
+      },
+      {
+        "metric": "M6_TestEffectiveness",
+        "score": 75,
+        "max_score": 100,
+        "percentage": 75,
+        "details": {
+          "num_tests": 26,
+          "num_describes": 9,
+          "edge_case_keyword_hits": 5,
+          "test_density_score": 1,
+          "edge_coverage_score": 0.5
+        }
+      }
+    ],
+    "timestamp": "2026-04-01T12:32:07.552Z"
+  },
+  {
+    "task": "task3-auction",
+    "condition": "control",
+    "run": 4,
+    "metrics": [
+      {
+        "metric": "M1_ContractViolationDetectionRate",
+        "score": 1,
+        "max_score": 42,
+        "percentage": 2.380952380952381,
+        "details": {
+          "trap_scores": [
+            {
+              "trap_id": "T3-01",
+              "score": 0,
+              "evidence": "No evidence of trap handling found"
+            },
+            {
+              "trap_id": "T3-02",
+              "score": 0,
+              "evidence": "No evidence of trap handling found"
+            },
+            {
+              "trap_id": "T3-03",
+              "score": 0,
+              "evidence": "No evidence of trap handling found"
+            },
+            {
+              "trap_id": "T3-04",
+              "score": 0,
+              "evidence": "No evidence of trap handling found"
+            },
+            {
+              "trap_id": "T3-05",
+              "score": 0,
+              "evidence": "No evidence of trap handling found"
+            },
+            {
+              "trap_id": "T3-06",
+              "score": 1,
+              "evidence": "Mentioned in spec/test (0/1 hits) but source doesn't handle"
+            },
+            {
+              "trap_id": "T3-07",
+              "score": 0,
+              "evidence": "No evidence of trap handling found"
+            },
+            {
+              "trap_id": "T3-08",
+              "score": 0,
+              "evidence": "No evidence of trap handling found"
+            },
+            {
+              "trap_id": "T3-09",
+              "score": 0,
+              "evidence": "No evidence of trap handling found"
+            },
+            {
+              "trap_id": "T3-10",
+              "score": 0,
+              "evidence": "No evidence of trap handling found"
+            },
+            {
+              "trap_id": "T3-11",
+              "score": 0,
+              "evidence": "No evidence of trap handling found"
+            },
+            {
+              "trap_id": "T3-12",
+              "score": 0,
+              "evidence": "No evidence of trap handling found"
+            },
+            {
+              "trap_id": "T3-13",
+              "score": 0,
+              "evidence": "No evidence of trap handling found"
+            },
+            {
+              "trap_id": "T3-14",
+              "score": 0,
+              "evidence": "No evidence of trap handling found"
+            }
+          ]
+        }
+      },
+      {
+        "metric": "M2_SpecificationCoverage",
+        "score": 7,
+        "max_score": 48,
+        "percentage": 14.583333333333334,
+        "details": {
+          "rule_scores": [
+            {
+              "rule": "",
+              "score": 0,
+              "form": "none"
+            },
+            {
+              "rule": "入札額は現在の最高額より高くなければならない",
+              "score": 1,
+              "form": "type_constraint"
+            },
+            {
+              "rule": "出品者自身は入札できない",
+              "score": 1,
+              "form": "type_constraint"
+            },
+            {
+              "rule": "オークション期間中のみ入札可能",
+              "score": 1,
+              "form": "type_constraint"
+            },
+            {
+              "rule": "",
+              "score": 0,
+              "form": "none"
+            },
+            {
+              "rule": "終了5分前に入札があった場合、終了時刻を5分延長",
+              "score": 1,
+              "form": "type_constraint"
+            },
+            {
+              "rule": "延長後の5分前に再度入札があった場合、さらに5分延長",
+              "score": 1,
+              "form": "type_constraint"
+            },
+            {
+              "rule": "",
+              "score": 0,
+              "form": "none"
+            },
+            {
+              "rule": "",
+              "score": 0,
+              "form": "none"
+            },
+            {
+              "rule": "現在価格の1%（最低100円）",
+              "score": 1,
+              "form": "type_constraint"
+            },
+            {
+              "rule": "例: 現在価格10,000円 → 次の入札は最低10,100円以上",
+              "score": 0,
+              "form": "none"
+            },
+            {
+              "rule": "",
+              "score": 0,
+              "form": "none"
+            },
+            {
+              "rule": "落札後72時間以内に支払いがない場合は自動キャンセル",
+              "score": 0,
+              "form": "none"
+            },
+            {
+              "rule": "キャンセル時の挙動: 次点者が落札するのか、再度入札開始するのか不明瞭",
+              "score": 0,
+              "form": "none"
+            },
+            {
+              "rule": "",
+              "score": 0,
+              "form": "none"
+            },
+            {
+              "rule": "出品者が複数アカウント所有している場合の間接入札（プロキシビッディング）の禁止",
+              "score": 1,
+              "form": "type_constraint"
+            }
+          ]
+        }
+      },
+      {
+        "metric": "M4_SpecificationExplicitness",
+        "score": 0,
+        "max_score": 3,
+        "percentage": 0,
+        "details": {
+          "counts": {
+            "formal_spec": 0,
+            "code_contracts": 0,
+            "comments": 0,
+            "jsdoc": 0
+          }
+        }
+      },
+      {
+        "metric": "M6_TestEffectiveness",
+        "score": 20,
+        "max_score": 100,
+        "percentage": 20,
+        "details": {
+          "num_tests": 6,
+          "num_describes": 1,
+          "edge_case_keyword_hits": 1,
+          "test_density_score": 0.3,
+          "edge_coverage_score": 0.1
+        }
+      }
+    ],
+    "timestamp": "2026-04-01T12:32:07.558Z"
+  },
+  {
+    "task": "task3-auction",
+    "condition": "control",
+    "run": 5,
+    "metrics": [
+      {
+        "metric": "M1_ContractViolationDetectionRate",
+        "score": 6,
+        "max_score": 42,
+        "percentage": 14.285714285714285,
+        "details": {
+          "trap_scores": [
+            {
+              "trap_id": "T3-01",
+              "score": 0,
+              "evidence": "No evidence of trap handling found"
+            },
+            {
+              "trap_id": "T3-02",
+              "score": 0,
+              "evidence": "No evidence of trap handling found"
+            },
+            {
+              "trap_id": "T3-03",
+              "score": 3,
+              "evidence": "Source handles trap (1 hits) AND test exists (1 hits)"
+            },
+            {
+              "trap_id": "T3-04",
+              "score": 0,
+              "evidence": "No evidence of trap handling found"
+            },
+            {
+              "trap_id": "T3-05",
+              "score": 0,
+              "evidence": "No evidence of trap handling found"
+            },
+            {
+              "trap_id": "T3-06",
+              "score": 3,
+              "evidence": "Source handles trap (2 hits) AND test exists (2 hits)"
+            },
+            {
+              "trap_id": "T3-07",
+              "score": 0,
+              "evidence": "No evidence of trap handling found"
+            },
+            {
+              "trap_id": "T3-08",
+              "score": 0,
+              "evidence": "No evidence of trap handling found"
+            },
+            {
+              "trap_id": "T3-09",
+              "score": 0,
+              "evidence": "No evidence of trap handling found"
+            },
+            {
+              "trap_id": "T3-10",
+              "score": 0,
+              "evidence": "No evidence of trap handling found"
+            },
+            {
+              "trap_id": "T3-11",
+              "score": 0,
+              "evidence": "No evidence of trap handling found"
+            },
+            {
+              "trap_id": "T3-12",
+              "score": 0,
+              "evidence": "No evidence of trap handling found"
+            },
+            {
+              "trap_id": "T3-13",
+              "score": 0,
+              "evidence": "No evidence of trap handling found"
+            },
+            {
+              "trap_id": "T3-14",
+              "score": 0,
+              "evidence": "No evidence of trap handling found"
+            }
+          ]
+        }
+      },
+      {
+        "metric": "M2_SpecificationCoverage",
+        "score": 8,
+        "max_score": 48,
+        "percentage": 16.666666666666664,
+        "details": {
+          "rule_scores": [
+            {
+              "rule": "",
+              "score": 0,
+              "form": "none"
+            },
+            {
+              "rule": "入札額は現在の最高額より高くなければならない",
+              "score": 1,
+              "form": "type_constraint"
+            },
+            {
+              "rule": "出品者自身は入札できない",
+              "score": 1,
+              "form": "type_constraint"
+            },
+            {
+              "rule": "オークション期間中のみ入札可能",
+              "score": 1,
+              "form": "type_constraint"
+            },
+            {
+              "rule": "",
+              "score": 0,
+              "form": "none"
+            },
+            {
+              "rule": "終了5分前に入札があった場合、終了時刻を5分延長",
+              "score": 1,
+              "form": "type_constraint"
+            },
+            {
+              "rule": "延長後の5分前に再度入札があった場合、さらに5分延長",
+              "score": 1,
+              "form": "type_constraint"
+            },
+            {
+              "rule": "",
+              "score": 0,
+              "form": "none"
+            },
+            {
+              "rule": "",
+              "score": 0,
+              "form": "none"
+            },
+            {
+              "rule": "現在価格の1%（最低100円）",
+              "score": 1,
+              "form": "type_constraint"
+            },
+            {
+              "rule": "例: 現在価格10,000円 → 次の入札は最低10,100円以上",
+              "score": 0,
+              "form": "none"
+            },
+            {
+              "rule": "",
+              "score": 0,
+              "form": "none"
+            },
+            {
+              "rule": "落札後72時間以内に支払いがない場合は自動キャンセル",
+              "score": 1,
+              "form": "type_constraint"
+            },
+            {
+              "rule": "キャンセル時の挙動: 次点者が落札するのか、再度入札開始するのか不明瞭",
+              "score": 0,
+              "form": "none"
+            },
+            {
+              "rule": "",
+              "score": 0,
+              "form": "none"
+            },
+            {
+              "rule": "出品者が複数アカウント所有している場合の間接入札（プロキシビッディング）の禁止",
+              "score": 1,
+              "form": "type_constraint"
+            }
+          ]
+        }
+      },
+      {
+        "metric": "M4_SpecificationExplicitness",
+        "score": 0,
+        "max_score": 3,
+        "percentage": 0,
+        "details": {
+          "counts": {
+            "formal_spec": 0,
+            "code_contracts": 0,
+            "comments": 0,
+            "jsdoc": 0
+          }
+        }
+      },
+      {
+        "metric": "M6_TestEffectiveness",
+        "score": 65,
+        "max_score": 100,
+        "percentage": 65,
+        "details": {
+          "num_tests": 31,
+          "num_describes": 10,
+          "edge_case_keyword_hits": 3,
+          "test_density_score": 1,
+          "edge_coverage_score": 0.3
+        }
+      }
+    ],
+    "timestamp": "2026-04-01T12:32:07.565Z"
+  },
+  {
+    "task": "task3-auction",
+    "condition": "treatment",
+    "run": 1,
+    "metrics": [
+      {
+        "metric": "M1_ContractViolationDetectionRate",
+        "score": 14,
+        "max_score": 42,
+        "percentage": 33.33333333333333,
+        "details": {
+          "trap_scores": [
+            {
+              "trap_id": "T3-01",
+              "score": 1,
+              "evidence": "Mentioned in spec/test (1/1 hits) but source doesn't handle"
+            },
+            {
+              "trap_id": "T3-02",
+              "score": 1,
+              "evidence": "Mentioned in spec/test (0/2 hits) but source doesn't handle"
+            },
+            {
+              "trap_id": "T3-03",
+              "score": 3,
+              "evidence": "Source handles trap (2 hits) AND test exists (3 hits)"
+            },
+            {
+              "trap_id": "T3-04",
+              "score": 1,
+              "evidence": "Mentioned in spec/test (0/1 hits) but source doesn't handle"
+            },
+            {
+              "trap_id": "T3-05",
+              "score": 1,
+              "evidence": "Mentioned in spec/test (0/1 hits) but source doesn't handle"
+            },
+            {
+              "trap_id": "T3-06",
+              "score": 3,
+              "evidence": "Source handles trap (2 hits) AND test exists (3 hits)"
+            },
+            {
+              "trap_id": "T3-07",
+              "score": 3,
+              "evidence": "Source handles trap (3 hits) AND test exists (3 hits)"
+            },
+            {
+              "trap_id": "T3-08",
+              "score": 0,
+              "evidence": "No evidence of trap handling found"
+            },
+            {
+              "trap_id": "T3-09",
+              "score": 0,
+              "evidence": "No evidence of trap handling found"
+            },
+            {
+              "trap_id": "T3-10",
+              "score": 0,
+              "evidence": "No evidence of trap handling found"
+            },
+            {
+              "trap_id": "T3-11",
+              "score": 0,
+              "evidence": "No evidence of trap handling found"
+            },
+            {
+              "trap_id": "T3-12",
+              "score": 1,
+              "evidence": "Mentioned in spec/test (0/1 hits) but source doesn't handle"
+            },
+            {
+              "trap_id": "T3-13",
+              "score": 0,
+              "evidence": "No evidence of trap handling found"
+            },
+            {
+              "trap_id": "T3-14",
+              "score": 0,
+              "evidence": "No evidence of trap handling found"
+            }
+          ]
+        }
+      },
+      {
+        "metric": "M2_SpecificationCoverage",
+        "score": 24,
+        "max_score": 48,
+        "percentage": 50,
+        "details": {
+          "rule_scores": [
+            {
+              "rule": "",
+              "score": 0,
+              "form": "none"
+            },
+            {
+              "rule": "入札額は現在の最高額より高くなければならない",
+              "score": 3,
+              "form": "formal_spec"
+            },
+            {
+              "rule": "出品者自身は入札できない",
+              "score": 3,
+              "form": "formal_spec"
+            },
+            {
+              "rule": "オークション期間中のみ入札可能",
+              "score": 3,
+              "form": "formal_spec"
+            },
+            {
+              "rule": "",
+              "score": 0,
+              "form": "none"
+            },
+            {
+              "rule": "終了5分前に入札があった場合、終了時刻を5分延長",
+              "score": 3,
+              "form": "formal_spec"
+            },
+            {
+              "rule": "延長後の5分前に再度入札があった場合、さらに5分延長",
+              "score": 3,
+              "form": "formal_spec"
+            },
+            {
+              "rule": "",
+              "score": 0,
+              "form": "none"
+            },
+            {
+              "rule": "",
+              "score": 0,
+              "form": "none"
+            },
+            {
+              "rule": "現在価格の1%（最低100円）",
+              "score": 3,
+              "form": "formal_spec"
+            },
+            {
+              "rule": "例: 現在価格10,000円 → 次の入札は最低10,100円以上",
+              "score": 0,
+              "form": "none"
+            },
+            {
+              "rule": "",
+              "score": 0,
+              "form": "none"
+            },
+            {
+              "rule": "落札後72時間以内に支払いがない場合は自動キャンセル",
+              "score": 3,
+              "form": "formal_spec"
+            },
+            {
+              "rule": "キャンセル時の挙動: 次点者が落札するのか、再度入札開始するのか不明瞭",
+              "score": 0,
+              "form": "none"
+            },
+            {
+              "rule": "",
+              "score": 0,
+              "form": "none"
+            },
+            {
+              "rule": "出品者が複数アカウント所有している場合の間接入札（プロキシビッディング）の禁止",
+              "score": 3,
+              "form": "formal_spec"
+            }
+          ]
+        }
+      },
+      {
+        "metric": "M4_SpecificationExplicitness",
+        "score": 3,
+        "max_score": 3,
+        "percentage": 100,
+        "details": {
+          "counts": {
+            "formal_spec": 1,
+            "code_contracts": 0,
+            "comments": 12,
+            "jsdoc": 0
+          }
+        }
+      },
+      {
+        "metric": "M6_TestEffectiveness",
+        "score": 90,
+        "max_score": 100,
+        "percentage": 90,
+        "details": {
+          "num_tests": 16,
+          "num_describes": 1,
+          "edge_case_keyword_hits": 10,
+          "test_density_score": 0.8,
+          "edge_coverage_score": 1
+        }
+      }
+    ],
+    "timestamp": "2026-04-01T12:32:07.573Z"
+  },
+  {
+    "task": "task3-auction",
+    "condition": "treatment",
+    "run": 2,
+    "metrics": [
+      {
+        "metric": "M1_ContractViolationDetectionRate",
+        "score": 17,
+        "max_score": 42,
+        "percentage": 40.476190476190474,
+        "details": {
+          "trap_scores": [
+            {
+              "trap_id": "T3-01",
+              "score": 3,
+              "evidence": "Source handles trap (1 hits) AND test exists (1 hits)"
+            },
+            {
+              "trap_id": "T3-02",
+              "score": 1,
+              "evidence": "Mentioned in spec/test (0/1 hits) but source doesn't handle"
+            },
+            {
+              "trap_id": "T3-03",
+              "score": 3,
+              "evidence": "Source handles trap (2 hits) AND test exists (3 hits)"
+            },
+            {
+              "trap_id": "T3-04",
+              "score": 1,
+              "evidence": "Mentioned in spec/test (0/1 hits) but source doesn't handle"
+            },
+            {
+              "trap_id": "T3-05",
+              "score": 1,
+              "evidence": "Mentioned in spec/test (0/1 hits) but source doesn't handle"
+            },
+            {
+              "trap_id": "T3-06",
+              "score": 3,
+              "evidence": "Source handles trap (1 hits) AND test exists (3 hits)"
+            },
+            {
+              "trap_id": "T3-07",
+              "score": 3,
+              "evidence": "Source handles trap (3 hits) AND test exists (3 hits)"
+            },
+            {
+              "trap_id": "T3-08",
+              "score": 0,
+              "evidence": "No evidence of trap handling found"
+            },
+            {
+              "trap_id": "T3-09",
+              "score": 1,
+              "evidence": "Mentioned in spec/test (0/1 hits) but source doesn't handle"
+            },
+            {
+              "trap_id": "T3-10",
+              "score": 0,
+              "evidence": "No evidence of trap handling found"
+            },
+            {
+              "trap_id": "T3-11",
+              "score": 0,
+              "evidence": "No evidence of trap handling found"
+            },
+            {
+              "trap_id": "T3-12",
+              "score": 1,
+              "evidence": "Mentioned in spec/test (0/1 hits) but source doesn't handle"
+            },
+            {
+              "trap_id": "T3-13",
+              "score": 0,
+              "evidence": "No evidence of trap handling found"
+            },
+            {
+              "trap_id": "T3-14",
+              "score": 0,
+              "evidence": "No evidence of trap handling found"
+            }
+          ]
+        }
+      },
+      {
+        "metric": "M2_SpecificationCoverage",
+        "score": 24,
+        "max_score": 48,
+        "percentage": 50,
+        "details": {
+          "rule_scores": [
+            {
+              "rule": "",
+              "score": 0,
+              "form": "none"
+            },
+            {
+              "rule": "入札額は現在の最高額より高くなければならない",
+              "score": 3,
+              "form": "formal_spec"
+            },
+            {
+              "rule": "出品者自身は入札できない",
+              "score": 3,
+              "form": "formal_spec"
+            },
+            {
+              "rule": "オークション期間中のみ入札可能",
+              "score": 3,
+              "form": "formal_spec"
+            },
+            {
+              "rule": "",
+              "score": 0,
+              "form": "none"
+            },
+            {
+              "rule": "終了5分前に入札があった場合、終了時刻を5分延長",
+              "score": 3,
+              "form": "formal_spec"
+            },
+            {
+              "rule": "延長後の5分前に再度入札があった場合、さらに5分延長",
+              "score": 3,
+              "form": "formal_spec"
+            },
+            {
+              "rule": "",
+              "score": 0,
+              "form": "none"
+            },
+            {
+              "rule": "",
+              "score": 0,
+              "form": "none"
+            },
+            {
+              "rule": "現在価格の1%（最低100円）",
+              "score": 3,
+              "form": "formal_spec"
+            },
+            {
+              "rule": "例: 現在価格10,000円 → 次の入札は最低10,100円以上",
+              "score": 0,
+              "form": "none"
+            },
+            {
+              "rule": "",
+              "score": 0,
+              "form": "none"
+            },
+            {
+              "rule": "落札後72時間以内に支払いがない場合は自動キャンセル",
+              "score": 3,
+              "form": "formal_spec"
+            },
+            {
+              "rule": "キャンセル時の挙動: 次点者が落札するのか、再度入札開始するのか不明瞭",
+              "score": 0,
+              "form": "none"
+            },
+            {
+              "rule": "",
+              "score": 0,
+              "form": "none"
+            },
+            {
+              "rule": "出品者が複数アカウント所有している場合の間接入札（プロキシビッディング）の禁止",
+              "score": 3,
+              "form": "formal_spec"
+            }
+          ]
+        }
+      },
+      {
+        "metric": "M4_SpecificationExplicitness",
+        "score": 3,
+        "max_score": 3,
+        "percentage": 100,
+        "details": {
+          "counts": {
+            "formal_spec": 1,
+            "code_contracts": 4,
+            "comments": 3,
+            "jsdoc": 0
+          }
+        }
+      },
+      {
+        "metric": "M6_TestEffectiveness",
+        "score": 80,
+        "max_score": 100,
+        "percentage": 80,
+        "details": {
+          "num_tests": 16,
+          "num_describes": 1,
+          "edge_case_keyword_hits": 8,
+          "test_density_score": 0.8,
+          "edge_coverage_score": 0.8
+        }
+      }
+    ],
+    "timestamp": "2026-04-01T12:32:07.580Z"
+  },
+  {
+    "task": "task3-auction",
+    "condition": "treatment",
+    "run": 3,
+    "metrics": [
+      {
+        "metric": "M1_ContractViolationDetectionRate",
+        "score": 15,
+        "max_score": 42,
+        "percentage": 35.714285714285715,
+        "details": {
+          "trap_scores": [
+            {
+              "trap_id": "T3-01",
+              "score": 1,
+              "evidence": "Mentioned in spec/test (0/1 hits) but source doesn't handle"
+            },
+            {
+              "trap_id": "T3-02",
+              "score": 1,
+              "evidence": "Mentioned in spec/test (0/1 hits) but source doesn't handle"
+            },
+            {
+              "trap_id": "T3-03",
+              "score": 3,
+              "evidence": "Source handles trap (2 hits) AND test exists (3 hits)"
+            },
+            {
+              "trap_id": "T3-04",
+              "score": 1,
+              "evidence": "Mentioned in spec/test (0/1 hits) but source doesn't handle"
+            },
+            {
+              "trap_id": "T3-05",
+              "score": 1,
+              "evidence": "Mentioned in spec/test (0/1 hits) but source doesn't handle"
+            },
+            {
+              "trap_id": "T3-06",
+              "score": 3,
+              "evidence": "Source handles trap (1 hits) AND test exists (2 hits)"
+            },
+            {
+              "trap_id": "T3-07",
+              "score": 3,
+              "evidence": "Source handles trap (3 hits) AND test exists (3 hits)"
+            },
+            {
+              "trap_id": "T3-08",
+              "score": 0,
+              "evidence": "No evidence of trap handling found"
+            },
+            {
+              "trap_id": "T3-09",
+              "score": 1,
+              "evidence": "Mentioned in spec/test (0/1 hits) but source doesn't handle"
+            },
+            {
+              "trap_id": "T3-10",
+              "score": 0,
+              "evidence": "No evidence of trap handling found"
+            },
+            {
+              "trap_id": "T3-11",
+              "score": 0,
+              "evidence": "No evidence of trap handling found"
+            },
+            {
+              "trap_id": "T3-12",
+              "score": 1,
+              "evidence": "Mentioned in spec/test (0/1 hits) but source doesn't handle"
+            },
+            {
+              "trap_id": "T3-13",
+              "score": 0,
+              "evidence": "No evidence of trap handling found"
+            },
+            {
+              "trap_id": "T3-14",
+              "score": 0,
+              "evidence": "No evidence of trap handling found"
+            }
+          ]
+        }
+      },
+      {
+        "metric": "M2_SpecificationCoverage",
+        "score": 24,
+        "max_score": 48,
+        "percentage": 50,
+        "details": {
+          "rule_scores": [
+            {
+              "rule": "",
+              "score": 0,
+              "form": "none"
+            },
+            {
+              "rule": "入札額は現在の最高額より高くなければならない",
+              "score": 3,
+              "form": "formal_spec"
+            },
+            {
+              "rule": "出品者自身は入札できない",
+              "score": 3,
+              "form": "formal_spec"
+            },
+            {
+              "rule": "オークション期間中のみ入札可能",
+              "score": 3,
+              "form": "formal_spec"
+            },
+            {
+              "rule": "",
+              "score": 0,
+              "form": "none"
+            },
+            {
+              "rule": "終了5分前に入札があった場合、終了時刻を5分延長",
+              "score": 3,
+              "form": "formal_spec"
+            },
+            {
+              "rule": "延長後の5分前に再度入札があった場合、さらに5分延長",
+              "score": 3,
+              "form": "formal_spec"
+            },
+            {
+              "rule": "",
+              "score": 0,
+              "form": "none"
+            },
+            {
+              "rule": "",
+              "score": 0,
+              "form": "none"
+            },
+            {
+              "rule": "現在価格の1%（最低100円）",
+              "score": 3,
+              "form": "formal_spec"
+            },
+            {
+              "rule": "例: 現在価格10,000円 → 次の入札は最低10,100円以上",
+              "score": 0,
+              "form": "none"
+            },
+            {
+              "rule": "",
+              "score": 0,
+              "form": "none"
+            },
+            {
+              "rule": "落札後72時間以内に支払いがない場合は自動キャンセル",
+              "score": 3,
+              "form": "formal_spec"
+            },
+            {
+              "rule": "キャンセル時の挙動: 次点者が落札するのか、再度入札開始するのか不明瞭",
+              "score": 0,
+              "form": "none"
+            },
+            {
+              "rule": "",
+              "score": 0,
+              "form": "none"
+            },
+            {
+              "rule": "出品者が複数アカウント所有している場合の間接入札（プロキシビッディング）の禁止",
+              "score": 3,
+              "form": "formal_spec"
+            }
+          ]
+        }
+      },
+      {
+        "metric": "M4_SpecificationExplicitness",
+        "score": 3,
+        "max_score": 3,
+        "percentage": 100,
+        "details": {
+          "counts": {
+            "formal_spec": 1,
+            "code_contracts": 0,
+            "comments": 4,
+            "jsdoc": 0
+          }
+        }
+      },
+      {
+        "metric": "M6_TestEffectiveness",
+        "score": 90,
+        "max_score": 100,
+        "percentage": 90,
+        "details": {
+          "num_tests": 18,
+          "num_describes": 1,
+          "edge_case_keyword_hits": 9,
+          "test_density_score": 0.9,
+          "edge_coverage_score": 0.9
+        }
+      }
+    ],
+    "timestamp": "2026-04-01T12:32:07.588Z"
+  },
+  {
+    "task": "task3-auction",
+    "condition": "treatment",
+    "run": 4,
+    "metrics": [
+      {
+        "metric": "M1_ContractViolationDetectionRate",
+        "score": 9,
+        "max_score": 42,
+        "percentage": 21.428571428571427,
+        "details": {
+          "trap_scores": [
+            {
+              "trap_id": "T3-01",
+              "score": 1,
+              "evidence": "Mentioned in spec/test (0/1 hits) but source doesn't handle"
+            },
+            {
+              "trap_id": "T3-02",
+              "score": 1,
+              "evidence": "Mentioned in spec/test (0/1 hits) but source doesn't handle"
+            },
+            {
+              "trap_id": "T3-03",
+              "score": 1,
+              "evidence": "Mentioned in spec/test (0/3 hits) but source doesn't handle"
+            },
+            {
+              "trap_id": "T3-04",
+              "score": 1,
+              "evidence": "Mentioned in spec/test (0/1 hits) but source doesn't handle"
+            },
+            {
+              "trap_id": "T3-05",
+              "score": 0,
+              "evidence": "No evidence of trap handling found"
+            },
+            {
+              "trap_id": "T3-06",
+              "score": 1,
+              "evidence": "Mentioned in spec/test (0/2 hits) but source doesn't handle"
+            },
+            {
+              "trap_id": "T3-07",
+              "score": 3,
+              "evidence": "Source handles trap (1 hits) AND test exists (2 hits)"
+            },
+            {
+              "trap_id": "T3-08",
+              "score": 0,
+              "evidence": "No evidence of trap handling found"
+            },
+            {
+              "trap_id": "T3-09",
+              "score": 0,
+              "evidence": "No evidence of trap handling found"
+            },
+            {
+              "trap_id": "T3-10",
+              "score": 0,
+              "evidence": "No evidence of trap handling found"
+            },
+            {
+              "trap_id": "T3-11",
+              "score": 0,
+              "evidence": "No evidence of trap handling found"
+            },
+            {
+              "trap_id": "T3-12",
+              "score": 1,
+              "evidence": "Mentioned in spec/test (0/1 hits) but source doesn't handle"
+            },
+            {
+              "trap_id": "T3-13",
+              "score": 0,
+              "evidence": "No evidence of trap handling found"
+            },
+            {
+              "trap_id": "T3-14",
+              "score": 0,
+              "evidence": "No evidence of trap handling found"
+            }
+          ]
+        }
+      },
+      {
+        "metric": "M2_SpecificationCoverage",
+        "score": 14,
+        "max_score": 48,
+        "percentage": 29.166666666666668,
+        "details": {
+          "rule_scores": [
+            {
+              "rule": "",
+              "score": 0,
+              "form": "none"
+            },
+            {
+              "rule": "入札額は現在の最高額より高くなければならない",
+              "score": 3,
+              "form": "formal_spec"
+            },
+            {
+              "rule": "出品者自身は入札できない",
+              "score": 3,
+              "form": "formal_spec"
+            },
+            {
+              "rule": "オークション期間中のみ入札可能",
+              "score": 3,
+              "form": "formal_spec"
+            },
+            {
+              "rule": "",
+              "score": 0,
+              "form": "none"
+            },
+            {
+              "rule": "終了5分前に入札があった場合、終了時刻を5分延長",
+              "score": 0,
+              "form": "none"
+            },
+            {
+              "rule": "延長後の5分前に再度入札があった場合、さらに5分延長",
+              "score": 0,
+              "form": "none"
+            },
+            {
+              "rule": "",
+              "score": 0,
+              "form": "none"
+            },
+            {
+              "rule": "",
+              "score": 0,
+              "form": "none"
+            },
+            {
+              "rule": "現在価格の1%（最低100円）",
+              "score": 0,
+              "form": "none"
+            },
+            {
+              "rule": "例: 現在価格10,000円 → 次の入札は最低10,100円以上",
+              "score": 0,
+              "form": "none"
+            },
+            {
+              "rule": "",
+              "score": 0,
+              "form": "none"
+            },
+            {
+              "rule": "落札後72時間以内に支払いがない場合は自動キャンセル",
+              "score": 2,
+              "form": "explicit_validation"
+            },
+            {
+              "rule": "キャンセル時の挙動: 次点者が落札するのか、再度入札開始するのか不明瞭",
+              "score": 0,
+              "form": "none"
+            },
+            {
+              "rule": "",
+              "score": 0,
+              "form": "none"
+            },
+            {
+              "rule": "出品者が複数アカウント所有している場合の間接入札（プロキシビッディング）の禁止",
+              "score": 3,
+              "form": "formal_spec"
+            }
+          ]
+        }
+      },
+      {
+        "metric": "M4_SpecificationExplicitness",
+        "score": 3,
+        "max_score": 3,
+        "percentage": 100,
+        "details": {
+          "counts": {
+            "formal_spec": 1,
+            "code_contracts": 0,
+            "comments": 4,
+            "jsdoc": 0
+          }
+        }
+      },
+      {
+        "metric": "M6_TestEffectiveness",
+        "score": 83,
+        "max_score": 100,
+        "percentage": 82.5,
+        "details": {
+          "num_tests": 17,
+          "num_describes": 1,
+          "edge_case_keyword_hits": 8,
+          "test_density_score": 0.85,
+          "edge_coverage_score": 0.8
+        }
+      }
+    ],
+    "timestamp": "2026-04-01T12:32:07.595Z"
+  },
+  {
+    "task": "task3-auction",
+    "condition": "treatment",
+    "run": 5,
+    "metrics": [
+      {
+        "metric": "M1_ContractViolationDetectionRate",
+        "score": 19,
+        "max_score": 42,
+        "percentage": 45.23809523809524,
+        "details": {
+          "trap_scores": [
+            {
+              "trap_id": "T3-01",
+              "score": 3,
+              "evidence": "Source handles trap (1 hits) AND test exists (1 hits)"
+            },
+            {
+              "trap_id": "T3-02",
+              "score": 3,
+              "evidence": "Source handles trap (1 hits) AND test exists (1 hits)"
+            },
+            {
+              "trap_id": "T3-03",
+              "score": 3,
+              "evidence": "Source handles trap (2 hits) AND test exists (3 hits)"
+            },
+            {
+              "trap_id": "T3-04",
+              "score": 1,
+              "evidence": "Mentioned in spec/test (0/1 hits) but source doesn't handle"
+            },
+            {
+              "trap_id": "T3-05",
+              "score": 1,
+              "evidence": "Mentioned in spec/test (0/1 hits) but source doesn't handle"
+            },
+            {
+              "trap_id": "T3-06",
+              "score": 3,
+              "evidence": "Source handles trap (1 hits) AND test exists (3 hits)"
+            },
+            {
+              "trap_id": "T3-07",
+              "score": 3,
+              "evidence": "Source handles trap (3 hits) AND test exists (3 hits)"
+            },
+            {
+              "trap_id": "T3-08",
+              "score": 0,
+              "evidence": "No evidence of trap handling found"
+            },
+            {
+              "trap_id": "T3-09",
+              "score": 1,
+              "evidence": "Mentioned in spec/test (0/1 hits) but source doesn't handle"
+            },
+            {
+              "trap_id": "T3-10",
+              "score": 0,
+              "evidence": "No evidence of trap handling found"
+            },
+            {
+              "trap_id": "T3-11",
+              "score": 0,
+              "evidence": "No evidence of trap handling found"
+            },
+            {
+              "trap_id": "T3-12",
+              "score": 1,
+              "evidence": "Mentioned in spec/test (0/1 hits) but source doesn't handle"
+            },
+            {
+              "trap_id": "T3-13",
+              "score": 0,
+              "evidence": "No evidence of trap handling found"
+            },
+            {
+              "trap_id": "T3-14",
+              "score": 0,
+              "evidence": "No evidence of trap handling found"
+            }
+          ]
+        }
+      },
+      {
+        "metric": "M2_SpecificationCoverage",
+        "score": 24,
+        "max_score": 48,
+        "percentage": 50,
+        "details": {
+          "rule_scores": [
+            {
+              "rule": "",
+              "score": 0,
+              "form": "none"
+            },
+            {
+              "rule": "入札額は現在の最高額より高くなければならない",
+              "score": 3,
+              "form": "formal_spec"
+            },
+            {
+              "rule": "出品者自身は入札できない",
+              "score": 3,
+              "form": "formal_spec"
+            },
+            {
+              "rule": "オークション期間中のみ入札可能",
+              "score": 3,
+              "form": "formal_spec"
+            },
+            {
+              "rule": "",
+              "score": 0,
+              "form": "none"
+            },
+            {
+              "rule": "終了5分前に入札があった場合、終了時刻を5分延長",
+              "score": 3,
+              "form": "formal_spec"
+            },
+            {
+              "rule": "延長後の5分前に再度入札があった場合、さらに5分延長",
+              "score": 3,
+              "form": "formal_spec"
+            },
+            {
+              "rule": "",
+              "score": 0,
+              "form": "none"
+            },
+            {
+              "rule": "",
+              "score": 0,
+              "form": "none"
+            },
+            {
+              "rule": "現在価格の1%（最低100円）",
+              "score": 3,
+              "form": "formal_spec"
+            },
+            {
+              "rule": "例: 現在価格10,000円 → 次の入札は最低10,100円以上",
+              "score": 0,
+              "form": "none"
+            },
+            {
+              "rule": "",
+              "score": 0,
+              "form": "none"
+            },
+            {
+              "rule": "落札後72時間以内に支払いがない場合は自動キャンセル",
+              "score": 3,
+              "form": "formal_spec"
+            },
+            {
+              "rule": "キャンセル時の挙動: 次点者が落札するのか、再度入札開始するのか不明瞭",
+              "score": 0,
+              "form": "none"
+            },
+            {
+              "rule": "",
+              "score": 0,
+              "form": "none"
+            },
+            {
+              "rule": "出品者が複数アカウント所有している場合の間接入札（プロキシビッディング）の禁止",
+              "score": 3,
+              "form": "formal_spec"
+            }
+          ]
+        }
+      },
+      {
+        "metric": "M4_SpecificationExplicitness",
+        "score": 3,
+        "max_score": 3,
+        "percentage": 100,
+        "details": {
+          "counts": {
+            "formal_spec": 1,
+            "code_contracts": 0,
+            "comments": 6,
+            "jsdoc": 0
+          }
+        }
+      },
+      {
+        "metric": "M6_TestEffectiveness",
+        "score": 93,
+        "max_score": 100,
+        "percentage": 92.5,
+        "details": {
+          "num_tests": 19,
+          "num_describes": 1,
+          "edge_case_keyword_hits": 9,
+          "test_density_score": 0.95,
+          "edge_coverage_score": 0.9
+        }
+      }
+    ],
+    "timestamp": "2026-04-01T12:32:07.603Z"
+  }
+]

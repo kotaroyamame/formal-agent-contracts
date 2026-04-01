@@ -1,0 +1,111 @@
+-- VDM-SL Specification for Bank Account System (Run 2)
+-- Explicit invariants and nat-based Money type
+
+types
+  AccountId = nat1
+  -- Money allows zero (nat, not nat1) - explicitly handles zero-amount operations
+  Money = nat
+  AccountName = seq of char
+
+  Account :: id : AccountId
+            name : AccountName
+            balance : Money
+            inv mk_Account(-, name, -) == isValidName(name)
+            inv mk_Account(-, -, balance) == isValidMoney(balance)
+
+  BankState :: accounts : map AccountId to Account
+              inv mk_BankState(accs) == accountsInvariant(accs)
+
+functions
+  -- Type invariant functions
+  isValidName : AccountName -> bool
+  isValidName(name) == len name > 0
+
+  isValidMoney : Money -> bool
+  isValidMoney(m) == m >= 0 and m < 1000000000
+
+  accountsInvariant : (map AccountId to Account) -> bool
+  accountsInvariant(accs) ==
+    forall id : AccountId &
+      id in set dom accs =>
+        (let acc = accs(id)
+         in (acc.id = id and
+             isValidName(acc.name) and
+             isValidMoney(acc.balance)))
+
+  -- Helper: valid account name (accounts for trimming)
+  isValidAccountName : seq of char -> bool
+  isValidAccountName(name) ==
+    let trimmed = trim(name)
+    in len trimmed > 0
+
+  -- String trimming (simplified)
+  trim : seq of char -> seq of char
+  trim(s) ==
+    if s = [] then []
+    else if hd s = ' ' then trim(tl s)
+    else if last s = ' ' then trim(reverse(tl(reverse s)))
+    else s
+
+values
+  MAX_WITHDRAWAL : nat = 1000000
+  MIN_NAME_LENGTH : nat = 1
+  MAX_BALANCE : nat = 999999999
+
+state BankState of
+  accounts : map AccountId to Account
+  nextAccountId : nat1
+init bs == (bs.accounts = {} and bs.nextAccountId = 1)
+end
+
+operations
+  -- OpenAccount: Create account with validated name
+  OpenAccount(name : seq of char, initialBalance : Money)
+  ext rd accounts : map AccountId to Account
+      wr nextAccountId : nat1
+  pre isValidAccountName(name) and
+      isValidMoney(initialBalance)
+  post (let newId : nat1 = nextAccountId~
+        in (newId in set dom accounts and
+            accounts(newId).name = trim(name) and
+            accounts(newId).balance = initialBalance and
+            nextAccountId = nextAccountId~ + 1))
+
+  -- Deposit: Add amount (must be positive)
+  Deposit(accountId : AccountId, amount : Money)
+  ext wr accounts : map AccountId to Account
+  pre accountId in set dom accounts and
+      amount > 0 and
+      accounts(accountId).balance + amount < 1000000000
+  post (let oldBalance = accounts~(accountId).balance
+        in accounts(accountId).balance = oldBalance + amount)
+
+  -- Withdraw: Remove amount (must be positive, within limit, and sufficient funds)
+  Withdraw(accountId : AccountId, amount : Money)
+  ext wr accounts : map AccountId to Account
+  pre accountId in set dom accounts and
+      amount > 0 and
+      amount <= MAX_WITHDRAWAL and
+      amount <= accounts(accountId).balance
+  post (let oldBalance = accounts~(accountId).balance
+        in accounts(accountId).balance = oldBalance - amount)
+
+  -- GetBalance: Query account balance
+  GetBalance(accountId : AccountId) result : Money
+  ext rd accounts : map AccountId to Account
+  pre accountId in set dom accounts
+  post result = accounts(accountId).balance
+
+  -- Transfer: Atomic transfer between accounts
+  Transfer(fromId : AccountId, toId : AccountId, amount : Money)
+  ext wr accounts : map AccountId to Account
+  pre fromId in set dom accounts and
+      toId in set dom accounts and
+      fromId <> toId and
+      amount > 0 and
+      amount <= MAX_WITHDRAWAL and
+      amount <= accounts(fromId).balance
+  post (let oldFromBalance = accounts~(fromId).balance,
+            oldToBalance = accounts~(toId).balance
+        in (accounts(fromId).balance = oldFromBalance - amount and
+            accounts(toId).balance = oldToBalance + amount))

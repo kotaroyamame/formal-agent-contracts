@@ -1,0 +1,111 @@
+-- VDM-SL Specification for Bank Account System (Run 1)
+-- Classic VDM-SL with comprehensive pre/post conditions
+
+types
+  AccountId = nat1
+  Money = nat
+  AccountName = seq of char
+
+  Account :: id : AccountId
+            name : AccountName
+            balance : Money
+
+  BankState :: accounts : map AccountId to Account
+
+  DepositResult ::
+    success : bool
+    message : seq of char
+
+  WithdrawalResult ::
+    success : bool
+    message : seq of char
+    newBalance : Money
+
+  TransferResult ::
+    success : bool
+    message : seq of char
+
+values
+  MAX_WITHDRAWAL : nat = 1000000
+  VALID_NAME_MIN_LENGTH : nat = 1
+
+state BankState of
+  accounts : map AccountId to Account
+  nextAccountId : nat1
+init bs == (bs.accounts = {} and bs.nextAccountId = 1)
+end
+
+operations
+  -- Type invariants (implicit)
+  inv_AccountName : AccountName -> bool
+  inv_AccountName(name) == len name >= VALID_NAME_MIN_LENGTH
+
+  inv_Money : Money -> bool
+  inv_Money(m) == m >= 0
+
+  inv_Account : Account -> bool
+  inv_Account(acc) == (inv_AccountName(acc.name) and inv_Money(acc.balance))
+
+  -- OpenAccount: Create new account
+  OpenAccount(name : AccountName, initialBalance : Money)
+  ext rd accounts : map AccountId to Account
+      wr nextAccountId : nat1
+  pre inv_AccountName(name) and inv_Money(initialBalance) and initialBalance < 1000000000
+  post let newId : nat1 = nextAccountId~
+       in (exists acc : Account &
+             acc.id = newId and
+             acc.name = name and
+             acc.balance = initialBalance and
+             (accounts(newId) = acc) and
+             nextAccountId = nextAccountId~ + 1 and
+             (forall a : AccountId & a in set dom accounts~ => accounts(a) = accounts~(a)))
+
+  -- Deposit: Add money to account
+  Deposit(accountId : AccountId, amount : Money)
+  ext wr accounts : map AccountId to Account
+  pre accountId in set dom accounts and
+      inv_Money(amount) and
+      amount > 0 and
+      accounts(accountId).balance + amount < 1000000000
+  post let oldBalance : Money = accounts~(accountId).balance
+       in (accounts(accountId).balance = oldBalance + amount and
+           accounts(accountId).name = accounts~(accountId).name and
+           (forall a : AccountId & a <> accountId => accounts(a) = accounts~(a)))
+
+  -- Withdraw: Remove money from account
+  Withdraw(accountId : AccountId, amount : Money)
+  ext wr accounts : map AccountId to Account
+  pre accountId in set dom accounts and
+      inv_Money(amount) and
+      amount > 0 and
+      amount <= MAX_WITHDRAWAL and
+      amount <= accounts(accountId).balance
+  post let oldBalance : Money = accounts~(accountId).balance
+       in (accounts(accountId).balance = oldBalance - amount and
+           accounts(accountId).name = accounts~(accountId).name and
+           (forall a : AccountId & a <> accountId => accounts(a) = accounts~(a)))
+
+  -- GetBalance: Query account balance
+  GetBalance(accountId : AccountId) result : Money
+  ext rd accounts : map AccountId to Account
+  pre accountId in set dom accounts
+  post result = accounts(accountId).balance
+
+  -- Transfer: Move money between accounts (atomic)
+  Transfer(fromId : AccountId, toId : AccountId, amount : Money)
+  ext wr accounts : map AccountId to Account
+  pre fromId in set dom accounts and
+      toId in set dom accounts and
+      fromId <> toId and
+      inv_Money(amount) and
+      amount > 0 and
+      amount <= MAX_WITHDRAWAL and
+      amount <= accounts(fromId).balance
+  post let oldFromBalance : Money = accounts~(fromId).balance
+           oldToBalance : Money = accounts~(toId).balance
+       in (accounts(fromId).balance = oldFromBalance - amount and
+           accounts(toId).balance = oldToBalance + amount and
+           accounts(fromId).name = accounts~(fromId).name and
+           accounts(toId).name = accounts~(toId).name and
+           (forall a : AccountId & a <> fromId and a <> toId =>
+              accounts(a) = accounts~(a)))

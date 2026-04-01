@@ -1,0 +1,238 @@
+-- ============================================================================
+-- LIBRARY LOAN MANAGEMENT SYSTEM - VDM-SL FORMAL SPECIFICATION
+-- RUN 2: Single-Module Design with Clear Operation Grouping & Invariants
+-- ============================================================================
+
+module LIBRARY
+
+exports all
+
+definitions
+
+types
+  BookId = nat;
+  MemberId = nat;
+  LoanId = nat;
+
+  Category = <NORMAL> | <PRECIOUS>;
+
+  Book ::
+    id : BookId
+    title : seq of char
+    category : Category
+    total_copies : nat
+    available_copies : nat
+  inv b == b.available_copies <= b.total_copies;
+
+  Member ::
+    id : MemberId
+    name : seq of char
+    has_overdue : bool
+    loan_count : nat
+  inv m == m.loan_count >= 0;
+
+  Loan ::
+    id : LoanId
+    book_id : BookId
+    member_id : MemberId
+    borrow_date : nat
+    due_date : nat
+    extended : bool
+    is_returned : bool
+  inv l == l.due_date > l.borrow_date;
+
+  Catalog = map BookId to Book;
+  Members = map MemberId to Member;
+  ActiveLoans = map LoanId to Loan;
+
+state LibraryState of
+  catalog : Catalog
+  members : Members
+  active_loans : ActiveLoans
+  loan_counter : nat
+
+  inv ls ==
+    -- Invariant 1: Book stock consistency
+    (forall bookId in set dom ls.catalog &
+      ls.catalog(bookId).available_copies <= ls.catalog(bookId).total_copies) /\
+    -- Invariant 2: Member loan count >= 0
+    (forall memberId in set dom ls.members &
+      ls.members(memberId).loan_count >= 0) /\
+    -- Invariant 3: Loan due date > borrow date
+    (forall loanId in set dom ls.active_loans &
+      ls.active_loans(loanId).due_date > ls.active_loans(loanId).borrow_date) /\
+    -- Invariant 4: Precious books never in active loans
+    (forall loanId in set dom ls.active_loans &
+      let bid = ls.active_loans(loanId).book_id in
+        bid in set dom ls.catalog =>
+          ls.catalog(bid).category <> <PRECIOUS>)
+end
+
+operations
+  -- ========================================================================
+  -- CATALOG OPERATIONS
+  -- ========================================================================
+
+  AddBook(bookId : BookId, title : seq of char, category : Category, copies : nat)
+    ext wr catalog : Catalog
+    pre bookId not in set dom catalog /\ copies > 0
+    post catalog = catalog~ union {bookId |->
+           mk_Book(bookId, title, category, copies, copies)};
+
+  ReserveBook(bookId : BookId)
+    ext wr catalog : Catalog
+    pre bookId in set dom catalog /\
+        catalog(bookId).available_copies > 0
+    post catalog(bookId) =
+      mk_Book(
+        catalog(bookId).id,
+        catalog(bookId).title,
+        catalog(bookId).category,
+        catalog(bookId).total_copies,
+        catalog(bookId).available_copies - 1);
+
+  ReturnBook(bookId : BookId)
+    ext wr catalog : Catalog
+    pre bookId in set dom catalog /\
+        catalog(bookId).available_copies < catalog(bookId).total_copies
+    post catalog(bookId) =
+      mk_Book(
+        catalog(bookId).id,
+        catalog(bookId).title,
+        catalog(bookId).category,
+        catalog(bookId).total_copies,
+        catalog(bookId).available_copies + 1);
+
+  GetAvailableCopies(bookId : BookId) res : nat
+    ext rd catalog : Catalog
+    pre bookId in set dom catalog
+    post res = catalog(bookId).available_copies;
+
+  IsPrecious(bookId : BookId) res : bool
+    ext rd catalog : Catalog
+    pre bookId in set dom catalog
+    post res <=> catalog(bookId).category = <PRECIOUS>;
+
+  -- ========================================================================
+  -- MEMBER OPERATIONS
+  -- ========================================================================
+
+  RegisterMember(memberId : MemberId, name : seq of char)
+    ext wr members : Members
+    pre memberId not in set dom members
+    post members = members~ union {memberId |->
+           mk_Member(memberId, name, false, 0)};
+
+  IncrementLoanCount(memberId : MemberId)
+    ext wr members : Members
+    pre memberId in set dom members /\
+        members(memberId).loan_count < 5
+    post members(memberId).loan_count = members(memberId).loan_count~ + 1;
+
+  DecrementLoanCount(memberId : MemberId)
+    ext wr members : Members
+    pre memberId in set dom members /\
+        members(memberId).loan_count > 0
+    post members(memberId).loan_count = members(memberId).loan_count~ - 1;
+
+  SetOverdue(memberId : MemberId)
+    ext wr members : Members
+    pre memberId in set dom members
+    post members(memberId).has_overdue = true;
+
+  ClearOverdue(memberId : MemberId)
+    ext wr members : Members
+    pre memberId in set dom members
+    post members(memberId).has_overdue = false;
+
+  CanBorrow(memberId : MemberId) res : bool
+    ext rd members : Members
+    pre memberId in set dom members
+    post res <=> (members(memberId).loan_count < 5 /\
+                  members(memberId).has_overdue = false);
+
+  GetLoanCount(memberId : MemberId) res : nat
+    ext rd members : Members
+    pre memberId in set dom members
+    post res = members(memberId).loan_count;
+
+  -- ========================================================================
+  -- LOAN OPERATIONS
+  -- ========================================================================
+
+  CreateLoan(
+    book_id : BookId,
+    member_id : MemberId,
+    borrow_date : nat,
+    is_precious : bool,
+    can_member_borrow : bool,
+    has_available_copies : bool
+  ) res : LoanId
+    ext wr active_loans : ActiveLoans,
+        wr loan_counter : nat
+    pre not is_precious /\
+        can_member_borrow /\
+        has_available_copies
+    post active_loans = active_loans~ union
+           {loan_counter~ |-> mk_Loan(
+             loan_counter~,
+             book_id,
+             member_id,
+             borrow_date,
+             borrow_date + 14,
+             false,
+             false
+           )} /\
+         res = loan_counter~ /\
+         loan_counter = loan_counter~ + 1;
+
+  ExtendLoan(loan_id : LoanId)
+    ext wr active_loans : ActiveLoans
+    pre loan_id in set dom active_loans /\
+        active_loans(loan_id).extended = false /\
+        active_loans(loan_id).is_returned = false
+    post active_loans(loan_id) =
+      mk_Loan(
+        active_loans(loan_id).id,
+        active_loans(loan_id).book_id,
+        active_loans(loan_id).member_id,
+        active_loans(loan_id).borrow_date,
+        active_loans(loan_id).due_date + 7,
+        true,
+        active_loans(loan_id).is_returned
+      );
+
+  ReturnLoan(loan_id : LoanId)
+    ext wr active_loans : ActiveLoans
+    pre loan_id in set dom active_loans /\
+        active_loans(loan_id).is_returned = false
+    post active_loans(loan_id) =
+      mk_Loan(
+        active_loans(loan_id).id,
+        active_loans(loan_id).book_id,
+        active_loans(loan_id).member_id,
+        active_loans(loan_id).borrow_date,
+        active_loans(loan_id).due_date,
+        active_loans(loan_id).extended,
+        true
+      );
+
+  IsOverdue(loan_id : LoanId, current_date : nat) res : bool
+    ext rd active_loans : ActiveLoans
+    pre loan_id in set dom active_loans
+    post res <=> (active_loans(loan_id).due_date < current_date /\
+                  active_loans(loan_id).is_returned = false);
+
+  GetMemberLoans(member_id : MemberId) res : set of LoanId
+    ext rd active_loans : ActiveLoans
+    post res = {lid in set dom active_loans &
+                active_loans(lid).member_id = member_id /\
+                active_loans(lid).is_returned = false};
+
+  GetActiveLoanCount(member_id : MemberId) res : nat
+    ext rd active_loans : ActiveLoans
+    post res = card {lid in set dom active_loans &
+                     active_loans(lid).member_id = member_id /\
+                     active_loans(lid).is_returned = false}
+
+end LIBRARY

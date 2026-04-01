@@ -1,0 +1,129 @@
+-- VDM-SL Specification for Bank Account System (Run 3)
+-- Emphasizes atomicity of Transfer operation
+
+types
+  AccountId = nat1
+  Money = nat
+  AccountName = seq of char
+
+  Account :: id : AccountId
+            name : AccountName
+            balance : Money
+
+  BankState :: accounts : map AccountId to Account
+              lock : map AccountId to bool
+
+  TransactionResult ::
+    success : bool
+    fromBalance : Money
+    toBalance : Money
+
+values
+  MAX_WITHDRAWAL : nat = 1000000
+
+state BankState of
+  accounts : map AccountId to Account
+  nextAccountId : nat1
+  inTransaction : bool
+init bs == (bs.accounts = {} and bs.nextAccountId = 1 and bs.inTransaction = false)
+end
+
+operations
+  -- Helper: Validate name (non-empty after trim)
+  isValidName : AccountName -> bool
+  isValidName(name) == len name > 0
+
+  -- OpenAccount: Create account
+  OpenAccount(name : AccountName, initialBalance : Money)
+  ext rd accounts : map AccountId to Account
+      wr nextAccountId : nat1
+  pre isValidName(name) and
+      initialBalance >= 0 and
+      initialBalance < 1000000000
+  post (let newId : nat1 = nextAccountId~
+        in (newId in set dom accounts and
+            accounts(newId).name = name and
+            accounts(newId).balance = initialBalance and
+            nextAccountId = nextAccountId~ + 1))
+
+  -- Deposit: Add to account
+  Deposit(accountId : AccountId, amount : Money)
+  ext wr accounts : map AccountId to Account
+  pre accountId in set dom accounts and
+      amount > 0 and
+      accounts(accountId).balance + amount < 1000000000
+  post (let oldBalance = accounts~(accountId).balance
+        in accounts(accountId).balance = oldBalance + amount)
+
+  -- Withdraw: Remove from account
+  Withdraw(accountId : AccountId, amount : Money)
+  ext wr accounts : map AccountId to Account
+  pre accountId in set dom accounts and
+      amount > 0 and
+      amount <= MAX_WITHDRAWAL and
+      amount <= accounts(accountId).balance
+  post (let oldBalance = accounts~(accountId).balance
+        in accounts(accountId).balance = oldBalance - amount)
+
+  -- GetBalance: Query balance
+  GetBalance(accountId : AccountId) result : Money
+  ext rd accounts : map AccountId to Account
+  pre accountId in set dom accounts
+  post result = accounts(accountId).balance
+
+  -- Transfer: ATOMIC operation - all-or-nothing
+  -- If any step fails, entire operation is rolled back
+  Transfer(fromId : AccountId, toId : AccountId, amount : Money)
+  ext wr accounts : map AccountId to Account
+      rd inTransaction : bool
+  pre fromId in set dom accounts and
+      toId in set dom accounts and
+      fromId <> toId and
+      amount > 0 and
+      amount <= MAX_WITHDRAWAL and
+      amount <= accounts(fromId).balance and
+      not inTransaction
+  post (-- ATOMIC: Both updates succeed or both fail
+        let oldFromBalance = accounts~(fromId).balance,
+            oldToBalance = accounts~(toId).balance,
+            -- Withdraw succeeds
+            tempFromBalance = oldFromBalance - amount,
+            -- Deposit succeeds
+            newFromBalance = tempFromBalance,
+            newToBalance = oldToBalance + amount
+        in (-- Both accounts updated consistently
+            accounts(fromId).balance = newFromBalance and
+            accounts(toId).balance = newToBalance and
+            -- No other accounts affected
+            (forall a : AccountId &
+              a <> fromId and a <> toId =>
+                accounts(a) = accounts~(a)) and
+            -- Total money preserved
+            (accounts(fromId).balance + accounts(toId).balance =
+             accounts~(fromId).balance + accounts~(toId).balance)))
+
+  -- TransferSafe: Transfer with explicit rollback capability
+  -- Marks transaction state to enable rollback
+  TransferSafe(fromId : AccountId, toId : AccountId, amount : Money,
+               rollback : bool)
+  ext wr accounts : map AccountId to Account
+      wr inTransaction : bool
+  pre fromId in set dom accounts and
+      toId in set dom accounts and
+      fromId <> toId and
+      amount > 0 and
+      amount <= MAX_WITHDRAWAL and
+      amount <= accounts(fromId).balance
+  post (if rollback
+        then -- Rollback: state unchanged
+             accounts = accounts~ and
+             inTransaction = false
+        else -- Commit: atomically transfer
+             (let oldFromBalance = accounts~(fromId).balance,
+                  oldToBalance = accounts~(toId).balance
+              in (accounts(fromId).balance = oldFromBalance - amount and
+                  accounts(toId).balance = oldToBalance + amount and
+                  inTransaction = false and
+                  (forall a : AccountId &
+                    a <> fromId and a <> toId =>
+                      accounts(a) = accounts~(a)))))

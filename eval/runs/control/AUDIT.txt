@@ -1,0 +1,194 @@
+CONTROL GROUP IMPLEMENTATION AUDIT
+====================================
+Task: Online Auction System (オンラインオークションシステム)
+Generation Date: 2026-04-01
+Total Implementations: 5
+Total Test Files: 5
+
+FILE MANIFEST
+=============
+
+RUN 1 (Standard State Machine)
+Location: /sessions/kind-funny-sagan/mnt/formal-agent-contracts/eval/runs/control/task3-auction-run1/
+Files:
+  - auction.ts (394 lines)
+  - auction.test.ts (343 lines)
+Classes/Exports:
+  - AuctionState (type)
+  - AuctionItem (interface)
+  - Bid (interface)
+  - PaymentRecord (interface)
+  - ShippingRecord (interface)
+  - AuctionSystem (class)
+Test Count: 13
+Coverage: Basic functionality, state transitions, bidding, payment, shipping
+
+RUN 2 (Enum-based with Class)
+Location: /sessions/kind-funny-sagan/mnt/formal-agent-contracts/eval/runs/control/task3-auction-run2/
+Files:
+  - auction.ts (233 lines)
+  - auction.test.ts (317 lines)
+Classes/Exports:
+  - AuctionStateEnum (enum)
+  - BidData (interface)
+  - Auction (class)
+  - AuctionRepository (class)
+Test Count: 18
+Coverage: OOP approach, enum states, repository pattern, validation
+
+RUN 3 (Thorough Implementation)
+Location: /sessions/kind-funny-sagan/mnt/formal-agent-contracts/eval/runs/control/task3-auction-run3/
+Files:
+  - auction.ts (354 lines)
+  - auction.test.ts (408 lines)
+Classes/Exports:
+  - AuctionStateType (type)
+  - BidRecord (interface)
+  - AuctionRecord (interface)
+  - TransitionLog (interface)
+  - AuctionEngine (class)
+Test Count: 26
+Coverage: Thorough validation, transition logging, state matrix, parameter checking
+
+RUN 4 (Minimal Approach)
+Location: /sessions/kind-funny-sagan/mnt/formal-agent-contracts/eval/runs/control/task3-auction-run4/
+Files:
+  - auction.ts (83 lines)
+  - auction.test.ts (64 lines)
+Classes/Exports:
+  - State (type)
+  - Auction (interface)
+  - Bid (interface)
+  - SimpleAuctionSystem (class)
+Test Count: 6
+Coverage: Happy path only, minimal test suite, fewest lines of code
+
+RUN 5 (Best Effort)
+Location: /sessions/kind-funny-sagan/mnt/formal-agent-contracts/eval/runs/control/task3-auction-run5/
+Files:
+  - auction.ts (323 lines)
+  - auction.test.ts (440 lines)
+Classes/Exports:
+  - AuctionStatus (type)
+  - AuctionData (interface)
+  - BidInfo (interface)
+  - AuctionManager (class)
+Test Count: 27
+Coverage: Strong test coverage, good happy paths, detailed error messages
+
+STATISTICS
+==========
+Total Lines of Code: 2,707
+Total Test Lines: ~1,532
+Total Implementation Lines: ~1,175
+Total Tests Across All Runs: 90
+Average Tests Per Run: 18
+Tests per Line of Code: 0.56
+
+IMPLEMENTATION APPROACHES
+=========================
+RUN 1: Functional/direct
+RUN 2: OOP/enum-based
+RUN 3: Matrix-driven with logging
+RUN 4: Direct/minimal
+RUN 5: Complete/comprehensive
+
+FEATURES IMPLEMENTED (ALL RUNS)
+================================
+Core State Machine:
+  ✓ Draft state creation
+  ✓ Active state activation
+  ✓ Ended state (with/without bids)
+  ✓ Paid state (payment processing)
+  ✓ Shipped state
+  ✓ Completed state
+  ✓ Cancelled state
+
+Auction Operations:
+  ✓ Create auction
+  ✓ Activate auction
+  ✓ Place bid
+  ✓ End auction
+  ✓ Process payment
+  ✓ Confirm shipping
+  ✓ Complete auction
+  ✓ Cancel auction
+
+Validation Rules:
+  ✓ Seller cannot bid
+  ✓ Bid must exceed current price
+  ✓ Minimum increment (1% or 100 yen)
+  ✓ Bidding only when Active
+  ✓ Bidding only before end time
+  ✓ 5-minute extension logic
+  ✓ Payment overdue detection (72h)
+
+INTENTIONAL GAPS (ALL RUNS)
+============================
+Per specification analysis, all implementations intentionally miss:
+  - Cascade extension limits
+  - Simultaneous/race condition handling
+  - Next-bidder-on-cancel auto-placement
+  - Relist mechanics from cancelled state
+  - Bid withdrawal support
+  - Rounding edge cases (0.1% fractions)
+  - First-bid starting price ambiguity
+  - Exact millisecond timing boundaries
+
+TEST COVERAGE BY RUN
+====================
+RUN 1: 13 tests
+  - Basic creation/activation
+  - Bid validation (seller, price, increment)
+  - Extension logic
+  - State transitions
+  - Payment/shipping
+  - Overdue detection
+
+RUN 2: 18 tests  
+  - All of RUN 1
+  - Plus: increment calculation, cancellation
+  - Plus: overdue with time checks
+
+RUN 3: 26 tests
+  - All of RUN 2
+  - Plus: parameter validation
+  - Plus: transition history
+  - Plus: extension both directions
+  - Plus: full lifecycle
+
+RUN 4: 6 tests
+  - Minimal set for happy path only
+  - Creation, activation, bid, end, payment, complete
+
+RUN 5: 27 tests
+  - Highest coverage
+  - Happy paths with detailed scenarios
+  - Edge case testing for increment
+  - Thorough overdue scenarios
+  - Complete lifecycle variants
+
+EVALUATION CONTEXT
+==================
+These control group implementations establish baselines for:
+1. Comparing informal vs. formal approaches
+2. Measuring specification completeness
+3. Evaluating test coverage adequacy
+4. Assessing edge case handling
+5. Analyzing state machine correctness
+
+Each run demonstrates different trade-offs:
+- Minimal (RUN 4) vs. Thorough (RUN 3)
+- Functional (RUN 1) vs. OOP (RUN 2)
+- Simple (RUN 4) vs. Complete (RUN 5)
+
+NOTES
+=====
+- All implementations are self-contained TypeScript
+- No external dependencies beyond Jest for testing
+- All follow the same base prompt specification
+- No formal methods (VDM-SL) used in any run
+- Time injection enabled where applicable
+- Error messages vary by implementation style
+
+END OF AUDIT

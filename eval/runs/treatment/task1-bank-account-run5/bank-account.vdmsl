@@ -1,0 +1,116 @@
+-- VDM-SL Specification for Bank Account System (Run 5)
+-- With explicit proof obligation comments
+
+types
+  AccountId = nat1
+  Money = nat
+  AccountName = seq of char
+
+  Account :: id : AccountId
+            name : AccountName
+            balance : Money
+
+  BankState :: accounts : map AccountId to Account
+
+state BankState of
+  accounts : map AccountId to Account
+  nextAccountId : nat1
+init bs == (bs.accounts = {} and bs.nextAccountId = 1)
+end
+
+functions
+  -- Helper functions with proof obligations
+  isValidName : AccountName -> bool
+  isValidName(name) == len name > 0
+
+  isValidMoney : Money -> bool
+  isValidMoney(m) == m >= 0 and m < 1000000000
+
+values
+  MAX_WITHDRAWAL : nat = 1000000
+
+operations
+  -- PO-1: Name invariant must hold for all accounts
+  -- Proof obligation: isValidName(name) => account.name is valid
+  OpenAccount(name : AccountName, initialBalance : Money)
+  ext rd accounts : map AccountId to Account
+      wr nextAccountId : nat1
+  pre isValidName(name) and
+      isValidMoney(initialBalance)
+  post (let newId : nat1 = nextAccountId~
+        in (newId in set dom accounts and
+            -- PO-2: New account has correct name
+            accounts(newId).name = name and
+            -- PO-3: New account has correct balance
+            accounts(newId).balance = initialBalance and
+            -- PO-4: Next ID increments
+            nextAccountId = nextAccountId~ + 1 and
+            -- PO-5: Existing accounts unchanged
+            (forall a : AccountId & a in set dom accounts~ =>
+              accounts(a) = accounts~(a))))
+
+  -- PO-6: Deposit amount must be positive
+  -- Proof obligation: amount > 0 => balance increases by amount
+  Deposit(accountId : AccountId, amount : Money)
+  ext wr accounts : map AccountId to Account
+  pre accountId in set dom accounts and
+      amount > 0 and
+      accounts(accountId).balance + amount < 1000000000
+  post (let oldBalance = accounts~(accountId).balance
+        -- PO-7: Balance increased correctly
+        in accounts(accountId).balance = oldBalance + amount and
+        -- PO-8: Other accounts unchanged
+        (forall a : AccountId & a <> accountId =>
+          accounts(a) = accounts~(a)))
+
+  -- PO-9: Withdrawal amount must be positive and within limit
+  -- Proof obligation: amount > 0 and amount <= MAX_WITHDRAWAL and amount <= balance
+  Withdraw(accountId : AccountId, amount : Money)
+  ext wr accounts : map AccountId to Account
+  pre accountId in set dom accounts and
+      amount > 0 and
+      amount <= MAX_WITHDRAWAL and
+      amount <= accounts(accountId).balance
+  post (let oldBalance = accounts~(accountId).balance
+        -- PO-10: Balance decreased correctly
+        in accounts(accountId).balance = oldBalance - amount and
+        -- PO-11: Other accounts unchanged
+        (forall a : AccountId & a <> accountId =>
+          accounts(a) = accounts~(a)) and
+        -- PO-12: No negative balance
+        accounts(accountId).balance >= 0)
+
+  -- PO-13: Query must return actual balance
+  -- Proof obligation: result = accounts(accountId).balance
+  GetBalance(accountId : AccountId) result : Money
+  ext rd accounts : map AccountId to Account
+  pre accountId in set dom accounts
+  post result = accounts(accountId).balance and
+      -- PO-14: Result is valid money
+      isValidMoney(result)
+
+  -- PO-15: Transfer atomicity - both accounts updated or none
+  -- Proof obligation: (fromBalance - amount) + (toBalance + amount) = fromBalance + toBalance
+  Transfer(fromId : AccountId, toId : AccountId, amount : Money)
+  ext wr accounts : map AccountId to Account
+  pre fromId in set dom accounts and
+      toId in set dom accounts and
+      fromId <> toId and
+      amount > 0 and
+      amount <= MAX_WITHDRAWAL and
+      amount <= accounts(fromId).balance
+  post (let oldFromBalance = accounts~(fromId).balance,
+            oldToBalance = accounts~(toId).balance
+        in (-- PO-16: Source balance decreased
+            accounts(fromId).balance = oldFromBalance - amount and
+            -- PO-17: Destination balance increased
+            accounts(toId).balance = oldToBalance + amount and
+            -- PO-18: Money conservation
+            (accounts(fromId).balance + accounts(toId).balance =
+             accounts~(fromId).balance + accounts~(toId).balance) and
+            -- PO-19: Other accounts unchanged
+            (forall a : AccountId & a <> fromId and a <> toId =>
+              accounts(a) = accounts~(a)) and
+            -- PO-20: No negative balances
+            accounts(fromId).balance >= 0 and
+            accounts(toId).balance >= 0))

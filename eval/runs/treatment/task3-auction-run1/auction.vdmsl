@@ -1,0 +1,166 @@
+-- Online Auction System - VDM-SL Formal Specification (Run 1)
+-- Comprehensive state machine with extension cascade limit
+
+module AUCTION_SYSTEM
+
+imports
+  from VDM
+
+types
+  AuctionState = <Draft> | <Active> | <Ended> | <Paid> | <Shipped> | <Completed> | <Cancelled>;
+
+  AuctionId = seq of char;
+  UserId = seq of char;
+  Money = nat;
+
+  Bid ::
+    bidder_id : UserId
+    amount : Money
+    timestamp : nat
+  inv bid == bid.amount > 0;
+
+  Auction ::
+    auction_id : AuctionId
+    seller_id : UserId
+    title : seq of char
+    description : seq of char
+    starting_price : Money
+    current_highest_bid : Money
+    highest_bidder : [UserId]
+    state : AuctionState
+    bids : seq of Bid
+    created_at : nat
+    start_time : nat
+    end_time : nat
+    paid_at : [nat]
+    shipped_at : [nat]
+    extension_count : nat
+    MAX_EXTENSIONS : nat
+  inv auction ==
+    -- Starting price must be positive
+    auction.starting_price > 0 and
+    -- Duration must be positive (derived from start_time < end_time)
+    auction.start_time < auction.end_time and
+    -- No more than MAX_EXTENSIONS extensions allowed
+    auction.extension_count <= auction.MAX_EXTENSIONS and
+    -- If state is Active, must be in time window
+    (auction.state = <Active> => auction.start_time <= auction.created_at and auction.created_at < auction.end_time) and
+    -- Highest bidder cannot be seller
+    (auction.highest_bidder <> nil => auction.highest_bidder <> auction.seller_id) and
+    -- All bids must be from non-sellers
+    (forall i in set inds auction.bids & auction.bids(i).bidder_id <> auction.seller_id) and
+    -- Current highest bid >= starting price or no bids yet
+    (len auction.bids = 0 => auction.current_highest_bid = 0) and
+    (len auction.bids > 0 => auction.current_highest_bid >= auction.starting_price) and
+    -- Bids are strictly increasing
+    (forall i in set inds auction.bids, j in set inds auction.bids &
+      i < j => auction.bids(i).amount < auction.bids(j).amount);
+
+state AuctionStore of
+  auctions : map AuctionId to Auction
+init as == as`auctions = {|->}
+end
+
+operations
+  -- Create a new auction in Draft state
+  CreateAuction(auction_id : AuctionId, seller_id : UserId, title : seq of char,
+                description : seq of char, starting_price : Money, duration : nat,
+                now : nat) auction_id : AuctionId
+  pre starting_price > 0 and duration > 0 and auction_id not in set dom auctions
+  post let new_auction = mk_Auction(
+         auction_id, seller_id, title, description, starting_price, 0, nil, <Draft>,
+         [], now, now + duration, now + duration, nil, nil, 0, 10)
+       in auctions = auctions~ union {auction_id |-> new_auction}
+  return auction_id;
+
+  -- Activate auction (Draft -> Active)
+  ActivateAuction(auction_id : AuctionId, now : nat) result : bool
+  pre auction_id in set dom auctions and
+      auctions(auction_id).state = <Draft> and
+      now < auctions(auction_id).end_time
+  post let auction = auctions~(auction_id)
+       in auctions(auction_id).state = <Active> and
+          auctions(auction_id).start_time = now;
+
+  -- Place a bid
+  PlaceBid(auction_id : AuctionId, bidder_id : UserId, bid_amount : Money, now : nat) result : bool
+  pre auction_id in set dom auctions and
+      let auction = auctions(auction_id)
+      in auction.state = <Active> and
+         bidder_id <> auction.seller_id and
+         now >= auction.start_time and
+         now < auction.end_time and
+         bid_amount > auction.current_highest_bid and
+         bid_amount >= auction.starting_price and
+         (let min_increment = max_val(floor_val(auction.current_highest_bid * 1 / 100), 100)
+          in bid_amount >= auction.current_highest_bid + min_increment)
+  post let auction = auctions~(auction_id),
+           new_bid = mk_Bid(bidder_id, bid_amount, now),
+           time_until_end = auction.end_time - now
+       in if time_until_end <= 300 and auction.extension_count < auction.MAX_EXTENSIONS
+          then (auctions(auction_id).end_time = auction.end_time + 300 and
+                auctions(auction_id).extension_count = auction.extension_count + 1)
+          else (auctions(auction_id).end_time = auction.end_time~ and
+                auctions(auction_id).extension_count = auction.extension_count~),
+          auctions(auction_id).current_highest_bid = bid_amount and
+          auctions(auction_id).highest_bidder = bidder_id and
+          len auctions(auction_id).bids = len auction.bids + 1;
+
+  -- End auction (Active -> Ended)
+  EndAuction(auction_id : AuctionId, now : nat) result : bool
+  pre auction_id in set dom auctions and
+      auctions(auction_id).state = <Active> and
+      now >= auctions(auction_id).end_time
+  post auctions(auction_id).state = <Ended>;
+
+  -- Process payment (Ended -> Paid)
+  ProcessPayment(auction_id : AuctionId, now : nat) result : bool
+  pre auction_id in set dom auctions and
+      auctions(auction_id).state = <Ended> and
+      now <= auctions(auction_id).end_time + 259200  -- 72 hours
+  post auctions(auction_id).state = <Paid> and
+       auctions(auction_id).paid_at = now;
+
+  -- Cancel unpaid auction (Ended -> Cancelled) after 72 hours
+  CancelUnpaid(auction_id : AuctionId, now : nat) result : bool
+  pre auction_id in set dom auctions and
+      auctions(auction_id).state = <Ended> and
+      now > auctions(auction_id).end_time + 259200
+  post auctions(auction_id).state = <Cancelled>;
+
+  -- Record shipment (Paid -> Shipped)
+  ShipItem(auction_id : AuctionId, now : nat) result : bool
+  pre auction_id in set dom auctions and
+      auctions(auction_id).state = <Paid>
+  post auctions(auction_id).state = <Shipped> and
+       auctions(auction_id).shipped_at = now;
+
+  -- Complete auction (Shipped -> Completed)
+  CompleteAuction(auction_id : AuctionId) result : bool
+  pre auction_id in set dom auctions and
+      auctions(auction_id).state = <Shipped>
+  post auctions(auction_id).state = <Completed>;
+
+  -- Cancel from Draft state
+  CancelFromDraft(auction_id : AuctionId) result : bool
+  pre auction_id in set dom auctions and
+      auctions(auction_id).state = <Draft>
+  post auctions(auction_id).state = <Cancelled>;
+
+  -- Cancel from Active state
+  CancelFromActive(auction_id : AuctionId) result : bool
+  pre auction_id in set dom auctions and
+      auctions(auction_id).state = <Active>
+  post auctions(auction_id).state = <Cancelled>
+
+end AUCTION_SYSTEM
+
+-- Helper functions for minimum increment calculation
+functions
+  floor_val : nat -> nat
+  floor_val(n) == floor(n);
+
+  max_val : nat * nat -> nat
+  max_val(a, b) == if a >= b then a else b
+
+end AUCTION_SYSTEM

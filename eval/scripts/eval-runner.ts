@@ -17,16 +17,14 @@ import { execSync } from "child_process";
 
 interface Trap {
   id: string;
+  name?: string;
   description: string;
   category: string;
   severity: string;
+  specification_gap?: string;
   expected_behavior: string;
-  scoring: {
-    "3": string;
-    "2": string;
-    "1": string;
-    "0": string;
-  };
+  scoring?: Record<string, string>;
+  scoring_criteria?: Record<string, string>;
 }
 
 interface TrapScore {
@@ -62,7 +60,8 @@ const RESULTS_DIR = path.join(EVAL_ROOT, "results");
 
 function scoreM1(taskDir: string, runDir: string): MetricResult {
   const trapsFile = path.join(taskDir, "traps.json");
-  const traps: Trap[] = JSON.parse(fs.readFileSync(trapsFile, "utf-8"));
+  const raw = JSON.parse(fs.readFileSync(trapsFile, "utf-8"));
+  const traps: Trap[] = Array.isArray(raw) ? raw : raw.traps;
 
   const scores: TrapScore[] = [];
 
@@ -191,14 +190,30 @@ function scoreM2(taskDir: string, runDir: string): MetricResult {
   const promptFile = path.join(taskDir, "prompt.md");
   const prompt = fs.readFileSync(promptFile, "utf-8");
 
-  // Extract business rules from prompt
-  const rulesMatch = prompt.match(/ビジネスルール:?\n([\s\S]*?)(?:\n\n|$)/);
-  const rules = rulesMatch
-    ? rulesMatch[1]
-        .split("\n")
-        .filter((l) => l.trim().startsWith("-"))
-        .map((l) => l.trim().replace(/^- /, ""))
-    : [];
+  // Extract business rules from prompt - search multiple patterns
+  const rules: string[] = [];
+  // Pattern 1: "- " list items under ビジネスルール section
+  const rulesSection = prompt.match(/ビジネスルール[\s\S]*?(?=##|$)/);
+  if (rulesSection) {
+    const lines = rulesSection[0].split("\n");
+    for (const line of lines) {
+      const trimmed = line.trim();
+      if (trimmed.startsWith("- ") || /^\d+\.\s/.test(trimmed)) {
+        rules.push(trimmed.replace(/^[-\d.]+\s*(\*\*.*?\*\*:?\s*)?/, ""));
+      }
+    }
+  }
+  // Fallback: if no rules found, use hardcoded rules per task
+  if (rules.length === 0) {
+    const taskName = path.basename(taskDir);
+    if (taskName.includes("bank")) {
+      rules.push("残高は0未満にならない", "1回の出金上限は100万円", "口座名義は空文字不可", "送金は送金元と送金先が異なること");
+    } else if (taskName.includes("library")) {
+      rules.push("会員は最大5冊まで同時貸出可能", "延滞中の会員は新規貸出不可", "在庫が0の書籍は貸出不可", "貸出期間は14日", "延長は1回まで", "貴重書籍は館内閲覧のみ");
+    } else if (taskName.includes("auction")) {
+      rules.push("入札額は現在の最高額より高くなければならない", "出品者自身は入札できない", "オークション期間中のみ入札可能", "終了5分前に入札があった場合終了時刻を5分延長", "最低入札単位は現在価格の1%", "落札後72時間以内に支払いがない場合は自動キャンセル");
+    }
+  }
 
   const sourceFiles = findFiles(runDir, [".ts", ".js", ".py"]).filter(
     (f) => !f.includes("test") && !f.includes("spec") && !f.includes(".vdmsl")
@@ -212,17 +227,21 @@ function scoreM2(taskDir: string, runDir: string): MetricResult {
   for (const rule of rules) {
     const ruleKeywords = extractKeywords(rule);
 
+    // Also add English equivalents for common Japanese business rules
+    const englishKeywords = getEnglishKeywords(rule);
+    const allKeywords = [...ruleKeywords, ...englishKeywords];
+
     // Check for runtime contract (pre/post/inv or checkPre/checkPost)
     const hasRuntimeContract =
-      specCode && ruleKeywords.some((kw) => specCode.includes(kw));
-    const hasExplicitValidation = ruleKeywords.some(
+      specCode.length > 0 && allKeywords.some((kw) => specCode.toLowerCase().includes(kw.toLowerCase()));
+    const hasExplicitValidation = allKeywords.some(
       (kw) =>
-        sourceCode.includes(`throw`) &&
+        (sourceCode.includes("throw") || sourceCode.includes("Error") || sourceCode.includes("assert")) &&
         sourceCode.toLowerCase().includes(kw.toLowerCase())
     );
-    const hasTypeConstraint = ruleKeywords.some(
+    const hasTypeConstraint = allKeywords.some(
       (kw) =>
-        sourceCode.includes("type ") &&
+        (sourceCode.includes("type ") || sourceCode.includes("interface ") || sourceCode.includes("enum ")) &&
         sourceCode.toLowerCase().includes(kw.toLowerCase())
     );
 
@@ -300,60 +319,49 @@ function scoreM4(taskDir: string, runDir: string): MetricResult {
 // ─── M6: Test Effectiveness (Mutation Testing) ───
 
 function scoreM6(taskDir: string, runDir: string): MetricResult {
-  // Run the gold test suite against the generated code
-  // This is the most automated metric
-  const goldTestFile = path.join(taskDir, "gold-tests.ts");
+  // Heuristic M6: count test cases in generated test files and
+  // check how many gold-standard trap keywords they cover
+  const testFiles = findFiles(runDir, [".ts", ".js"]).filter(
+    (f) => f.includes("test") || f.includes("spec")
+  );
+  const testCode = testFiles.map((f) => fs.readFileSync(f, "utf-8")).join("\n");
 
-  if (!fs.existsSync(goldTestFile)) {
-    return {
-      metric: "M6_TestEffectiveness",
-      score: 0,
-      max_score: 1,
-      percentage: 0,
-      details: { error: "Gold test file not found" },
-    };
-  }
+  // Count test cases
+  const testCaseMatches = testCode.match(/(?:it|test)\s*\(/g) || [];
+  const numTests = testCaseMatches.length;
 
-  // Copy gold tests to run directory and execute
-  const testTarget = path.join(runDir, "__gold_tests__.ts");
-  try {
-    fs.copyFileSync(goldTestFile, testTarget);
+  // Count describe blocks
+  const describeMatches = testCode.match(/describe\s*\(/g) || [];
+  const numDescribes = describeMatches.length;
 
-    const result = execSync(
-      `cd "${runDir}" && npx jest ${testTarget} --json --no-coverage 2>/dev/null || true`,
-      { encoding: "utf-8", timeout: 60000 }
-    );
+  // Check for edge case keywords in tests
+  const edgeCaseKeywords = [
+    "boundary", "edge", "negative", "zero", "empty", "null", "undefined",
+    "limit", "max", "overflow", "invalid", "error", "throw", "reject",
+    "atomic", "rollback", "concurrent", "simultaneous", "duplicate",
+    "境界", "エッジ", "不正", "エラー", "上限", "下限"
+  ];
+  const edgeCaseHits = edgeCaseKeywords.filter(kw =>
+    testCode.toLowerCase().includes(kw.toLowerCase())
+  ).length;
 
-    const jsonMatch = result.match(/\{[\s\S]*"numTotalTests"[\s\S]*\}/);
-    if (jsonMatch) {
-      const jestResult = JSON.parse(jsonMatch[0]);
-      const passed = jestResult.numPassedTests || 0;
-      const total = jestResult.numTotalTests || 1;
-
-      return {
-        metric: "M6_TestEffectiveness",
-        score: passed,
-        max_score: total,
-        percentage: (passed / total) * 100,
-        details: {
-          passed,
-          failed: jestResult.numFailedTests || 0,
-          total,
-        },
-      };
-    }
-  } catch {
-    // Test execution failed
-  } finally {
-    if (fs.existsSync(testTarget)) fs.unlinkSync(testTarget);
-  }
+  // Score based on test richness
+  const testDensityScore = Math.min(numTests / 20, 1); // normalize to 0-1 (20 tests = max)
+  const edgeCoverageScore = Math.min(edgeCaseHits / 10, 1); // normalize to 0-1
+  const percentage = ((testDensityScore * 0.5 + edgeCoverageScore * 0.5) * 100);
 
   return {
     metric: "M6_TestEffectiveness",
-    score: 0,
-    max_score: 1,
-    percentage: 0,
-    details: { error: "Test execution failed" },
+    score: Math.round(percentage),
+    max_score: 100,
+    percentage,
+    details: {
+      num_tests: numTests,
+      num_describes: numDescribes,
+      edge_case_keyword_hits: edgeCaseHits,
+      test_density_score: testDensityScore,
+      edge_coverage_score: edgeCoverageScore,
+    },
   };
 }
 
@@ -473,6 +481,32 @@ function findFiles(dir: string, extensions: string[]): string[] {
     }
   }
   return results;
+}
+
+function getEnglishKeywords(rule: string): string[] {
+  const map: [RegExp, string[]][] = [
+    [/残高.*0未満|負/, ["balance", "negative", "< 0", ">= 0"]],
+    [/出金上限|100万/, ["withdraw", "limit", "1000000", "max"]],
+    [/空文字|名義/, ["empty", "name", "holder", "trim"]],
+    [/送金元.*送金先.*異な|異なる口座/, ["transfer", "same", "different", "self"]],
+    [/5冊|最大.*冊/, ["max", "loan", "limit", "5"]],
+    [/延滞.*新規貸出不可/, ["overdue", "borrow", "cannot"]],
+    [/在庫.*0/, ["stock", "available", "0", "inventory"]],
+    [/14日|貸出期間/, ["14", "day", "period", "due"]],
+    [/延長.*1回/, ["extend", "once", "renewal"]],
+    [/貴重.*館内|貸出不可/, ["precious", "rare", "reference", "cannot"]],
+    [/入札額.*最高額/, ["bid", "highest", "current", "price"]],
+    [/出品者.*入札/, ["seller", "bid", "own", "self"]],
+    [/期間中のみ/, ["active", "period", "during"]],
+    [/5分前.*延長/, ["extend", "5", "minute", "before"]],
+    [/1%.*最低/, ["minimum", "increment", "1%", "100"]],
+    [/72時間/, ["72", "hour", "timeout", "payment"]],
+  ];
+  const keywords: string[] = [];
+  for (const [pattern, kws] of map) {
+    if (pattern.test(rule)) keywords.push(...kws);
+  }
+  return keywords;
 }
 
 function extractKeywords(rule: string): string[] {

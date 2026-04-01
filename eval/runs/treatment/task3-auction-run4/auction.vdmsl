@@ -1,0 +1,103 @@
+-- Online Auction System - VDM-SL Formal Specification (Run 4)
+-- Simpler specification focusing on invariants
+
+module SIMPLE_AUCTION
+
+imports
+  from VDM
+
+types
+  AuctionState = <Draft> | <Active> | <Ended> | <Paid> | <Shipped> | <Completed> | <Cancelled>;
+
+  AuctionId = seq of char;
+  UserId = seq of char;
+  Money = nat;
+
+  Bid ::
+    bidder_id : UserId
+    amount : Money
+  inv bid == bid.amount > 0;
+
+  SimpleAuction ::
+    auction_id : AuctionId
+    seller_id : UserId
+    starting_price : Money
+    highest_bid : Money
+    highest_bidder : [UserId]
+    state : AuctionState
+    bids : seq of Bid
+    end_time : nat
+  inv auction ==
+    auction.starting_price > 0 and
+    (auction.highest_bidder <> nil => auction.highest_bidder <> auction.seller_id) and
+    (forall b in seq auction.bids & b.bidder_id <> auction.seller_id);
+
+state SimpleStore of
+  auctions : map AuctionId to SimpleAuction
+init st == st`auctions = {|->}
+end
+
+operations
+  -- Create auction
+  New(id : AuctionId, seller : UserId, price : Money, end_t : nat) result : AuctionId
+  pre price > 0 and id not in set dom auctions
+  post let new_auction = mk_SimpleAuction(id, seller, price, 0, nil, <Draft>, [], end_t)
+       in auctions = auctions~ union {id |-> new_auction}
+  return id;
+
+  -- Activate
+  Activate(id : AuctionId) result : bool
+  pre id in set dom auctions and
+      auctions(id).state = <Draft>
+  post auctions(id).state = <Active>;
+
+  -- Bid
+  Bid(id : AuctionId, bidder : UserId, amount : Money) result : bool
+  pre id in set dom auctions and
+      let auction = auctions(id)
+      in auction.state = <Active> and
+         bidder <> auction.seller_id and
+         amount > auction.starting_price
+  post let auction = auctions~(id),
+           new_bid = mk_Bid(bidder, amount)
+       in auctions(id).highest_bidder = bidder and
+          auctions(id).highest_bid = amount and
+          len auctions(id).bids = len auction.bids + 1;
+
+  -- End
+  End(id : AuctionId) result : bool
+  pre id in set dom auctions and
+      auctions(id).state = <Active>
+  post auctions(id).state = <Ended>;
+
+  -- Pay
+  Pay(id : AuctionId) result : bool
+  pre id in set dom auctions and
+      auctions(id).state = <Ended>
+  post auctions(id).state = <Paid>;
+
+  -- Ship
+  Ship(id : AuctionId) result : bool
+  pre id in set dom auctions and
+      auctions(id).state = <Paid>
+  post auctions(id).state = <Shipped>;
+
+  -- Complete
+  Complete(id : AuctionId) result : bool
+  pre id in set dom auctions and
+      auctions(id).state = <Shipped>
+  post auctions(id).state = <Completed>;
+
+  -- Cancel Draft
+  CancelDraft(id : AuctionId) result : bool
+  pre id in set dom auctions and
+      auctions(id).state = <Draft>
+  post auctions(id).state = <Cancelled>;
+
+  -- Cancel Active
+  CancelActive(id : AuctionId) result : bool
+  pre id in set dom auctions and
+      auctions(id).state = <Active>
+  post auctions(id).state = <Cancelled>
+
+end SIMPLE_AUCTION

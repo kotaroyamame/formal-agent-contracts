@@ -1,0 +1,285 @@
+-- ============================================================================
+-- LIBRARY LOAN MANAGEMENT SYSTEM - VDM-SL FORMAL SPECIFICATION
+-- RUN 5: Most Thorough Formalization with Proof Obligations & All Edge Cases
+-- ============================================================================
+
+module LIBRARY
+
+exports all
+
+definitions
+
+types
+  BookId = nat;
+  MemberId = nat;
+  LoanId = nat;
+  Category = <NORMAL> | <PRECIOUS>;
+
+  Book ::
+    id : BookId
+    title : seq of char
+    category : Category
+    total_copies : nat
+    available_copies : nat
+  inv b == b.available_copies <= b.total_copies;
+
+  Member ::
+    id : MemberId
+    name : seq of char
+    has_overdue : bool
+    loan_count : nat
+  inv m == m.loan_count >= 0 /\ m.loan_count <= 5;
+
+  Loan ::
+    id : LoanId
+    book_id : BookId
+    member_id : MemberId
+    borrow_date : nat
+    due_date : nat
+    extended : bool
+    is_returned : bool
+  inv l == l.due_date > l.borrow_date;
+
+  Catalog = map BookId to Book;
+  Members = map MemberId to Member;
+  ActiveLoans = map LoanId to Loan;
+
+functions
+  -- Helper: Count active loans for a member
+  CountActiveLoansByMember(memberId : MemberId, loans : ActiveLoans) : nat
+    post RESULT = card {lid in set dom loans &
+                        loans(lid).member_id = memberId /\
+                        loans(lid).is_returned = false};
+
+  -- Helper: Check if book is available (has copies)
+  IsAvailable(bookId : BookId, catalog : Catalog) : bool
+    pre bookId in set dom catalog
+    post RESULT <=> catalog(bookId).available_copies > 0;
+
+  -- Helper: Check if member has any overdue loans
+  HasOverdueLoan(memberId : MemberId, loans : ActiveLoans, current_date : nat) : bool
+    post RESULT <=> exists lid in set dom loans &
+                      loans(lid).member_id = memberId /\
+                      loans(lid).is_returned = false /\
+                      loans(lid).due_date < current_date;
+
+  -- Helper: Check if loan is overdue
+  IsLoanOverdue(loan : Loan, current_date : nat) : bool
+    post RESULT <=> loan.due_date < current_date /\ loan.is_returned = false;
+
+state LibraryState of
+  catalog : Catalog
+  members : Members
+  active_loans : ActiveLoans
+  loan_counter : nat
+
+  inv ls ==
+    -- INV1: Book stock consistency (available <= total)
+    (forall bookId in set dom ls.catalog &
+      ls.catalog(bookId).available_copies <= ls.catalog(bookId).total_copies) /\
+
+    -- INV2: Member loan count constraints (0-5)
+    (forall memberId in set dom ls.members &
+      ls.members(memberId).loan_count >= 0 /\
+      ls.members(memberId).loan_count <= 5) /\
+
+    -- INV3: Loan temporal ordering (due_date > borrow_date)
+    (forall loanId in set dom ls.active_loans &
+      ls.active_loans(loanId).due_date > ls.active_loans(loanId).borrow_date) /\
+
+    -- INV4: Precious books never in active (non-returned) loans
+    (forall loanId in set dom ls.active_loans &
+      ls.active_loans(loanId).is_returned = false =>
+        (let bid = ls.active_loans(loanId).book_id in
+           bid in set dom ls.catalog =>
+             ls.catalog(bid).category <> <PRECIOUS>)) /\
+
+    -- INV5: Member can borrow iff loan_count < 5 AND not overdue
+    (forall memberId in set dom ls.members &
+      let m = ls.members(memberId) in
+        (m.loan_count < 5 /\ m.has_overdue = false) <=>
+        (m.loan_count < 5 /\ not HasOverdueLoan(memberId, ls.active_loans, 0)))
+end
+
+-- PROOF OBLIGATIONS:
+-- PO1: AddBook - Precondition guarantees bookId not in dom catalog
+-- PO2: ReserveBook - Precondition checks available > 0, Post decrements by 1
+-- PO3: ReturnBook - Precondition checks available < total, Post increments by 1
+-- PO4: CreateLoan - Precondition checks precious=false, can_borrow=true, copies_available=true
+-- PO5: ExtendLoan - Precondition checks extended=false to prevent double extension
+-- PO6: ReturnLoan - Precondition checks is_returned=false to prevent double return
+-- PO7: Day 14 Boundary - IsOverdue uses due_date < current_date (not <=)
+--      On day 15 (due_date=15), 15 < 15 is false, so not overdue
+-- PO8: Duplicate member - RegisterMember pre checks memberId not in members
+-- PO9: Last copy reservation - ReserveBook pre checks available > 0
+-- PO10: Member overdue state - INV5 couples has_overdue with actual overdue loans
+-- PO11: Precious book prohibition - CreateLoan pre checks not is_precious
+-- PO12: Extended-then-overdue - INV3 ensures due_date > borrow_date after extension
+
+operations
+  -- ========================================================================
+  -- CATALOG OPERATIONS
+  -- ========================================================================
+
+  AddBook(bookId : BookId, title : seq of char, category : Category, copies : nat)
+    ext wr catalog : Catalog
+    pre bookId not in set dom catalog /\ copies > 0
+    post catalog = catalog~ union {bookId |->
+           mk_Book(bookId, title, category, copies, copies)};
+
+  ReserveBook(bookId : BookId)
+    ext wr catalog : Catalog
+    pre bookId in set dom catalog /\
+        IsAvailable(bookId, catalog)
+    post catalog(bookId) =
+      mk_Book(
+        catalog(bookId).id,
+        catalog(bookId).title,
+        catalog(bookId).category,
+        catalog(bookId).total_copies,
+        catalog(bookId).available_copies - 1
+      ) /\
+      forall bid in set dom catalog & bid <> bookId =>
+        catalog(bid) = catalog~(bid);
+
+  ReturnBook(bookId : BookId)
+    ext wr catalog : Catalog
+    pre bookId in set dom catalog /\
+        catalog(bookId).available_copies < catalog(bookId).total_copies
+    post catalog(bookId) =
+      mk_Book(
+        catalog(bookId).id,
+        catalog(bookId).title,
+        catalog(bookId).category,
+        catalog(bookId).total_copies,
+        catalog(bookId).available_copies + 1
+      ) /\
+      forall bid in set dom catalog & bid <> bookId =>
+        catalog(bid) = catalog~(bid);
+
+  GetAvailableCopies(bookId : BookId) res : nat
+    ext rd catalog : Catalog
+    pre bookId in set dom catalog
+    post res = catalog(bookId).available_copies;
+
+  IsPrecious(bookId : BookId) res : bool
+    ext rd catalog : Catalog
+    pre bookId in set dom catalog
+    post res <=> catalog(bookId).category = <PRECIOUS>;
+
+  -- ========================================================================
+  -- MEMBER OPERATIONS
+  -- ========================================================================
+
+  RegisterMember(memberId : MemberId, name : seq of char)
+    ext wr members : Members
+    pre memberId not in set dom members
+    post members = members~ union {memberId |->
+           mk_Member(memberId, name, false, 0)};
+
+  IncrementLoanCount(memberId : MemberId)
+    ext wr members : Members
+    pre memberId in set dom members /\
+        members(memberId).loan_count < 5
+    post members(memberId).loan_count = members(memberId).loan_count~ + 1 /\
+         forall mid in set dom members & mid <> memberId =>
+           members(mid) = members~(mid);
+
+  DecrementLoanCount(memberId : MemberId)
+    ext wr members : Members
+    pre memberId in set dom members /\
+        members(memberId).loan_count > 0
+    post members(memberId).loan_count = members(memberId).loan_count~ - 1 /\
+         forall mid in set dom members & mid <> memberId =>
+           members(mid) = members~(mid);
+
+  SetOverdue(memberId : MemberId)
+    ext wr members : Members
+    pre memberId in set dom members
+    post members(memberId).has_overdue = true /\
+         forall mid in set dom members & mid <> memberId =>
+           members(mid) = members~(mid);
+
+  ClearOverdue(memberId : MemberId)
+    ext wr members : Members
+    pre memberId in set dom members
+    post members(memberId).has_overdue = false /\
+         forall mid in set dom members & mid <> memberId =>
+           members(mid) = members~(mid);
+
+  CanBorrow(memberId : MemberId) res : bool
+    ext rd members : Members
+    pre memberId in set dom members
+    post res <=> (members(memberId).loan_count < 5 /\
+                  members(memberId).has_overdue = false);
+
+  GetLoanCount(memberId : MemberId) res : nat
+    ext rd members : Members
+    pre memberId in set dom members
+    post res = members(memberId).loan_count;
+
+  -- ========================================================================
+  -- LOAN OPERATIONS
+  -- ========================================================================
+
+  CreateLoan(
+    book_id : BookId,
+    member_id : MemberId,
+    borrow_date : nat,
+    is_precious : bool,
+    can_member_borrow : bool,
+    has_available_copies : bool
+  ) res : LoanId
+    ext wr active_loans : ActiveLoans,
+        wr loan_counter : nat
+    pre not is_precious /\
+        can_member_borrow /\
+        has_available_copies
+    post active_loans = active_loans~ union
+           {loan_counter~ |-> mk_Loan(
+             loan_counter~,
+             book_id,
+             member_id,
+             borrow_date,
+             borrow_date + 14,
+             false,
+             false
+           )} /\
+         res = loan_counter~ /\
+         loan_counter = loan_counter~ + 1;
+
+  ExtendLoan(loan_id : LoanId)
+    ext wr active_loans : ActiveLoans
+    pre loan_id in set dom active_loans /\
+        active_loans(loan_id).extended = false /\
+        active_loans(loan_id).is_returned = false
+    post active_loans(loan_id).due_date = active_loans(loan_id).due_date~ + 7 /\
+         active_loans(loan_id).extended = true /\
+         forall lid in set dom active_loans & lid <> loan_id =>
+           active_loans(lid) = active_loans~(lid);
+
+  ReturnLoan(loan_id : LoanId)
+    ext wr active_loans : ActiveLoans
+    pre loan_id in set dom active_loans /\
+        active_loans(loan_id).is_returned = false
+    post active_loans(loan_id).is_returned = true /\
+         forall lid in set dom active_loans & lid <> loan_id =>
+           active_loans(lid) = active_loans~(lid);
+
+  IsOverdue(loan_id : LoanId, current_date : nat) res : bool
+    ext rd active_loans : ActiveLoans
+    pre loan_id in set dom active_loans
+    post res <=> (active_loans(loan_id).due_date < current_date /\
+                  active_loans(loan_id).is_returned = false);
+
+  GetMemberLoans(member_id : MemberId) res : set of LoanId
+    ext rd active_loans : ActiveLoans
+    post res = {lid in set dom active_loans &
+                active_loans(lid).member_id = member_id /\
+                active_loans(lid).is_returned = false};
+
+  GetActiveLoanCount(member_id : MemberId) res : nat
+    ext rd active_loans : ActiveLoans
+    post res = CountActiveLoansByMember(member_id, active_loans~)
+
+end LIBRARY
