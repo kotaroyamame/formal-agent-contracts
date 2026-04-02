@@ -11,7 +11,7 @@
   "plugins": [
     {
       "name": "formal-agent-contracts",
-      "source": ".",
+      "source": "./",
       "description": "Define agent contracts in VDM-SL, verify specifications, auto-prove with Z3, generate code scaffolds with runtime contract checks, run end-to-end integrated workflows, and reverse-engineer specifications from existing code. Includes evaluation framework with comparative benchmarks.",
       "version": "1.5.0",
       "author": {
