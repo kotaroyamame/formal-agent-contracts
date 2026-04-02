@@ -416,3 +416,10 @@ Reference the individual skill SKILL.md files for phase-specific details:
 - Phase 3: `skills/reconcile-code/SKILL.md` (to be created)
 - Phase 4–6: Reuse skills from `skills/integrated-workflow/`
 - Background: `skills/formal-methods-guide/SKILL.md`
+- Human doc export: `skills/export-human-spec/SKILL.md`
+- MD spec import: `skills/import-natural-spec/SKILL.md`
+
+After the reverse workflow completes, offer the user the option to generate a
+human-readable specification document using `export-human-spec`.
+If the user's starting point is a natural language MD file rather than source code,
+recommend `import-natural-spec` instead of this reverse workflow.

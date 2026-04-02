@@ -13,9 +13,11 @@ With Claude's assistance, even developers without formal methods expertise can:
 - **Prove** proof obligations automatically by converting to SMT-LIB and solving with Z3 (v0.2.0)
 - **Generate** TypeScript/Python code scaffolds from VDM-SL specs with runtime contract checks (v0.3.0)
 - **Integrate** the full pipeline — define, verify, prove, generate, and test — in a single guided session (v1.0.0)
-- **Extract** provisional specs from existing code and **refine** them through dialogue to uncover the true specification (v1.1.0–v1.4.0) 🆕
+- **Extract** provisional specs from existing code and **refine** them through dialogue to uncover the true specification (v1.1.0–v1.4.0)
+- **Import** natural language specifications (Markdown) and interactively convert them to VDM-SL, resolving ambiguities through dialogue (v1.5.0) 🆕
+- **Export** VDM-SL specs as human-readable natural language documents for stakeholder review (v1.5.0) 🆕
 
-形式手法の知識がない開発者でも、Claudeの支援により、エージェント間インターフェースの厳密な定義、仕様の自動検証、POのSMT自動証明、仕様からのコード自動生成、統合ワークフローによる一気通貫開発、さらに既存コードからの仕様あぶり出しと対話的な真の仕様の発見が可能です。
+形式手法の知識がない開発者でも、Claudeの支援により、エージェント間インターフェースの厳密な定義、仕様の自動検証、POのSMT自動証明、仕様からのコード自動生成、統合ワークフローによる一気通貫開発、既存コードからの仕様あぶり出しと対話的な真の仕様の発見、さらにMD自然言語仕様のインポートとVDM-SLからの自然言語仕様書エクスポートが可能です。
 
 ## Skills / スキル一覧
 
@@ -98,6 +100,22 @@ Orchestrates the full reverse pipeline: **Extract → Refine → Reconcile**, th
 リバースパイプライン全体を統合実行: **抽出→磨き上げ→照合**。完了後、既存のフォワードパイプライン（検証→証明→生成）に接続可能。既存コードベース版の `integrated-workflow` です。
 
 **Triggers**: "reverse workflow", "extract and refine spec from code", 「リバースワークフローで」「コードの仕様を明確にしたい」
+
+### import-natural-spec — Natural Language Spec Import / 自然言語仕様インポート *(v1.5.0)* 🆕
+
+Read a Markdown requirements document and interactively convert it to a VDM-SL formal specification. The skill identifies ambiguities (vague quantifiers, missing error cases, implicit constraints, temporal ambiguity, boundary conditions) and resolves them through structured dialogue with the user.
+
+MD形式の自然言語仕様書を読み込み、対話的にVDM-SL形式仕様へ変換します。曖昧な記述（不明瞭な数量表現、未定義のエラーケース、暗黙の制約、時間的曖昧さ、境界条件）を検出し、ユーザーとの対話で解消します。
+
+**Triggers**: "import a spec from Markdown", "convert requirements to VDM-SL", 「自然言語仕様をインポートしたい」「要件定義からVDMを作りたい」
+
+### export-human-spec — Human-Readable Spec Export / 自然言語仕様エクスポート *(v1.5.0)* 🆕
+
+Generate a structured natural language specification document (Markdown) from a VDM-SL formal specification. Types become "what things exist", pre-conditions become "prerequisites", post-conditions become "guarantees". The output is designed for domain experts, project managers, and non-technical stakeholders who need to review the spec without learning VDM-SL.
+
+VDM-SL形式仕様から、構造化された自然言語仕様書（Markdown）を生成します。型は「存在するもの」、事前条件は「前提条件」、事後条件は「保証」として翻訳されます。VDM-SLを知らないドメインエキスパート、プロジェクトマネージャー、非技術者がレビューできる形式です。
+
+**Triggers**: "generate documentation from VDM-SL", "create readable spec", 「VDM仕様から自然言語仕様を作りたい」「人間が読める仕様書を生成して」
 
 ## Installation / インストール
 
@@ -460,7 +478,8 @@ Or download binaries from https://github.com/Z3Prover/z3/releases
 - [x] v1.1.0 — Provisional spec extraction from existing code (extract-spec) 🆕
 - [x] v1.2.0 — Dialogue-driven spec refinement to uncover true specifications (refine-spec) 🆕
 - [x] v1.3.0 — Code reconciliation with confirmed specs, auto-test generation (reconcile-code) 🆕
-- [x] v1.4.0 — Reverse workflow orchestrator with forward pipeline connection (reverse-workflow) 🆕
+- [x] v1.4.0 — Reverse workflow orchestrator with forward pipeline connection (reverse-workflow)
+- [x] v1.5.0 — Natural language spec import (MD→VDM-SL) and human-readable spec export (VDM-SL→MD) 🆕
 
 ## Author / 作者
 

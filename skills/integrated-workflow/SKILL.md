@@ -43,8 +43,9 @@ Activate this skill when the user says any of:
 
 2. Gather session parameters:
    - **Agent name**: What agent are we defining?
-   - **Starting point**: New definition, or existing `.vdmsl` file?
-     - If existing file: skip to Phase 2 (Verify)
+   - **Starting point**: New definition, existing `.vdmsl` file, or natural language spec (MD)?
+     - If existing `.vdmsl` file: skip to Phase 2 (Verify)
+     - If natural language MD file: invoke `import-natural-spec` first to convert to VDM-SL
    - **Target language**: TypeScript, Python, or both?
    - **SMT verification**: Include Z3 automated proving? (requires Z3 installed)
 
@@ -272,6 +273,7 @@ Users can control the workflow at any point:
 
 Users may enter the workflow at any phase:
 
+- **From MD import**: User provides a natural language spec → `import-natural-spec` → Phase 1
 - **From Phase 1**: Full workflow (default)
 - **From Phase 2**: User provides existing `.vdmsl` file
 - **From Phase 4**: User wants code generation only (verification already done)
@@ -293,8 +295,14 @@ Instead, it:
 このスキルはオーケストレーターとして機能し、各フェーズの詳細は個別スキルに委譲する。
 
 Reference the individual skill SKILL.md files for phase-specific details:
+- Pre-phase (MD import): `skills/import-natural-spec/SKILL.md`
 - Phase 1: `skills/define-contract/SKILL.md`
 - Phase 2: `skills/verify-spec/SKILL.md`
 - Phase 3: `skills/smt-verify/SKILL.md`
 - Phase 4–5: `skills/generate-code/SKILL.md`
+- Post-phase (human doc export): `skills/export-human-spec/SKILL.md`
 - Background: `skills/formal-methods-guide/SKILL.md`
+
+After the workflow completes, offer the user the option to generate a human-readable
+specification document using `export-human-spec`. This is especially valuable when
+stakeholders who don't read VDM-SL need to review the spec.
