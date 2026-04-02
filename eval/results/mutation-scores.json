@@ -1,0 +1,525 @@
+{
+  "timestamp": "2026-04-02T04:29:37.306Z",
+  "summary": {
+    "totalRuns": 30,
+    "totalMutations": 46,
+    "totalKilled": 46,
+    "overallKillRate": 100
+  },
+  "results": [
+    {
+      "runName": "control/task1-bank-account-run1",
+      "sourceFile": "__gold_tests__.ts",
+      "testFile": "bank-account.test.ts",
+      "totalMutations": 2,
+      "killedMutations": 2,
+      "survivedMutations": 0,
+      "killRate": 100,
+      "mutations": [
+        {
+          "name": "NUM-1000000-1",
+          "killed": true
+        },
+        {
+          "name": "LT-LE",
+          "killed": true
+        }
+      ]
+    },
+    {
+      "runName": "control/task1-bank-account-run2",
+      "sourceFile": "bank-account.ts",
+      "testFile": "bank-account.test.ts",
+      "totalMutations": 2,
+      "killedMutations": 2,
+      "survivedMutations": 0,
+      "killRate": 100,
+      "mutations": [
+        {
+          "name": "NUM-1000000-1",
+          "killed": true
+        },
+        {
+          "name": "LT-LE",
+          "killed": true
+        }
+      ]
+    },
+    {
+      "runName": "control/task1-bank-account-run3",
+      "sourceFile": "bank-account.ts",
+      "testFile": "bank-account.test.ts",
+      "totalMutations": 2,
+      "killedMutations": 2,
+      "survivedMutations": 0,
+      "killRate": 100,
+      "mutations": [
+        {
+          "name": "NUM-1000000-1",
+          "killed": true
+        },
+        {
+          "name": "LT-LE",
+          "killed": true
+        }
+      ]
+    },
+    {
+      "runName": "control/task1-bank-account-run4",
+      "sourceFile": "bank-account.ts",
+      "testFile": "bank-account.test.ts",
+      "totalMutations": 2,
+      "killedMutations": 2,
+      "survivedMutations": 0,
+      "killRate": 100,
+      "mutations": [
+        {
+          "name": "NUM-1000000-1",
+          "killed": true
+        },
+        {
+          "name": "LT-LE",
+          "killed": true
+        }
+      ]
+    },
+    {
+      "runName": "control/task1-bank-account-run5",
+      "sourceFile": "bank-account.ts",
+      "testFile": "bank-account.test.ts",
+      "totalMutations": 1,
+      "killedMutations": 1,
+      "survivedMutations": 0,
+      "killRate": 100,
+      "mutations": [
+        {
+          "name": "LT-LE",
+          "killed": true
+        }
+      ]
+    },
+    {
+      "runName": "control/task2-library-run1",
+      "sourceFile": "library.ts",
+      "testFile": "library.test.ts",
+      "totalMutations": 1,
+      "killedMutations": 1,
+      "survivedMutations": 0,
+      "killRate": 100,
+      "mutations": [
+        {
+          "name": "LT-LE",
+          "killed": true
+        }
+      ]
+    },
+    {
+      "runName": "control/task2-library-run2",
+      "sourceFile": "library.ts",
+      "testFile": "library.test.ts",
+      "totalMutations": 1,
+      "killedMutations": 1,
+      "survivedMutations": 0,
+      "killRate": 100,
+      "mutations": [
+        {
+          "name": "LT-LE",
+          "killed": true
+        }
+      ]
+    },
+    {
+      "runName": "control/task2-library-run3",
+      "sourceFile": "library.ts",
+      "testFile": "library.test.ts",
+      "totalMutations": 1,
+      "killedMutations": 1,
+      "survivedMutations": 0,
+      "killRate": 100,
+      "mutations": [
+        {
+          "name": "LT-LE",
+          "killed": true
+        }
+      ]
+    },
+    {
+      "runName": "control/task2-library-run4",
+      "sourceFile": "library.ts",
+      "testFile": "library.test.ts",
+      "totalMutations": 2,
+      "killedMutations": 2,
+      "survivedMutations": 0,
+      "killRate": 100,
+      "mutations": [
+        {
+          "name": "NUM-3600000-1",
+          "killed": true
+        },
+        {
+          "name": "LT-LE",
+          "killed": true
+        }
+      ]
+    },
+    {
+      "runName": "control/task2-library-run5",
+      "sourceFile": "library.ts",
+      "testFile": "library.test.ts",
+      "totalMutations": 1,
+      "killedMutations": 1,
+      "survivedMutations": 0,
+      "killRate": 100,
+      "mutations": [
+        {
+          "name": "LT-LE",
+          "killed": true
+        }
+      ]
+    },
+    {
+      "runName": "control/task3-auction-run1",
+      "sourceFile": "auction.ts",
+      "testFile": "auction.test.ts",
+      "totalMutations": 1,
+      "killedMutations": 1,
+      "survivedMutations": 0,
+      "killRate": 100,
+      "mutations": [
+        {
+          "name": "LT-LE",
+          "killed": true
+        }
+      ]
+    },
+    {
+      "runName": "control/task3-auction-run2",
+      "sourceFile": "auction.ts",
+      "testFile": "auction.test.ts",
+      "totalMutations": 1,
+      "killedMutations": 1,
+      "survivedMutations": 0,
+      "killRate": 100,
+      "mutations": [
+        {
+          "name": "LT-LE",
+          "killed": true
+        }
+      ]
+    },
+    {
+      "runName": "control/task3-auction-run3",
+      "sourceFile": "auction.ts",
+      "testFile": "auction.test.ts",
+      "totalMutations": 1,
+      "killedMutations": 1,
+      "survivedMutations": 0,
+      "killRate": 100,
+      "mutations": [
+        {
+          "name": "LT-LE",
+          "killed": true
+        }
+      ]
+    },
+    {
+      "runName": "control/task3-auction-run4",
+      "sourceFile": "auction.ts",
+      "testFile": "auction.test.ts",
+      "totalMutations": 2,
+      "killedMutations": 2,
+      "survivedMutations": 0,
+      "killRate": 100,
+      "mutations": [
+        {
+          "name": "NUM-60000-1",
+          "killed": true
+        },
+        {
+          "name": "LT-LE",
+          "killed": true
+        }
+      ]
+    },
+    {
+      "runName": "control/task3-auction-run5",
+      "sourceFile": "auction.ts",
+      "testFile": "auction.test.ts",
+      "totalMutations": 1,
+      "killedMutations": 1,
+      "survivedMutations": 0,
+      "killRate": 100,
+      "mutations": [
+        {
+          "name": "LT-LE",
+          "killed": true
+        }
+      ]
+    },
+    {
+      "runName": "treatment/task1-bank-account-run1",
+      "sourceFile": "bank-account.ts",
+      "testFile": "bank-account.test.ts",
+      "totalMutations": 3,
+      "killedMutations": 3,
+      "survivedMutations": 0,
+      "killRate": 100,
+      "mutations": [
+        {
+          "name": "NUM-1000000-1",
+          "killed": true
+        },
+        {
+          "name": "LT-LE",
+          "killed": true
+        },
+        {
+          "name": "NEG-amount",
+          "killed": true
+        }
+      ]
+    },
+    {
+      "runName": "treatment/task1-bank-account-run2",
+      "sourceFile": "bank-account.ts",
+      "testFile": "bank-account.test.ts",
+      "totalMutations": 2,
+      "killedMutations": 2,
+      "survivedMutations": 0,
+      "killRate": 100,
+      "mutations": [
+        {
+          "name": "NUM-1000000-1",
+          "killed": true
+        },
+        {
+          "name": "LT-LE",
+          "killed": true
+        }
+      ]
+    },
+    {
+      "runName": "treatment/task1-bank-account-run3",
+      "sourceFile": "bank-account.ts",
+      "testFile": "bank-account.test.ts",
+      "totalMutations": 2,
+      "killedMutations": 2,
+      "survivedMutations": 0,
+      "killRate": 100,
+      "mutations": [
+        {
+          "name": "NUM-1000000-1",
+          "killed": true
+        },
+        {
+          "name": "LT-LE",
+          "killed": true
+        }
+      ]
+    },
+    {
+      "runName": "treatment/task1-bank-account-run4",
+      "sourceFile": "bank-account.ts",
+      "testFile": "bank-account.test.ts",
+      "totalMutations": 3,
+      "killedMutations": 3,
+      "survivedMutations": 0,
+      "killRate": 100,
+      "mutations": [
+        {
+          "name": "NUM-1000000-1",
+          "killed": true
+        },
+        {
+          "name": "LT-LE",
+          "killed": true
+        },
+        {
+          "name": "NEG-amount",
+          "killed": true
+        }
+      ]
+    },
+    {
+      "runName": "treatment/task1-bank-account-run5",
+      "sourceFile": "bank-account.ts",
+      "testFile": "bank-account.test.ts",
+      "totalMutations": 2,
+      "killedMutations": 2,
+      "survivedMutations": 0,
+      "killRate": 100,
+      "mutations": [
+        {
+          "name": "NUM-1000000-1",
+          "killed": true
+        },
+        {
+          "name": "LT-LE",
+          "killed": true
+        }
+      ]
+    },
+    {
+      "runName": "treatment/task2-library-run1",
+      "sourceFile": "library.ts",
+      "testFile": "library.test.ts",
+      "totalMutations": 1,
+      "killedMutations": 1,
+      "survivedMutations": 0,
+      "killRate": 100,
+      "mutations": [
+        {
+          "name": "LT-LE",
+          "killed": true
+        }
+      ]
+    },
+    {
+      "runName": "treatment/task2-library-run2",
+      "sourceFile": "library.ts",
+      "testFile": "library.test.ts",
+      "totalMutations": 1,
+      "killedMutations": 1,
+      "survivedMutations": 0,
+      "killRate": 100,
+      "mutations": [
+        {
+          "name": "LT-LE",
+          "killed": true
+        }
+      ]
+    },
+    {
+      "runName": "treatment/task2-library-run3",
+      "sourceFile": "library.ts",
+      "testFile": "library.test.ts",
+      "totalMutations": 1,
+      "killedMutations": 1,
+      "survivedMutations": 0,
+      "killRate": 100,
+      "mutations": [
+        {
+          "name": "LT-LE",
+          "killed": true
+        }
+      ]
+    },
+    {
+      "runName": "treatment/task2-library-run4",
+      "sourceFile": "library.ts",
+      "testFile": "library.test.ts",
+      "totalMutations": 1,
+      "killedMutations": 1,
+      "survivedMutations": 0,
+      "killRate": 100,
+      "mutations": [
+        {
+          "name": "LT-LE",
+          "killed": true
+        }
+      ]
+    },
+    {
+      "runName": "treatment/task2-library-run5",
+      "sourceFile": "library.ts",
+      "testFile": "library.test.ts",
+      "totalMutations": 1,
+      "killedMutations": 1,
+      "survivedMutations": 0,
+      "killRate": 100,
+      "mutations": [
+        {
+          "name": "LT-LE",
+          "killed": true
+        }
+      ]
+    },
+    {
+      "runName": "treatment/task3-auction-run1",
+      "sourceFile": "auction.ts",
+      "testFile": "auction.test.ts",
+      "totalMutations": 1,
+      "killedMutations": 1,
+      "survivedMutations": 0,
+      "killRate": 100,
+      "mutations": [
+        {
+          "name": "LT-LE",
+          "killed": true
+        }
+      ]
+    },
+    {
+      "runName": "treatment/task3-auction-run2",
+      "sourceFile": "auction.ts",
+      "testFile": "auction.test.ts",
+      "totalMutations": 2,
+      "killedMutations": 2,
+      "survivedMutations": 0,
+      "killRate": 100,
+      "mutations": [
+        {
+          "name": "NUM-300000-1",
+          "killed": true
+        },
+        {
+          "name": "LT-LE",
+          "killed": true
+        }
+      ]
+    },
+    {
+      "runName": "treatment/task3-auction-run3",
+      "sourceFile": "auction.ts",
+      "testFile": "auction.test.ts",
+      "totalMutations": 2,
+      "killedMutations": 2,
+      "survivedMutations": 0,
+      "killRate": 100,
+      "mutations": [
+        {
+          "name": "NUM-300000-1",
+          "killed": true
+        },
+        {
+          "name": "LT-LE",
+          "killed": true
+        }
+      ]
+    },
+    {
+      "runName": "treatment/task3-auction-run4",
+      "sourceFile": "auction.ts",
+      "testFile": "auction.test.ts",
+      "totalMutations": 1,
+      "killedMutations": 1,
+      "survivedMutations": 0,
+      "killRate": 100,
+      "mutations": [
+        {
+          "name": "LT-LE",
+          "killed": true
+        }
+      ]
+    },
+    {
+      "runName": "treatment/task3-auction-run5",
+      "sourceFile": "auction.ts",
+      "testFile": "auction.test.ts",
+      "totalMutations": 2,
+      "killedMutations": 2,
+      "survivedMutations": 0,
+      "killRate": 100,
+      "mutations": [
+        {
+          "name": "NUM-300000-1",
+          "killed": true
+        },
+        {
+          "name": "LT-LE",
+          "killed": true
+        }
+      ]
+    }
+  ]
+}
