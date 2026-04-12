@@ -13,7 +13,7 @@ tags:
 
 # エージェント契約定義スキル (v0.2.0)
 
-形式的エージェント契約を段階的に定義し、VDM-SL（Vienna Development Method Specification Language）仕様と設計文書（PROTOCOL.md、API-SIGNATURES.md）を生成するスキルです。v0.2.0では Phase 1（ドメイン論理）の VDM-SL 仕様に加えて、Phase 2（プロトコル・API 仕様）の設計文書生成に対応し、ハイブリッドチャットボット等の複雑なマルチエージェントシステムに対応しています。
+形式的エージェント契約を段階的に定義し、VDM-SL（Vienna Development Method Specification Language）仕様と設計文書（PROTOCOL.md、API-SIGNATURES.md）を生成するスキルです。v0.2.0では Phase 1（ドメイン論理）の VDM-SL 仕様に加えて、Phase 2（プロトコル・API 仕様）の設計文書生成に対応し、複雑なマルチエージェントシステムに対応しています。
 
 ## 概要
 
@@ -527,7 +527,6 @@ end HybridSystem
 ## 参考資料
 
 - VDM-SL公式仕様：ISO/IEC 13817-1
-- ハイブリッドチャットボットプロジェクトでの実装例：`../../../hybrid-chatbot/vdm/`
 - テスト生成スキル：`../generate-tests/SKILL.md`
 - 仕様検証スキル：`../verify-spec/SKILL.md`
 
