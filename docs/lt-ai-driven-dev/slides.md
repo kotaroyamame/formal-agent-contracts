@@ -115,19 +115,17 @@ ValidTransition(fromSt, toSt) ==
 ```text
 > 仕様を検証して
 Parsed 1 module in 0.029 secs. No syntax errors
-Type checked 1 module in 0.071 secs. No type errors
-Generated 38 proof obligations
+Type checked 1 module in 0.07 secs. No type errors
+Generated 37 proof obligations → QuickCheck: FAILED 0 ✅
 
-> qc   （QuickCheck で全 PO を判定）
-PO #8  初期状態は不変条件を満たすか → PROVABLE ✅（witness: 空ボード, nextId=1）
-PO #22 CreateTask の事後条件      → FAILED ❌ 反例つき
+> 事後条件に off-by-one をわざと仕込んで再検証
+PO #21 CreateTask の事後条件 → FAILED ❌ 反例つき
    反例: nextId=1 のとき RESULT=1 ≠ nextId~ - 1 (=0)
-   → 事後条件の off-by-one（nextId~ の取り違え）
 ```
 
-- この反例、**同梱サンプルに実在したバグ**です（この発表の準備中に検出 → 修正済み。
-  <span class="small">再現は修正前コミット d6427bc で。修正後は FAILED 0 / PO 37個</span>）
-- PO は QuickCheck / Z3 が自動処理。**人間が見るのは反例が出たときだけ**
+- 仕様にバグや矛盾があれば、**コードを書く前に反例つきで返ってくる**
+  <span class="small">（上の出力はすべて同梱サンプル TaskManager.vdmsl での実測）</span>
+- 37個の PO は QuickCheck / Z3 が自動処理。**人間が見るのは反例が出たときだけ**
 - LLM の「たぶん大丈夫です」ではなく、**チェッカーの判定**
 
 ---
