@@ -67,12 +67,14 @@ operations
   (
     dcl newId : TaskId := nextId;
     dcl newTask : Task := mk_Task(newId, title, desc, <Todo>, priority, assignee);
-    board := board munion {newId |-> newTask};
-    nextId := nextId + 1;
+    atomic (
+      board := board munion {newId |-> newTask};
+      nextId := nextId + 1
+    );
     return newId
   )
   pre len title <= 100 and len desc <= 500
-  post RESULT = nextId~ - 1 and
+  post RESULT = nextId~ and
        RESULT in set dom board and
        board(RESULT).title = title and
        board(RESULT).status = <Todo>;
