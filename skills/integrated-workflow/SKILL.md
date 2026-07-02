@@ -170,6 +170,16 @@ If skipped, proceed directly to Phase 4.
   - ℹ️ Unknown/Timeout: <count>
 ```
 
+### Phase 3.5 (optional): DB Schema — Persistence Design
+
+**Invoke**: `generate-db-schema` skill — only when the spec has persistent state
+(a `state` definition the user wants stored in a database).
+
+仕様に永続化すべき state がある場合、コード生成の前に generate-db-schema で
+DDL・DEVIATIONS（乖離表）・TRACEABILITY（担保箇所対照表）を導出する。
+生成されたスキーマの「アプリ層」補償項目は Phase 4 のデータアクセス層実装に、
+「契約テスト」補償項目は Phase 5 のテスト生成に引き継ぐ。
+
 ### Phase 4: Generate — Code Scaffold Generation
 
 **Invoke**: `generate-code` skill

@@ -1,6 +1,6 @@
 # Formal Agent Contracts
 
-**バージョン 2.0.0** ｜ マルチエージェント開発における形式手法ツールキット。エージェント間の契約をVDM-SLで定義し、自動検証する。
+**バージョン 2.1.0** ｜ マルチエージェント開発における形式手法ツールキット。エージェント間の契約をVDM-SLで定義し、自動検証する。
 
 形式手法の知識がない開発者でも、Claudeの支援により：
 
@@ -8,6 +8,7 @@
 - Phase 2設計文書（PROTOCOL.md、API-SIGNATURES.md）を生成し、仕様と実装の距離を縮められる
 - VDMJによる構文チェック・型チェック・証明責務（PO）生成を実行できる
 - Z3によるPOの自動証明・反例探索ができる
+- 仕様の型・不変条件からDBスキーマ（DDL）を導出し、乖離（DEVIATIONS）と担保箇所（TRACEABILITY）を記録できる
 - 仕様からTypeScript/Pythonのコードスキャフォールドと契約テストを自動生成できる
 - 既存コードから仕様を逆抽出し、対話で磨き上げ、コードと照合できる（リバースワークフロー）
 
@@ -20,7 +21,7 @@ Claude Code のプラグインとしてインストール：
 /plugin install formal-agent-contracts@formal-agent-contracts
 ```
 
-## スキル一覧（全13スキル）
+## スキル一覧（全14スキル）
 
 ### フォワード開発（仕様 → コード）
 
@@ -29,6 +30,7 @@ Claude Code のプラグインとしてインストール：
 | **define-contract** | 自然言語での対話からVDM-SL契約と設計文書（PROTOCOL.md、API-SIGNATURES.md）を段階的に生成 |
 | **verify-spec** | VDMJによる構文チェック・型チェック・PO生成。設計文書の完全性チェックとVDM-SL仕様との一貫性確認も実行 |
 | **smt-verify** | POをSMT-LIBに変換し、Z3で自動証明・反例探索 |
+| **generate-db-schema** | VDM-SLの型・不変条件からDBスキーマ（DDL）を規則的に導出。表現しきれない乖離は DEVIATIONS（retrenchment表）、担保箇所は TRACEABILITY に記録 |
 | **generate-code** | VDM-SL仕様からTypeScript/Pythonのコードスキャフォールドを生成（事前条件・事後条件・不変式のランタイム検証コード付き） |
 | **generate-tests** | VDM-SL仕様と設計文書からJest/Vitest互換の契約テストを自動生成（型不変式・契約遵守・状態遷移・境界値） |
 | **integrated-workflow** | 定義→検証→証明→コード生成→テストの5フェーズを一気通貫で実行 |
@@ -65,6 +67,7 @@ Claude Code のプラグインとしてインストール：
 | VDMJ | verify-spec、smt-verify | https://github.com/nickbattle/vdmj/releases （`vdmj-suite-*-distribution.zip`）。詳細は [vdmj-setup.md](skills/verify-spec/references/vdmj-setup.md) |
 | Z3 | smt-verify | `pip install z3-solver` または https://github.com/Z3Prover/z3 |
 | Node.js + Vitest/Jest | generate-tests（生成テストの実行） | https://nodejs.org/ |
+| sqlite3 または PostgreSQL | generate-db-schema（任意。生成DDLの実行検証用） | macOS は sqlite3 同梱 / https://www.postgresql.org/ |
 
 define-contract、formal-methods-guide、import-natural-spec、export-human-spec などの対話系スキルは外部ツールなしで動作します。
 
@@ -87,7 +90,7 @@ define-contract、formal-methods-guide、import-natural-spec、export-human-spec
 
 | パス | 内容 |
 |------|------|
-| `skills/` | 13スキルの定義（各スキルは SKILL.md、多くは references/ 付き） |
+| `skills/` | 14スキルの定義（各スキルは SKILL.md、多くは references/ 付き） |
 | `examples/` | 動作例（`task-manager`: VDM-SL仕様 → TypeScript実装 → SMT-LIB証明） |
 | `eval/` | 評価フレームワーク（ベンチマーク課題、実行ログ、採点スクリプト、結果） |
 | `design/` | 設計文書（`reverse-workflow-design.md` — リバースワークフローの設計時ドキュメント） |
@@ -99,6 +102,7 @@ define-contract、formal-methods-guide、import-natural-spec、export-human-spec
 
 ## 変更履歴
 
+- **v2.1.0** — DBスキーマ導出（generate-db-schema）：型・不変条件→DDLの規則的写像（R1〜R18）、retrenchment に基づく乖離記録（DEVIATIONS）、不変条件の担保箇所対照表（TRACEABILITY）
 - **v2.0.0** — Phase 2設計文書（PROTOCOL.md、API-SIGNATURES.md）生成支援、契約テスト自動生成（generate-tests）、設計文書の完全性チェック（verify-spec拡張）
 - **v1.5.0** — import-natural-spec / export-human-spec（自然言語仕様の入出力）
 - **v1.1.0–v1.4.0** — リバースワークフロー（extract-spec、refine-spec、reconcile-code、reverse-workflow）、評価フレームワーク
@@ -109,6 +113,8 @@ define-contract、formal-methods-guide、import-natural-spec、export-human-spec
 
 ## 今後の予定
 
+- [ ] design-system スキル（ARCHITECTURE.md / TECH-STACK.md / ADR / 制約ファイルによる技術選定支援）
+- [ ] UI契約とE2Eテスト生成（define-ui-contract / generate-e2e — VDM-SL traces から Playwright テストを導出）
 - [ ] 評価の再実施（独立した採点者・複数モデルでの追試、変異数を増やしたミューテーションテスト）
 - [ ] 実プロジェクトでの適用事例の収集
 
