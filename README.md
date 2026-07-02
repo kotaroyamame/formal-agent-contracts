@@ -1,72 +1,121 @@
-# Formal Agent Contracts v0.2.0
+# Formal Agent Contracts
 
-マルチエージェント開発における形式手法ツールキット。エージェント間の契約をVDM-SLで定義し、自動検証する。
-
-## v0.2.0の変更点
-
-### 新機能
-
-1. **Phase 2 設計文書の生成支援**
-   - PROTOCOL.md、API-SIGNATURES.mdなどの設計文書テンプレート生成
-   - メッセージ型、ペイロード構造、状態遷移規則の設計書化
-   - 命名規約、API仕様の明示的定義
-   - VDM-SLと並行した設計文書の自動補完
-
-2. **契約テストの自動生成**（新スキル: generate-tests）
-   - VDM-SLの型不変条件 → 型バリデーションテスト
-   - 事前条件/事後条件 → 契約遵守テスト
-   - 設計文書の仕様 → メッセージ型網羅テスト、ペイロード構造テスト
-   - 状態遷移規則 → 状態遷移テスト
-   - 境界値の自動導出 → 境界値テスト
-   - Jest/Vitest互換のテストコード出力
-
-3. **設計文書の完全性チェック**（verify-spec拡張）
-   - PROTOCOL.md、API-SIGNATURES.mdの完全性検証
-   - VDM-SL仕様との一貫性確認
-   - 実装コードとの照合レポート
-
-### 新テンプレート
-
-- パターン6: 設計文書テンプレート — PROTOCOL.md、API-SIGNATURES.mdの生成
-- パターン7: ハイブリッド判定エージェント — スコアリング+閾値判定
-
-## 概要
+**バージョン 2.0.0** ｜ マルチエージェント開発における形式手法ツールキット。エージェント間の契約をVDM-SLで定義し、自動検証する。
 
 形式手法の知識がない開発者でも、Claudeの支援により：
 
 - エージェント間のインターフェースを厳密に定義できる（VDM-SL）
-- **Phase 2設計文書（PROTOCOL.md、API-SIGNATURES.md）を自動生成し、仕様と実装の距離を縮める**（v0.2.0）
-- VDM-SL仕様と設計文書の整合性を自動検証できる
-- 証明責務（Proof Obligation）の意味を理解できる
-- **仕様と設計文書から契約テストを自動生成し、実装との乖離を防止できる**（v0.2.0）
+- Phase 2設計文書（PROTOCOL.md、API-SIGNATURES.md）を生成し、仕様と実装の距離を縮められる
+- VDMJによる構文チェック・型チェック・証明責務（PO）生成を実行できる
+- Z3によるPOの自動証明・反例探索ができる
+- 仕様からTypeScript/Pythonのコードスキャフォールドと契約テストを自動生成できる
+- 既存コードから仕様を逆抽出し、対話で磨き上げ、コードと照合できる（リバースワークフロー）
 
-## スキル一覧
+## インストール
 
-### define-contract（契約定義）
-自然言語でエージェントの役割・入出力を説明すると、VDM-SLの形式仕様に変換する。v0.2.0: Phase 2設計文書（PROTOCOL.md、API-SIGNATURES.md）の生成もガイドする。
+Claude Code のプラグインとしてインストール：
 
-### verify-spec（仕様検証）
-VDMJによる構文チェック・型チェック・PO生成。v0.2.0: 設計文書の完全性チェック、VDM-SL仕様との一貫性確認を追加。
+```
+/plugin marketplace add kotaroyamame/formal-agent-contracts
+/plugin install formal-agent-contracts@formal-agent-contracts
+```
 
-### generate-tests（契約テスト生成）【v0.2.0新規】
-VDM-SL仕様と設計文書の両方から実行可能な契約テスト（Jest/Vitest）を自動生成。
+## スキル一覧（全13スキル）
 
-### formal-methods-guide（形式手法ガイド）
-VDM-SLの文法、型システム、PO種別の背景知識を提供。
+### フォワード開発（仕様 → コード）
 
-## セットアップ
-- Java 11以上
-- VDMJ: https://github.com/nickbattle/vdmj/releases
+| スキル | 説明 |
+|---|---|
+| **define-contract** | 自然言語での対話からVDM-SL契約と設計文書（PROTOCOL.md、API-SIGNATURES.md）を段階的に生成 |
+| **verify-spec** | VDMJによる構文チェック・型チェック・PO生成。設計文書の完全性チェックとVDM-SL仕様との一貫性確認も実行 |
+| **smt-verify** | POをSMT-LIBに変換し、Z3で自動証明・反例探索 |
+| **generate-code** | VDM-SL仕様からTypeScript/Pythonのコードスキャフォールドを生成（事前条件・事後条件・不変式のランタイム検証コード付き） |
+| **generate-tests** | VDM-SL仕様と設計文書からJest/Vitest互換の契約テストを自動生成（型不変式・契約遵守・状態遷移・境界値） |
+| **integrated-workflow** | 定義→検証→証明→コード生成→テストの5フェーズを一気通貫で実行 |
 
-## 開発ロードマップ
-- [x] v0.1.0 — VDM-SL契約テンプレート、構文/型チェック、PO生成と自然言語解説
-- [x] v0.2.0 — Phase 2設計文書（PROTOCOL.md、API-SIGNATURES.md）生成支援、VDM-SL・設計文書からの契約テスト自動生成
-- [ ] v0.3.0 — SMT-LIB自動変換とZ3による証明
-- [ ] v0.4.0 — VDM-SL仕様と設計文書からコードスキャフォールドの自動生成
-- [ ] v1.0.0 — 統合ワークフロー（VDM-SL定義→Phase 2設計→検証→テスト生成→コード生成の一気通貫）
+### リバース開発（既存コード → 仕様）
+
+| スキル | 説明 |
+|---|---|
+| **extract-spec** | 既存コードから暫定VDM-SL仕様を抽出（対話の足場となる仮仕様） |
+| **refine-spec** | 対話を通じて仮仕様を磨き、ユーザーの頭の中にある「真の仕様」を引き出す |
+| **reconcile-code** | 確定した仕様と既存コードを項目ごとに照合し、差分レポート・修正・テストを生成 |
+| **reverse-workflow** | 抽出→洗練→照合のリバースパイプラインを一気通貫で実行（フォワードパイプラインへの接続も可能） |
+
+### 仕様の入出力
+
+| スキル | 説明 |
+|---|---|
+| **import-natural-spec** | 自然言語の仕様書（Markdown）を読み込み、曖昧さを対話で解消しながらVDM-SL仕様へ変換 |
+| **export-human-spec** | VDM-SL仕様から非エンジニアも読める自然言語仕様書（Markdown）を生成 |
+
+### リファレンス
+
+| スキル | 説明 |
+|---|---|
+| **formal-methods-guide** | VDM-SLの文法、型システム、PO種別などの背景知識を提供（他スキルからも参照される） |
+
+## セットアップ（外部ツール）
+
+スキルによって必要な外部ツールが異なります。使うスキルに応じてインストールしてください。
+
+| ツール | 必要とするスキル | 入手先 |
+|---|---|---|
+| Java 11以上 | verify-spec、smt-verify（VDMJの実行に必要） | https://adoptium.net/ |
+| VDMJ | verify-spec、smt-verify | https://github.com/nickbattle/vdmj/releases （`vdmj-suite-*-distribution.zip`）。詳細は [vdmj-setup.md](skills/verify-spec/references/vdmj-setup.md) |
+| Z3 | smt-verify | `pip install z3-solver` または https://github.com/Z3Prover/z3 |
+| Node.js + Vitest/Jest | generate-tests（生成テストの実行） | https://nodejs.org/ |
+
+define-contract、formal-methods-guide、import-natural-spec、export-human-spec などの対話系スキルは外部ツールなしで動作します。
+
+## 使い方
+
+最初のプロンプトの雛形は [prompt-templates.md](prompt-templates.md) を参照してください。単一エージェント定義、マルチエージェント境界契約、統合ワークフロー、既存仕様の形式化、リバースワークフロー、検証・自動証明、契約テスト生成の7テンプレートがあります。
+
+最小の例：
+
+```
+在庫管理エージェントを定義して。
+- 商品には商品ID・商品名・在庫数がある
+- 在庫数は0未満にならない
+- 出荷数は現在の在庫数を超えられない
+```
+
+→ define-contract が対話的に契約を深掘りし、VDM-SL仕様を生成します。その後「検証して」でverify-spec、「テストを生成して」でgenerate-testsへ続きます。
+
+## リポジトリ構成
+
+| パス | 内容 |
+|------|------|
+| `skills/` | 13スキルの定義（各スキルは SKILL.md、多くは references/ 付き） |
+| `examples/` | 動作例（`task-manager`: VDM-SL仕様 → TypeScript実装 → SMT-LIB証明） |
+| `eval/` | 評価フレームワーク（ベンチマーク課題、実行ログ、採点スクリプト、結果） |
+| `design/` | 設計文書（`reverse-workflow-design.md` — リバースワークフローの設計時ドキュメント） |
+| `prompt-templates.md` | ユーザー向けプロンプトテンプレート集 |
+
+## 評価
+
+本プラグインの有無で同一課題（3課題 × 5試行 × 2条件）の成果物を比較した探索的評価を同梱しています。仕様カバレッジ・テスト有効性などで効果を示唆する結果が得られていますが、単一モデルによる生成・ヒューリスティック採点などの方法論的制約があります。結果と限界の詳細は [eval/results/report.md](eval/results/report.md) を参照してください。
+
+## 変更履歴
+
+- **v2.0.0** — Phase 2設計文書（PROTOCOL.md、API-SIGNATURES.md）生成支援、契約テスト自動生成（generate-tests）、設計文書の完全性チェック（verify-spec拡張）
+- **v1.5.0** — import-natural-spec / export-human-spec（自然言語仕様の入出力）
+- **v1.1.0–v1.4.0** — リバースワークフロー（extract-spec、refine-spec、reconcile-code、reverse-workflow）、評価フレームワーク
+- **v1.0.0** — 統合ワークフロー（integrated-workflow）、ドキュメントの日英対応
+- **v0.3.0** — コードスキャフォールド生成（generate-code、TypeScript/Python）
+- **v0.2.0** — SMT-LIB変換とZ3証明（smt-verify）
+- **v0.1.0** — 初版（define-contract、verify-spec、formal-methods-guide）
+
+## 今後の予定
+
+- [ ] 評価の再実施（独立した採点者・複数モデルでの追試、変異数を増やしたミューテーションテスト）
+- [ ] 実プロジェクトでの適用事例の収集
 
 ## 作者
+
 IID Systems (https://iid.systems)
 
 ## ライセンス
-MIT
+
+MIT — [LICENSE](LICENSE) を参照

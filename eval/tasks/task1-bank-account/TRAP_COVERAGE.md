@@ -4,10 +4,10 @@
 This document verifies that all 10 traps are properly covered across all four gold standard files.
 
 ## File Locations
-- `/sessions/kind-funny-sagan/mnt/formal-agent-contracts/eval/tasks/task1-bank-account/prompt.md` (75 lines)
-- `/sessions/kind-funny-sagan/mnt/formal-agent-contracts/eval/tasks/task1-bank-account/traps.json` (166 lines)
-- `/sessions/kind-funny-sagan/mnt/formal-agent-contracts/eval/tasks/task1-bank-account/gold-spec.vdmsl` (224 lines)
-- `/sessions/kind-funny-sagan/mnt/formal-agent-contracts/eval/tasks/task1-bank-account/gold-tests.ts` (671 lines)
+- `eval/tasks/task1-bank-account/prompt.md` (75 lines)
+- `eval/tasks/task1-bank-account/traps.json` (166 lines)
+- `eval/tasks/task1-bank-account/gold-spec.vdmsl` (224 lines)
+- `eval/tasks/task1-bank-account/gold-tests.ts` (671 lines)
 
 ## Trap Coverage Matrix
 

@@ -332,7 +332,7 @@ If skipped, proceed directly to Session Report.
 ## Session Report
 
 After all phases complete (or when the user stops), generate a comprehensive session report.
-See `references/reverse-session-report-template.md` for the full template.
+See `../integrated-workflow/references/session-report-template.md` for the full template.
 
 全フェーズ完了後（またはユーザーが中断した時点で）、包括的なセッションレポートを生成する。
 
@@ -412,8 +412,8 @@ Instead, it:
 
 Reference the individual skill SKILL.md files for phase-specific details:
 - Phase 1: `skills/extract-spec/SKILL.md`
-- Phase 2: `skills/refine-spec/SKILL.md` (to be created)
-- Phase 3: `skills/reconcile-code/SKILL.md` (to be created)
+- Phase 2: `skills/refine-spec/SKILL.md`
+- Phase 3: `skills/reconcile-code/SKILL.md`
 - Phase 4–6: Reuse skills from `skills/integrated-workflow/`
 - Background: `skills/formal-methods-guide/SKILL.md`
 - Human doc export: `skills/export-human-spec/SKILL.md`

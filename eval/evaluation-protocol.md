@@ -281,25 +281,24 @@ eval/
 │   │   ├── prompt.md          # 課題文
 │   │   ├── gold-spec.vdmsl    # 完全仕様
 │   │   ├── gold-tests.ts      # ゴールドテストスイート
-│   │   ├── mutations.ts       # ミューテーション定義
 │   │   └── traps.json         # 埋め込みトラップ定義
+│   │   ※ ミューテーション定義は scripts/mutation-test-runner.ts 内に実装
 │   ├── task2-library/
 │   │   └── ...
 │   └── task3-auction/
 │       └── ...
 ├── runs/
 │   ├── control/               # A群の出力 (5試行×3課題)
-│   │   ├── task1-run1/
-│   │   ├── task1-run2/
+│   │   ├── task1-bank-account-run1/
+│   │   ├── task1-bank-account-run2/
 │   │   └── ...
 │   └── treatment/             # B群の出力 (5試行×3課題)
-│       ├── task1-run1/
+│       ├── task1-bank-account-run1/
 │       └── ...
 ├── scripts/
-│   ├── eval-runner.ts         # 自動評価スクリプト
-│   ├── score-calculator.ts    # スコア集計
-│   ├── mutation-tester.ts     # ミューテーションテスト
-│   └── report-generator.ts   # レポート生成
+│   ├── eval-runner.ts             # 自動評価スクリプト（スコア集計を含む）
+│   ├── mutation-test-runner.ts    # ミューテーションテスト（ミューテーション定義を含む）
+│   └── mutation-test-runner.js    # 同上のJavaScript版
 └── results/
     └── report.md              # 最終レポート
 ```
@@ -356,7 +355,7 @@ eval/
 |------|------|
 | LLMの出力のランダム性 | 各条件5回試行で分散を吸収 |
 | プロンプトの差による不公平 | 課題文は両群完全同一。B群に追加情報を与えない |
-| 評価者バイアス | M1/M5 は二重盲検（条件ラベルを伏せて評価） |
+| 評価者バイアス | M1/M5 は二重盲検（条件ラベルを伏せて評価）を計画。※実施済みの評価（results/report.md）ではキーワードベースの自動スコアリングを使用しており、二重盲検の手動評価およびM5の計測は未実施 |
 | ゴールドスタンダードの恣意性 | 課題設計前にトラップリストを固定。事後追加しない |
 
 ### 外的妥当性

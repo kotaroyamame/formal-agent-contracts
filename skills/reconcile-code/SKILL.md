@@ -138,7 +138,7 @@ For each Bug Finding:
 4. Include the Finding reference and confidence level
 
 Example structure:
-```
+````
 Bug Fix #1: createUser() pre-condition validation missing
 Finding: BUG-001 [Confidence: High]
 Spec requirement: User email must be non-empty string
@@ -161,6 +161,7 @@ function createUser(user: User) {
   return db.insert(user);
 }
 ```
+````
 
 **JP:** コード動作が確認済み仕様と異なり、実行時エラーまたは不正な結果を引き起こす:
 - コードが間違ったロジックを実装

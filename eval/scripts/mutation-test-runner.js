@@ -6,11 +6,12 @@
  */
 
 const fs = require('fs');
+const os = require('os');
 const path = require('path');
 const { execSync } = require('child_process');
 
-const EVAL_ROOT = '/sessions/kind-funny-sagan/mnt/formal-agent-contracts/eval';
-const WORK_DIR = '/sessions/kind-funny-sagan/mutation-test-work';
+const EVAL_ROOT = process.env.EVAL_ROOT || path.resolve(__dirname, '..');
+const WORK_DIR = process.env.WORK_DIR || path.join(os.tmpdir(), 'mutation-test-work');
 
 /**
  * Generate mutations for the given source code

@@ -6,6 +6,7 @@
  */
 
 import * as fs from 'fs';
+import * as os from 'os';
 import * as path from 'path';
 import { execSync } from 'child_process';
 
@@ -46,8 +47,8 @@ interface Mutation {
   description: string;
 }
 
-const EVAL_ROOT = '/sessions/kind-funny-sagan/mnt/formal-agent-contracts/eval';
-const WORK_DIR = '/sessions/kind-funny-sagan/mutation-test-work';
+const EVAL_ROOT = process.env.EVAL_ROOT || path.resolve(__dirname, '..');
+const WORK_DIR = process.env.WORK_DIR || path.join(os.tmpdir(), 'mutation-test-work');
 
 /**
  * Find all source file mutations applicable to the given source code

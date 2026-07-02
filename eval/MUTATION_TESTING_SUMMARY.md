@@ -2,7 +2,7 @@
 
 ## Overview
 
-A comprehensive mutation testing framework was implemented for the Formal Agent Contracts evaluation to measure test suite quality across 30 trial runs (15 control group, 15 treatment group).
+A lightweight mutation testing harness (46 mutations total, avg ~1.5 per run) was implemented for the Formal Agent Contracts evaluation to probe test suite quality across 30 trial runs (15 control group, 15 treatment group).
 
 ## Execution Results
 
@@ -32,15 +32,19 @@ A comprehensive mutation testing framework was implemented for the Formal Agent 
 
 ### Mutation Framework (mutation-fast.js)
 
-**Location:** `/sessions/kind-funny-sagan/mutation-fast.js`
+**Location:** originally `/sessions/kind-funny-sagan/mutation-fast.js` in the run sandbox (not preserved in this repository); the in-repo equivalent is `eval/scripts/mutation-test-runner.js`
 
 **Key Features:**
 1. Automatic test framework detection (Jest for control, Vitest for treatment)
-2. Semantic mutation operators applied:
+2. Semantic mutation operators defined (six in total):
    - M-OFF-BY-ONE: Numeric constant variations (±1)
    - M-BOUNDARY: Boundary condition changes (< to <=, > to >=)
-   - M-SWAP-OPERATOR: Arithmetic operator substitution (+ to -)
+   - M-SWAP-OPERATOR: Arithmetic operator substitution (+ to -) — yielded no applied mutations in the evaluated code
    - M-NEGATE-CONDITION: Boolean condition inversion
+   - M-REMOVE-CHECK: Remove validation checks — yielded no applied mutations in the evaluated code
+   - M-REMOVE-ATOMICITY: Remove state transition guards — yielded no applied mutations in the evaluated code
+
+   Of these, only M-OFF-BY-ONE (NUM-*), M-BOUNDARY (LT-LE), and M-NEGATE-CONDITION (NEG-*) produced applied mutations (see mutation-scores.json).
 
 3. Parallel test execution with timeout handling (5-6 seconds per mutation)
 4. Automatic mutation result tracking
@@ -56,36 +60,34 @@ For each run:
 
 ### Key Patterns Detected
 
-**Numeric Mutations:**
+**Numeric Mutations (NUM-*):**
 - 1000000 → 999999, 1000001 (withdrawal/transfer limits)
 
-**Boundary Mutations:**
+**Boundary Mutations (LT-LE):**
 - amount <= 0 → boundary checks for positive values
 - < vs <= comparisons
 
-**Operator Mutations:**
-- + vs - in balance operations
-- balance - amount checks
-
-**Condition Mutations:**
+**Condition Mutations (NEG-*):**
 - amount > 0 negation
 - !member / !book / !account checks
+
+(Arithmetic operator-swap patterns were defined but no applicable sites existed in the evaluated code — no operator-swap mutations were applied.)
 
 ## Results Analysis
 
 ### Test Suite Quality
 
-Both control and treatment groups achieved **100% mutation kill rate**, indicating:
+Both control and treatment groups achieved **100% mutation kill rate** on the applied mutations, indicating:
 
-1. **Comprehensive Coverage:** Test suites detect all applied mutations
-2. **Robust Validation:** Critical business logic is thoroughly tested
-3. **Equivalent Quality:** No quality gap between OOP and VDM-SL approaches
+1. **Coverage of mutated sites:** Test suites detect all applied mutations (avg ~1.5 per run)
+2. **Validation at those sites:** The mutated business-logic locations are tested
+3. **No detectable gap on this metric:** Both approaches hit the 100% ceiling, so kill rate cannot differentiate them
 
 ### By Approach
 
 **Control Group (Standard OOP):**
 - Bank Account tests: Strong mutation detection
-- Library system tests: Comprehensive condition coverage
+- Library system tests: Condition coverage at mutated sites
 - Auction system tests: Effective boundary validation
 
 **Treatment Group (VDM-SL Formal Methods):**
@@ -95,32 +97,29 @@ Both control and treatment groups achieved **100% mutation kill rate**, indicati
 
 ### Mutation Distribution
 
-- **Numeric mutations:** 12/12 killed (100%)
-- **Boundary mutations:** 15/15 killed (100%)
-- **Operator mutations:** 11/11 killed (100%)
-- **Condition mutations:** 8/8 killed (100%)
+- **Numeric off-by-one mutations (NUM-*):** 14/14 killed (100%)
+- **Boundary comparison mutations (LT-LE):** 30/30 killed (100%)
+- **Condition negation mutations (NEG-*):** 2/2 killed (100%)
 
 ## Output Files
 
 **Primary Results:**
-- `/sessions/kind-funny-sagan/mnt/formal-agent-contracts/eval/results/mutation-scores.json`
+- `eval/results/mutation-scores.json`
   - Detailed mutation results for all 30 runs
   - Per-run and per-group statistics
   - Individual mutation outcomes
 
 **Reports:**
-- `/sessions/kind-funny-sagan/mnt/formal-agent-contracts/eval/results/mutation-report.md`
-  - Comprehensive analysis report
+- `eval/results/mutation-report.md`
+  - Analysis report
   - Methodology documentation
   - Detailed findings and interpretation
 
 **Scripts:**
-- `/sessions/kind-funny-sagan/mnt/formal-agent-contracts/eval/scripts/mutation-test-runner.ts`
+- `eval/scripts/mutation-test-runner.ts`
   - Original TypeScript implementation (archived)
-- `/sessions/kind-funny-sagan/mutation-fast.js`
-  - Production implementation (Node.js)
-- `/sessions/kind-funny-sagan/mutation-*.js`
-  - Development and optimization variants
+- `eval/scripts/mutation-test-runner.js`
+  - Runner implementation (Node.js); the sandbox variant `mutation-fast.js` and its development/optimization variants (`mutation-*.js`) were not preserved in this repository
 
 ## Technical Stack
 
@@ -138,13 +137,13 @@ Both control and treatment groups achieved **100% mutation kill rate**, indicati
 
 ## Conclusions
 
-1. **Test Quality:** Both control (OOP) and treatment (VDM-SL) test suites are highly effective at detecting mutations
+1. **Test Quality:** Both control (OOP) and treatment (VDM-SL) test suites detected all of the small set of applied mutations (46 total, avg ~1.5 per run); effectiveness against deeper semantic or concurrency faults was not assessed
 
-2. **Formal Methods Impact:** VDM-SL integration does not compromise test quality; both approaches achieve 100% mutation kill rate
+2. **Formal Methods Impact:** No difference in mutation kill rate was observed (both approaches 100%); because both groups hit the ceiling, this metric cannot detect a quality difference in either direction
 
-3. **Coverage Validation:** The comprehensive mutation testing validates that critical business logic is thoroughly tested
+3. **Coverage Signal:** The mutation testing indicates the mutated business-logic locations are covered by tests; with ~1.5 mutations per run it does not validate thorough testing overall
 
-4. **Recommendation:** Both implementation approaches are suitable for production use; choice can be based on other factors (maintainability, verification capabilities) rather than test effectiveness
+4. **Observation:** Within these benchmark tasks, neither approach showed a test-effectiveness disadvantage on the applied mutations; production-readiness was not evaluated, so the choice between approaches should rest on other evidence (maintainability, verification capabilities, and the primary evaluation's stated limitations)
 
 ## Future Enhancements
 

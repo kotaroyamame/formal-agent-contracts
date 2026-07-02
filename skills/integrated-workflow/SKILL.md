@@ -1,3 +1,19 @@
+---
+name: integrated-workflow
+description: >
+  Orchestrate the full formal development pipeline end-to-end:
+  Define (VDM-SL contract) → Verify (VDMJ) → Prove (Z3, optional) → Generate (TS/Python code)
+  → Test (contract tests), with automated handoff between phases, error recovery,
+  and a final session report. Each phase invokes an existing skill
+  (define-contract, verify-spec, smt-verify, generate-code, generate-tests).
+  Triggered by: "run the full workflow", "end-to-end development",
+  "define and generate code for an agent", or when the user requests multiple phases in sequence.
+  Japanese triggers: 「統合ワークフローで開発したい」「一気通貫で」「エンドツーエンドで」
+  「定義から生成まで」「全フェーズ実行して」
+metadata:
+  version: "2.0.0"
+---
+
 # Integrated Workflow — End-to-End Formal Agent Development
 
 ## Overview

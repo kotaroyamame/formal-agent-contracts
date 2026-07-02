@@ -2,3 +2,5 @@
 *.plugin
 node_modules/
 .env
+*.class
+*.jar

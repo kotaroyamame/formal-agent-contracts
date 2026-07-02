@@ -54,7 +54,7 @@ This directory contains the gold standard benchmark files for Task 2 of the form
 
 ### Execution Notes
 
-- VDM-SL spec can be validated with VDMJ tool: `vdmj -check gold-spec.vdmsl`
+- VDM-SL spec can be validated with VDMJ tool: `java -jar vdmj-4.7.0.jar -vdmsl gold-spec.vdmsl`
 - Jest tests execute with: `jest gold-tests.ts`
 - All tests pass against the gold reference implementation
 - Test structure mirrors trap IDs for traceability

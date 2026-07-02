@@ -10,9 +10,9 @@
 
 ## Executive Summary
 
-Mutation testing was applied to all 30 trial runs from the Formal Agent Contracts evaluation to assess the fault-detection capability of generated test suites. Both control and treatment groups achieved a **100% mutation kill rate** (46/46 mutations killed), confirming that AI-generated tests — with or without formal specification guidance — are effective at detecting the mutation types tested.
+Mutation testing was applied to all 30 trial runs from the Formal Agent Contracts evaluation to assess the fault-detection capability of generated test suites. Both control and treatment groups achieved a **100% mutation kill rate** (46/46 mutations killed). Given the small mutation set (avg 1.5 per run) and the uniform ceiling, this indicates that AI-generated tests — with or without formal specification guidance — catch these shallow mutation types, but it provides no discriminative power between the groups (see Limitations).
 
-A notable secondary finding: the treatment group detected **more mutations per run** (1.67 vs 1.40) and identified **additional mutation types** not caught by the control group, suggesting that formal specification-guided development produces code with more explicit, testable boundary conditions.
+A secondary observation: **more mutations were applicable to treatment code per run** (1.67 vs 1.40), and some mutation types (e.g., NEG-amount) had applicable sites only in treatment code. This reflects properties of the generated code (more mutable boundary/validation sites) rather than superior test detection, and is consistent with — though not independent confirmation of — more explicit, testable boundary conditions.
 
 ---
 
@@ -20,12 +20,12 @@ A notable secondary finding: the treatment group detected **more mutations per r
 
 ### Mutation Operators
 
-Six semantic mutation operators were applied to source code:
+Six semantic mutation operators were defined; per mutation-scores.json, only three produced applicable mutations in the evaluated code (numeric off-by-one NUM-*, boundary comparison LT-LE, condition negation NEG-*). M-REMOVE-CHECK, M-SWAP-OPERATOR, and M-REMOVE-ATOMICITY yielded no applied mutations:
 
 | Operator | Description | Example |
 |----------|-------------|---------|
-| M-BOUNDARY | Replace boundary constants with 1 | `1000000` → `1` |
-| M-OFF-BY-ONE | Change `<` to `<=` or vice versa | `balance < limit` → `balance <= limit` |
+| M-OFF-BY-ONE | Change numeric constants by ±1 | `1000000` → `999999` / `1000001` |
+| M-BOUNDARY | Change `<` to `<=` or vice versa | `balance < limit` → `balance <= limit` |
 | M-REMOVE-CHECK | Delete guard conditions | Remove `if (amount < 0) throw` |
 | M-SWAP-OPERATOR | Replace arithmetic operators | `+` → `-` |
 | M-NEGATE-CONDITION | Invert boolean conditions | `isActive` → `!isActive` |
@@ -110,7 +110,7 @@ For each of the 30 runs:
 | Kill Rate | 100% | 100% |
 | Unique Mutation Types | 2 (NUM, LT-LE) | **3 (NUM, LT-LE, NEG)** |
 
-Treatment runs produced code with more mutable boundary conditions. The `NEG-amount` mutation type (negation of the amount parameter in validation) appeared exclusively in 2/5 treatment runs, indicating that formal specifications led to more explicit parameter validation in the generated code.
+Treatment runs produced code with more mutable boundary conditions. The `NEG-amount` mutation type (negation of the amount parameter in validation) appeared exclusively in 2/5 treatment runs, which is consistent with — though at n=5 not sufficient to establish — formal specifications leading to more explicit parameter validation in the generated code.
 
 ### Task 2: Library System (Medium Complexity)
 
@@ -121,7 +121,7 @@ Treatment runs produced code with more mutable boundary conditions. The `NEG-amo
 | Kill Rate | 100% | 100% |
 | Unique Mutation Types | 2 (NUM, LT-LE) | 1 (LT-LE) |
 
-Task 2 showed similar performance. The control group detected one numeric constant mutation (NUM-3600000-1) that treatment did not, likely due to implementation differences in timeout handling.
+Task 2 showed similar performance. One numeric constant mutation (NUM-3600000-1) was applicable only to control code — treatment code had no matching site, likely due to implementation differences in timeout handling.
 
 ### Task 3: Auction System (High Complexity)
 
@@ -132,7 +132,7 @@ Task 2 showed similar performance. The control group detected one numeric consta
 | Kill Rate | 100% | 100% |
 | NUM boundary hits | 1/5 (20%) | **3/5 (60%)** |
 
-Treatment runs detected boundary constant mutations more consistently in the auction timeout logic (NUM-300000-1 in 3/5 runs vs NUM-60000-1 in 1/5 control runs), suggesting that formal specs produced more explicit boundary definitions.
+Numeric-constant mutations were applicable more consistently in treatment runs' auction timeout logic (NUM-300000-1 in 3/5 runs vs NUM-60000-1 in 1/5 control runs), suggesting that formal specs produced more explicit boundary definitions in the generated code.
 
 ---
 
@@ -140,9 +140,9 @@ Treatment runs detected boundary constant mutations more consistently in the auc
 
 ### Primary Finding: Tests Are Functionally Sound
 
-The 100% kill rate for both groups validates that AI-generated test suites are effective at detecting injected mutations. This is a **positive baseline result** confirming the overall quality of generated code from both conditions.
+The 100% kill rate for both groups shows that the generated test suites detected all 46 injected mutations (avg 1.5 per run). This is a **positive baseline result**, but the small mutation count and the ceiling effect (see Limitations) mean it neither measures overall code quality nor differentiates the two conditions.
 
-### Secondary Finding: Treatment Detects Broader Mutation Surface
+### Secondary Finding: Treatment Code Exposes a Broader Mutation Surface
 
 | Metric | Control | Treatment | Difference |
 |--------|---------|-----------|------------|
@@ -156,15 +156,15 @@ The treatment group's broader mutation surface suggests that formal specificatio
 
 | Primary Metric | Primary Result | Mutation Testing Support |
 |---------------|----------------|--------------------------|
-| M1 (Correctness) | +11.9pp | Both groups kill all mutations — correctness confirmed |
-| M2 (Spec Coverage) | +42.8pp | Treatment detects more diverse mutation types |
+| M1 (Correctness) | +11.8pp | Both groups kill all applied mutations — no group difference detectable on this metric due to the 100% ceiling |
+| M2 (Spec Coverage) | +42.8pp | More diverse mutation types applicable to treatment code — a property of the generated code |
 | M4 (Explicitness) | +91.1pp | Not directly measured by mutation testing |
-| M6 (Test Structure) | +20.3pp | Higher mutations/run indicates broader test targeting |
+| M6 (Test Structure) | +20.3pp | More applicable mutation sites per run in treatment code — a property of the generated code, not direct evidence of broader test targeting |
 
 ### Limitations
 
 1. **Ceiling effect**: 100% kill rate prevents differentiation on this metric alone
-2. **Limited mutation operators**: 6 operators applied; semantic/concurrency mutations could reveal larger differences
+2. **Limited mutation operators**: 6 operators defined but only 3 produced applicable mutations; semantic/concurrency mutations could reveal larger differences
 3. **Small mutation count per run**: Avg 1.5 mutations limits statistical power
 4. **Framework differences**: Jest (control) vs Vitest (treatment) could affect mutation applicability
 
@@ -172,7 +172,7 @@ The treatment group's broader mutation surface suggests that formal specificatio
 
 ## Conclusion
 
-The mutation testing phase validates that both control and treatment groups produce test suites capable of catching injected bugs (100% kill rate). The treatment group's advantage manifests not in kill rate but in **breadth of mutation detection**: more mutations found per run (1.67 vs 1.40, +19.3%) and detection of additional mutation types (NEG-amount). This supports the primary evaluation's findings, particularly M2 (Spec Coverage +42.8pp) and M6 (Test Structure +20.3pp), confirming that formal specification-guided development produces more thorough and explicit code.
+The mutation testing phase shows that both control and treatment groups produce test suites that caught all 46 injected mutations (100% kill rate); because both groups hit this ceiling, the metric does not discriminate between them. A secondary observation — more applicable mutation sites per run in treatment code (1.67 vs 1.40, +19.3%) and additional applicable mutation types (NEG-amount) — is directionally consistent with the primary evaluation's findings, particularly M2 (Spec Coverage +42.8pp) and M6 (Test Structure +20.3pp), but it reflects the structure of the generated code rather than test quality, and does not independently confirm that formal specification-guided development produces more thorough and explicit code.
 
 ---
 

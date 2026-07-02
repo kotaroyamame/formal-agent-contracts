@@ -10,7 +10,7 @@ All 4 required gold standard files have been created successfully.
 ================================================================================
 FILE 1: prompt.md (Task Specification)
 ================================================================================
-Location: /sessions/kind-funny-sagan/mnt/formal-agent-contracts/eval/tasks/task2-library/prompt.md
+Location: eval/tasks/task2-library/prompt.md
 Size: 55 lines
 Content:
   ✓ Task description (Japanese)
@@ -29,7 +29,7 @@ Business Rules Covered:
 ================================================================================
 FILE 2: traps.json (Trap Scenarios)
 ================================================================================
-Location: /sessions/kind-funny-sagan/mnt/formal-agent-contracts/eval/tasks/task2-library/traps.json
+Location: eval/tasks/task2-library/traps.json
 Size: 205 lines, 12 trap definitions
 Content:
   ✓ All 12 traps (T2-01 through T2-12)
@@ -58,7 +58,7 @@ Category Breakdown:
 ================================================================================
 FILE 3: gold-spec.vdmsl (Formal Specification)
 ================================================================================
-Location: /sessions/kind-funny-sagan/mnt/formal-agent-contracts/eval/tasks/task2-library/gold-spec.vdmsl
+Location: eval/tasks/task2-library/gold-spec.vdmsl
 Size: 445 lines, 5 VDM-SL modules
 Content:
   ✓ Type definitions (Book, Member, Loan)
@@ -117,7 +117,7 @@ Trap Coverage in Spec:
 ================================================================================
 FILE 4: gold-tests.ts (Test Suite)
 ================================================================================
-Location: /sessions/kind-funny-sagan/mnt/formal-agent-contracts/eval/tasks/task2-library/gold-tests.ts
+Location: eval/tasks/task2-library/gold-tests.ts
 Size: 1022 lines, 45 test cases (organized into ~15 describe blocks)
 Content:
   ✓ Type definitions matching VDM-SL
@@ -240,7 +240,7 @@ KEY DESIGN DECISIONS
 FILE LOCATIONS
 ================================================================================
 
-/sessions/kind-funny-sagan/mnt/formal-agent-contracts/eval/tasks/task2-library/
+eval/tasks/task2-library/
 ├── prompt.md                    (55 lines)
 ├── traps.json                   (205 lines, 12 traps)
 ├── gold-spec.vdmsl              (445 lines, 5 modules)
