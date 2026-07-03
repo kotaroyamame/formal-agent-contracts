@@ -1,6 +1,6 @@
 # Formal Agent Contracts
 
-**バージョン 2.1.0** ｜ マルチエージェント開発における形式手法ツールキット。エージェント間の契約をVDM-SLで定義し、自動検証する。
+**バージョン 2.2.0** ｜ マルチエージェント開発における形式手法ツールキット。エージェント間の契約をVDM-SLで定義し、自動検証する。
 
 形式手法の知識がない開発者でも、Claudeの支援により：
 
@@ -11,6 +11,7 @@
 - 仕様の型・不変条件からDBスキーマ（DDL）を導出し、乖離（DEVIATIONS）と担保箇所（TRACEABILITY）を記録できる
 - 仕様からTypeScript/Pythonのコードスキャフォールドと契約テストを自動生成できる
 - 既存コードから仕様を逆抽出し、対話で磨き上げ、コードと照合できる（リバースワークフロー）
+- モジュールごとに「能力が足りる範囲で最も軽いモデル」を割り振り、生成フェーズのトークン消費を抑えられる（契約駆動モデルルーティング、v2.2.0）
 
 ## インストール
 
@@ -21,7 +22,7 @@ Claude Code のプラグインとしてインストール：
 /plugin install formal-agent-contracts@formal-agent-contracts
 ```
 
-## スキル一覧（全14スキル）
+## スキル一覧（全15スキル）
 
 ### フォワード開発（仕様 → コード）
 
@@ -34,6 +35,7 @@ Claude Code のプラグインとしてインストール：
 | **generate-code** | VDM-SL仕様からTypeScript/Pythonのコードスキャフォールドを生成（事前条件・事後条件・不変式のランタイム検証コード付き） |
 | **generate-tests** | VDM-SL仕様と設計文書からJest/Vitest互換の契約テストを自動生成（型不変式・契約遵守・状態遷移・境界値） |
 | **integrated-workflow** | 定義→検証→証明→コード生成→テストの5フェーズを一気通貫で実行 |
+| **route-models** | 契約の客観的な複雑度シグナル（暗黙的定義・不変条件・PO件数など）からモジュールごとに能力が足りる範囲で最も軽いモデル層（light/standard/heavy）を割り振り、生成フェーズのトークン消費を削減。検証ゲートは不変で、同一モジュールで2回検証に失敗した場合のみ自動で1層エスカレーション |
 
 ### リバース開発（既存コード → 仕様）
 
@@ -90,7 +92,7 @@ define-contract、formal-methods-guide、import-natural-spec、export-human-spec
 
 | パス | 内容 |
 |------|------|
-| `skills/` | 14スキルの定義（各スキルは SKILL.md、多くは references/ 付き） |
+| `skills/` | 15スキルの定義（各スキルは SKILL.md、多くは references/ 付き） |
 | `examples/` | 動作例（`task-manager`: VDM-SL仕様 → TypeScript実装 → SMT-LIB証明） |
 | `eval/` | 評価フレームワーク（ベンチマーク課題、実行ログ、採点スクリプト、結果） |
 | `design/` | 設計文書（`reverse-workflow-design.md` — リバースワークフローの設計時ドキュメント） |
@@ -102,6 +104,7 @@ define-contract、formal-methods-guide、import-natural-spec、export-human-spec
 
 ## 変更履歴
 
+- **v2.2.0** — 契約駆動モデルルーティング（route-models）：契約の客観的な複雑度シグナルからモジュールごとに能力が足りる範囲で最も軽いモデル層（light/standard/heavy）を割り振り、生成フェーズのトークン消費を削減。検証ゲートは不変で、同一モジュールで2回検証に失敗した場合のみ自動で1層エスカレーション
 - **v2.1.0** — DBスキーマ導出（generate-db-schema）：型・不変条件→DDLの規則的写像（R1〜R18）、retrenchment に基づく乖離記録（DEVIATIONS）、不変条件の担保箇所対照表（TRACEABILITY）
 - **v2.0.0** — Phase 2設計文書（PROTOCOL.md、API-SIGNATURES.md）生成支援、契約テスト自動生成（generate-tests）、設計文書の完全性チェック（verify-spec拡張）
 - **v1.5.0** — import-natural-spec / export-human-spec（自然言語仕様の入出力）

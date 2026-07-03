@@ -8,7 +8,7 @@ description: >
   Also responds to Japanese: 「仕様からコードを生成して」「TypeScriptに変換して」等。
   Generates runtime verification code for pre-conditions, post-conditions, and invariants.
 metadata:
-  version: "0.3.0"
+  version: "0.4.0"
 ---
 
 # Code Generation from VDM-SL Specifications
@@ -36,6 +36,29 @@ If the user hasn't specified, ask with AskUserQuestion:
 - Both
 
 ユーザーが明示しない場合、AskUserQuestionで確認する。
+
+### Step 2.5: Check for Model Routing (optional, token saving)
+
+If a `model-routing.json` (produced by the `route-models` skill) exists next to the spec file:
+
+- Process each module as a **separate subagent with the module's assigned model**
+  (Claude Code: the Task tool's `model` parameter). Read the tier → model mapping
+  from the routing file — never hard-code model names.
+- Modules not listed in the file use `defaults.tier`.
+- Verification is unchanged: generated code must pass the same gates as without
+  routing. If a module's output fails its gate twice, escalate one tier,
+  regenerate, append to `escalation.history`, and add the same row to the
+  "Escalations" section of `MODEL-ROUTING.md`
+  (see the `route-models` skill, `references/routing-rules.md`).
+- If the runtime does not support per-subagent model selection, present the
+  routing table as a recommendation and continue normally. Never fail the phase
+  because routing is unavailable.
+
+仕様ファイルの隣に `model-routing.json`（`route-models` スキルの成果物）があれば、
+モジュールごとに割り当てモデルのサブエージェントで生成する（層→モデル対応は必ず
+ファイルから読む）。検証はルーティング無しのときと同一で、同一モジュールが2回
+失敗したら1層上げて再生成し、escalation.history と MODEL-ROUTING.md の両方に追記する。モデル指定が使えない環境では
+推奨表の提示に留め、通常どおり進める。
 
 ### Step 3: VDM-SL → Code Conversion
 

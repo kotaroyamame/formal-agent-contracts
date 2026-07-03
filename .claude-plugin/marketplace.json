@@ -6,14 +6,14 @@
   },
   "metadata": {
     "description": "Formal methods toolkit for multi-agent development using VDM-SL",
-    "version": "2.1.0"
+    "version": "2.2.0"
   },
   "plugins": [
     {
       "name": "formal-agent-contracts",
       "source": "./",
-      "description": "Formal methods toolkit for multi-agent development: define agent contracts in VDM-SL, generate Phase 2 design documents (PROTOCOL.md, API-SIGNATURES.md), verify specifications, auto-prove with Z3, derive database schemas (DDL) with deviation tracking and invariant traceability, generate code scaffolds with runtime contract checks, auto-generate contract tests from specs and design documents, run end-to-end integrated workflows, reverse-engineer specifications from existing code, import natural language specs to VDM-SL, and export human-readable specification documents. Includes an evaluation harness with benchmark tasks and exploratory comparative results (single-model, heuristic scoring; see eval/ for methodology and limitations).",
-      "version": "2.1.0",
+      "description": "Formal methods toolkit for multi-agent development: define agent contracts in VDM-SL, generate Phase 2 design documents (PROTOCOL.md, API-SIGNATURES.md), verify specifications, auto-prove with Z3, derive database schemas (DDL) with deviation tracking and invariant traceability, generate code scaffolds with runtime contract checks, auto-generate contract tests from specs and design documents, run end-to-end integrated workflows, route each module to the lightest capable model tier to cut token cost (contract-driven model routing with verification-gated escalation), reverse-engineer specifications from existing code, import natural language specs to VDM-SL, and export human-readable specification documents. Includes an evaluation harness with benchmark tasks and exploratory comparative results (single-model, heuristic scoring; see eval/ for methodology and limitations).",
+      "version": "2.2.0",
       "author": {
         "name": "IID Systems",
         "email": "info@iid.systems"
@@ -21,7 +21,7 @@
       "homepage": "https://iid.systems/formal-agent-contracts/",
       "repository": "https://github.com/kotaroyamame/formal-agent-contracts",
       "license": "MIT",
-      "keywords": ["formal-methods", "vdm-sl", "multi-agent", "contracts", "verification", "proof-obligations", "code-generation", "test-generation", "design-documents", "protocol-specification", "integrated-workflow", "reverse-engineering", "natural-language-import", "spec-export", "evaluation", "benchmarks"],
+      "keywords": ["formal-methods", "vdm-sl", "multi-agent", "contracts", "verification", "proof-obligations", "code-generation", "test-generation", "design-documents", "protocol-specification", "integrated-workflow", "model-routing", "token-optimization", "reverse-engineering", "natural-language-import", "spec-export", "evaluation", "benchmarks"],
       "category": "engineering",
       "tags": ["formal-methods", "specification", "verification", "multi-agent", "vdm-sl", "z3", "code-generation"]
     }
